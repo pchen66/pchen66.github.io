@@ -161,8 +161,8 @@
 			var controls;
 			var monitor_video, monitor_texture;
 			var monitor_source = new Array();
-			monitor_source[0] = ["textures/sintel.mp4","textures/sintel.ogv"];
-			monitor_source[1] = ["../ChromeExperiment/video/ironman3.mp4","../ChromeExperiment/video/ironman3.ogv"];
+			monitor_source[0] = ["textures/video/sintel.mp4","textures/video/sintel.ogv"];
+			monitor_source[1] = ["textures/video/ironman3.mp4","textures/video/ironman3.ogv"];
 			var Mindex = 1;
 			
 			//CSS3D HTML Page
@@ -188,7 +188,7 @@
 			//Model
 			var loader = new THREE.ColladaLoader();
 			loader.options.convertUpAxis = true;
-			loader.load( 'model/iphone4s/iphone4s.dae', function ( collada ) {
+			loader.load( 'iphone4s/iphone4s.dae', function ( collada ) {
 
 				iphone4S = collada.scene;
 
