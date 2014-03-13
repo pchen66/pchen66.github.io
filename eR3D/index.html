@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>eR3D</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link href='http://fonts.googleapis.com/css?family=Lato:300' rel='stylesheet' type='text/css'>
+
+		<style>
+			*{
+				font-family: 'Lato', Arial, sans-serif;
+			}
+			
+			body {			
+				background-color: #0f0f0f;
+				margin: 0px;
+				overflow: hidden;
+			}
+			
+			#menu{
+				position: absolute;				
+				width: 100%;
+				text-align: center;
+				bottom: 20px;
+				z-Index: 10;
+			}
+			
+			.controlbutton{
+				background: transparent;
+				background-repeat:no-repeat;
+				background-size:100% 100%;				
+				border: 0px;
+				width: 128px;
+				height: 128px;
+				cursor: pointer;
+			}
+			
+			#device_rotateZ_button{
+				float:left;
+				background-image: url("img/devicerotate2.png");
+			}
+			
+			#device_content_change_button{
+				float:left;
+				background-image: url("img/devicecontentchange2.png");
+			}
+			
+			#device_rotateY_button{
+				float:left;
+				background-image: url("img/devicerotateY2.png");
+			}
+			
+			#device_content_wave{
+				float:left;
+				background-image: url("img/devicewave2.png");
+			}
+			
+			#menu_HTML{
+				position: absolute;
+				width: 128px;
+				height: 128px;
+				top: 0;
+				right: 0;		
+				z-Index: 19;
+			}
+			
+			#device_content_html{			
+				background-image: url("img/deviceHTML_off.png");
+			}
+
+			.controlbutton:hover{
+				opacity: 0.8;
+			}
+			
+			#urlbar{
+				position: absolute;
+				width: 100%;
+				bottom: 5px;
+				z-Index: 20;
+				text-align: center;
+				visibility: hidden;
+			}
+			
+			#urlbar_input{
+				width: 30%;
+				height: 30px;
+				border: 3px solid #ffffff;
+				border-radius: 2px;
+				background: transparent;
+				color: #ffffff;
+				box-shadow: 0px 0px 15px #ffffff;
+				font-size: 20pt;
+			}
+			
+			#urlbar_submit{
+				width: 100px;
+				height: 42px;
+				border: 2px solid #ffffff;
+				border-radius: 2px;
+				background: transparent;
+				color: #ffffff;
+				box-shadow: 0px 0px 15px #ffffff;
+				font-size: 22pt;
+				
+				cursor: pointer;
+			}
+			
+			#urlbar_submit:hover{
+				background: #777777;
+			}
+		</style>
+	</head>
+	<body>
+		
+		<video id="video" style="display:none" autoplay loop></video>
+			
+		<!-- UI Controls !-->
+		<div id="menu">
+			<div class="controlbutton" id="device_rotateZ_button"></div>
+			<div class="controlbutton" id="device_content_change_button"></div>
+			<div class="controlbutton" id="device_rotateY_button"></div>
+			<div class="controlbutton" id="device_content_wave"></div>			
+		</div>
+		
+		<div id="menu_HTML">
+			<div class="controlbutton" id="device_content_html"></div>
+		</div>
+			
+		<div id="urlbar">
+			<input type="text" id="urlbar_input" placeholder="www.ebay.com"></input>
+			<button id="urlbar_submit">GO</button>
+		</div>
+
+		<script src="../js/THREE/three.min.js"></script>
+		<script src="../js/THREE/renderers/CSS3DRenderer.js"></script>
+
+		<script src="../js/THREE/controls/OrbitControls.js"></script>
+		<script src="../js/THREE/loaders/ColladaLoader.js"></script>
+		<script src="../js/THREE/libs/tween.min.js"></script>
+		<script src="../js/THREE/Detector.js"></script>
+		<script>
+
+			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
+			var container, stats;
+
+			var camera, scene, renderer, objects;
+			var renderer2, scene2;
+			var particleLight, SpotLight;
+			var iphone4S, skin;
+
+			//Camera
+			var paused = false;
+			var last = new Date().getTime();
+			var down = false;
+			var sx = 0, sy = 0;
+			var rotation = Math.PI/2;
+			var vertical_move = 100;
+			
+			//Scene
+			var controls;
+			var monitor_video, monitor_texture;
+			var monitor_source = new Array();
+			monitor_source[0] = ["textures/sintel.mp4","textures/sintel.ogv"];
+			monitor_source[1] = ["../ChromeExperiment/video/ironman3.mp4","../ChromeExperiment/video/ironman3.ogv"];
+			var Mindex = 1;
+			
+			//CSS3D HTML Page
+			var projector;
+			var mouseX, mouseY;
+			var css3dHTMLPage, fakeplane;
+			var isInHTMLMode = false;
+			
+			//Model
+			var ScreenMesh, ScreenMeshCopy;
+			var iphone4S_screen_panel,iphone4S_screen_texture, ipad;
+			var DeviceRotateY = false;
+			var skin;
+			var isMonsterOut = false;
+			var appleLogo, appleGeo, appleMat;
+			
+			//3D Wave
+			var CUBE_WIDTH = 17;
+			var CUBES;
+			var CubeTopVertices = [0,2,5,7];
+			var AnimationTween = [];
+			
+			//Model
+			var loader = new THREE.ColladaLoader();
+			loader.options.convertUpAxis = true;
+			loader.load( 'model/iphone4s/iphone4s.dae', function ( collada ) {
+
+				iphone4S = collada.scene;
+
+				iphone4S.scale.x = iphone4S.scale.y = iphone4S.scale.z = 18;
+				iphone4S.position.set(0,-30,0);
+				iphone4S.rotation.set(0,Math.PI,0);		
+				
+				var childrens = iphone4S.getDescendants();
+				for(var i = 0;i < childrens.length;i++){
+					if( childrens[i].material != undefined ){
+						//console.log(childrens[i].name);
+
+						switch( childrens[i].name ){
+						case "Main":
+							childrens[i].material.materials[0].color = new THREE.Color(0xf0f0f0);
+							childrens[i].material.materials[0].metal = true;
+							appleMat = childrens[i].material.materials[0].clone();
+							break;
+						case "Screen":
+							ScreenMesh = childrens[i];
+							ScreenMeshCopy = ScreenMesh.clone();
+							// Trailers Texture
+							monitor_video = document.getElementById('video');
+							setVideoSource();
+							monitor_texture = new THREE.Texture( monitor_video );
+							monitor_texture.minFilter = THREE.LinearFilter;
+							monitor_texture.magFilter = THREE.LinearFilter;
+							monitor_texture.format = THREE.RGBFormat;
+							monitor_texture.generateMipmaps = false;
+							
+							childrens[i].material.map = monitor_texture;
+
+							break;
+						case "Description":
+							childrens[i].material.materials[0].map = THREE.ImageUtils.loadTexture("textures/iphonebackcover.png");
+							childrens[i].material.materials[0].depthWrite = false;
+							break;
+						case "Home":			
+							childrens[i].material.materials[0].map = THREE.ImageUtils.loadTexture("textures/button.png");
+							childrens[i].material.materials[0].depthWrite = false;
+							childrens[i].material.materials[0].side = THREE.DoubleSide;
+							break;
+						case "Apple_Logo":
+							appleGeo = childrens[i].geometry.clone();
+							break;
+						}						
+						
+					}
+				}
+				
+				
+				
+				CUBES = new THREE.Object3D();
+				CUBE_WIDTH = CUBE_WIDTH/iphone4S.scale.x;
+				for(var i=0;i<8;i++){
+					for(var j=0; j<5;j++){
+						var cube = new THREE.Mesh(new THREE.CubeGeometry(CUBE_WIDTH*iphone4S.scale.x,CUBE_WIDTH*iphone4S.scale.x,0.1), appleMat);
+						cube.position.set(-3.7*CUBE_WIDTH+CUBE_WIDTH*i+i/20, -2.1*CUBE_WIDTH+CUBE_WIDTH*j+j/20,0.01);
+						cube.scale.set(1/iphone4S.scale.x,1/iphone4S.scale.y,1/iphone4S.scale.z);
+						cube.geometry.verticesNeedUpdate = true;
+						cube.visible = false;
+						CUBES.add( cube );
+						
+						// Tween
+						for(var number in CubeTopVertices){							
+							
+							var tweenUp	= new TWEEN.Tween( cube.geometry.vertices[CubeTopVertices[number]] )
+								.to({z: 30}, 2350)
+								.easing( TWEEN.Easing.Bounce.Out)
+								.delay(i*50)
+
+							var tweenDown = new TWEEN.Tween( cube.geometry.vertices[CubeTopVertices[number]] )
+								.to({z: 0}, 500)
+								.easing( TWEEN.Easing.Elastic.In)
+								
+							// after tweenHead do tweenBack
+							tweenUp.chain(tweenDown);
+							// after tweenBack do tweenHead, so it is cycling
+							tweenDown.chain(tweenUp);
+
+							AnimationTween.push( tweenDown );	
+							
+						}
+						
+					}
+				}	
+				ScreenMesh.add( CUBES );
+
+				init();
+				animate();
+			} );			
+			
+			function init() {
+
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
+
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
+				camera.position.set( 0, 0, 300 );				
+				
+				scene = new THREE.Scene();		
+
+				// Add the COLLADA
+
+				scene.add( iphone4S );				
+
+				/*SpotLight = new THREE.SpotLight( 0xffffff, 3, 500, true);
+				SpotLight.position = camera.position.clone();
+				SpotLight.target = iphone4S;
+				scene.add( SpotLight );*/
+				
+				var plight = new THREE.PointLight(0xffffff, 0.7);
+				plight.position = camera.position;
+				scene.add(plight);
+				
+
+				
+				var scaleFacotr = 11;
+				
+				fakeplane = new THREE.Mesh(new THREE.PlaneGeometry(93,148,3,4), new THREE.MeshBasicMaterial({color: 0x000000, opacity: 0, transparent: true}));
+				fakeplane.position.set(0,3,8.3);
+				fakeplane.name = "fakeplane";
+				//scene.add( fakeplane );
+				
+				scene2 = new THREE.Scene();
+				var element = document.createElement( 'div' );
+				element.style.width = scaleFacotr * 93 + "px";
+				element.style.height = scaleFacotr * 148 + "px";
+				
+				var iframe_element = document.createElement( 'iframe' );
+				iframe_element.style.width = "100%";
+				iframe_element.style.height = "100%";
+				iframe_element.style.border = 0;
+				iframe_element.src = "http://pojuichen.com";
+				element.appendChild( iframe_element );
+				
+				css3dHTMLPage = new THREE.CSS3DObject( element );
+				css3dHTMLPage.position = fakeplane.position;
+				css3dHTMLPage.rotation = fakeplane.rotation;
+				css3dHTMLPage.scale.multiplyScalar( 1 / scaleFacotr );				
+				//scene2.add( css3dHTMLPage );		
+				
+				projector = new THREE.Projector();
+				
+				renderer = new THREE.WebGLRenderer( {antialias: true });
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.domElement.style.position = 'absolute';
+				renderer.domElement.style.zIndex = 2;
+				container.appendChild( renderer.domElement );		
+
+				renderer2 = new THREE.CSS3DRenderer();
+				renderer2.setSize( window.innerWidth, window.innerHeight );
+				renderer2.domElement.style.position = 'absolute';
+				renderer2.domElement.style.top = 0;
+				renderer2.domElement.style.zIndex = 1;
+				container.appendChild( renderer2.domElement );			
+
+				// Controls
+				controls = new THREE.OrbitControls( camera, renderer.domElement );
+				controls.noPan = true;
+				controls.addEventListener( 'change', render );						
+
+				window.addEventListener( 'resize', onWindowResize, false );
+				
+				//3D Model Manipulation
+				document.getElementById('device_rotateZ_button').addEventListener( 'click', onDeviceRotateZ, false);
+				document.getElementById('device_content_change_button').addEventListener( 'click', onDeviceContentChange, false);
+				document.getElementById('device_rotateY_button').addEventListener( 'click', onDeviceRotateY, false);
+				document.getElementById('device_content_wave').addEventListener( 'click', onDeviceWave, false);
+				document.getElementById('device_content_html').addEventListener( 'click', onDeviceHTML, false);
+				
+				//Url Navigation
+				document.getElementById('urlbar_submit').addEventListener('click', onUrlChange, false);
+				
+				document.addEventListener('mousemove', onDocumentMouseMove, false);
+				
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer2.setSize( window.innerWidth, window.innerHeight );
+			}
+			
+			function onDocumentMouseMove( event ){
+				mouseX = event.clientX;
+				mouseY = event.clientY;
+				// If mouseover on the HTML page (fakeplane)
+				renderer2.domElement.style.zIndex = 1;
+				var vector = new THREE.Vector3( ( mouseX / window.innerWidth ) * 2 - 1, - ( mouseY / window.innerHeight ) * 2 + 1, 0.5 );
+				projector.unprojectVector( vector, camera );
+				var raycaster = new THREE.Raycaster(camera.position, vector.sub( camera.position ).normalize() );			
+				var intersects = raycaster.intersectObjects( scene.children, true );
+				
+				document.getElementById('urlbar_input').focus();
+				if ( intersects.length > 0 ) {
+					if( intersects[0].object.name == "fakeplane" ){
+						renderer2.domElement.style.zIndex = 3;
+						document.getElementById('urlbar_input').blur();
+					}
+				}
+			}
+			
+			function onDeviceRotateZ(){		
+				var rotateToZ;
+				if( iphone4S.rotation.z != 0 ){
+					rotateToZ = 0;
+					controls.target = scene.position;
+				}
+				else{
+					rotateToZ = -Math.PI / 2;
+					controls.target = iphone4S.position;
+				}
+				new TWEEN.Tween( iphone4S.rotation )
+				.to({z: rotateToZ}, 500)
+				.easing( TWEEN.Easing.Elastic.Out )
+				.start();
+			}
+			
+			function onDeviceRotateY(){
+				DeviceRotateY = !DeviceRotateY;
+			}
+			
+			function onDeviceContentChange(){
+				hideWaveAnimation( true );
+				setVideoSource();
+			}
+			
+			function onDeviceWave(){
+				hideWaveAnimation( false );
+				
+				for( var i=0;i<AnimationTween.length;i++){
+					AnimationTween[i].start();
+				}
+				
+				//ScreenMesh.material = new 
+			}
+			
+			function onDeviceHTML(){
+				
+				if( !isInHTMLMode ){
+					//Reset
+					hideWaveAnimation( true );
+					iphone4S.rotation.y = Math.PI;
+					iphone4S.rotation.z = 0;
+					camera.position.set( 0, 0, 300 );
+					controls.target = scene.position;
+					
+					DeviceRotateY = false;
+					document.getElementById('device_rotateZ_button').style.visibility = "hidden";
+					document.getElementById('device_content_change_button').style.visibility = "hidden";
+					document.getElementById('device_rotateY_button').style.visibility = "hidden";
+					document.getElementById('device_content_wave').style.visibility = "hidden";	
+					isInHTMLMode = true;
+					scene.add( fakeplane );
+					scene2.add( css3dHTMLPage );
+					renderer2.domElement.style.opacity = 1;
+				}			
+				else{
+					document.getElementById('device_rotateZ_button').style.visibility = "visible";
+					document.getElementById('device_content_change_button').style.visibility = "visible";
+					document.getElementById('device_rotateY_button').style.visibility = "visible";
+					document.getElementById('device_content_wave').style.visibility = "visible";	
+					isInHTMLMode = false;
+					controls.target = iphone4S.position;
+					scene.remove( fakeplane );
+					scene2.remove( css3dHTMLPage );
+					renderer2.domElement.style.opacity = 0;
+				}
+
+				//change top right image
+				if( document.getElementById('device_content_html').style.backgroundImage.indexOf("deviceHTML_on") != -1 ){
+					document.getElementById('device_content_html').style.backgroundImage = "url('img/deviceHTML_off.png')";
+					document.getElementById('urlbar').style.visibility = "hidden";	
+				}
+				else{
+					document.getElementById('device_content_html').style.backgroundImage = "url('img/deviceHTML_on.png')";
+					document.getElementById('urlbar').style.visibility = "visible";	
+				}
+				
+			}
+			
+			function hideWaveAnimation( bool ){
+				
+				for( var i=0;i<AnimationTween.length;i++){
+					AnimationTween[i].stop();
+				}
+				
+				//can be done better
+				if (monitor_video.canPlayType("video/mp4")) {
+					monitor_video.setAttribute("src", monitor_source[0][0]);
+					monitor_video.pause();
+				}
+				else{
+					monitor_video.setAttribute("src", monitor_source[0][1]);
+					monitor_video.pause();
+				}
+				
+				var childrenArray = CUBES.getDescendants();
+				for(var i=0; i<childrenArray.length;i++){
+					childrenArray[i].visible = !bool;
+				}
+			}
+			
+			function setVideoSource(){
+				if( Mindex == 0)
+					Mindex = 1;
+				else
+					Mindex = 0;
+				if (monitor_video.canPlayType("video/mp4")) {
+					monitor_video.setAttribute("src", monitor_source[Mindex][0]);
+				}
+				else{
+					monitor_video.setAttribute("src", monitor_source[Mindex][1]);
+				}
+				
+				monitor_video.play();
+			}			
+			
+			function onUrlChange(){
+				var UrlString = document.getElementById('urlbar_input').value;
+
+				if( UrlString.indexOf("http://") == 0)
+					css3dHTMLPage.element.children[0].src = UrlString;
+				else
+					css3dHTMLPage.element.children[0].src = "http://" + UrlString;
+				
+				
+				
+			}
+
+			function animate() {		
+
+				requestAnimationFrame( animate );
+				
+				render();
+				controls.update();
+				TWEEN.update();
+			}
+			
+			var clock = new THREE.Clock();
+			
+			
+			function render() {
+
+				// Update Video Texture
+				if ( monitor_video.readyState === monitor_video.HAVE_ENOUGH_DATA ) {
+					
+					if ( monitor_texture ) monitor_texture.needsUpdate = true;
+				}	
+				
+				if( DeviceRotateY ){
+					iphone4S.rotation.y += Math.PI/360;
+				}
+				
+				if( CUBES.children.length > 0 ){
+					for(var i=0;i< CUBES.children.length;i++){
+						CUBES.children[i].geometry.verticesNeedUpdate = true;
+					}
+				}
+				
+				renderer.render( scene, camera );	
+				if( isInHTMLMode )
+					renderer2.render( scene2, camera );
+				
+				
+			}
+
+		</script>
+	</body>
+</html>
