@@ -7,15 +7,15 @@ Feel free to report any problem you've found
 
 #Current Projects
 
-*##*3D Assembly*
+* ##*3D Assembly*
 ###Assembly 3D models piece by piece
 
-*##*eR3D*
+* ##*eR3D*
 ###Mix HTML with 3D objects
 
-*##*Periodic Table*
+* ##*Periodic Table*
 ###A tweak from Three.JS example with element events and transitions
 
-*##*Ironman*
+* ##*Ironman*
 ###Reconstructed and inspired from Tony Stark's lab in the movie "Ironman"
 
