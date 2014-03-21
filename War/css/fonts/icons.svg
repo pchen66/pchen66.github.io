@@ -1,0 +1,39 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd" >
+<svg xmlns="http://www.w3.org/2000/svg">
+<metadata>
+Created by FontForge 20100429 at Mon Jun 18 09:28:34 2012
+ By root
+Copyright (C) 2012 by original authors @ fontello.com
+</metadata>
+<defs>
+<font id="icons" horiz-adv-x="928" >
+  <font-face 
+    font-family="fontello"
+    font-weight="500"
+    font-stretch="normal"
+    units-per-em="1000"
+    panose-1="2 0 6 9 0 0 0 0 0 0"
+    ascent="800"
+    descent="-200"
+    cap-height="654"
+    bbox="18 -70 911 711"
+    underline-thickness="50"
+    underline-position="-100"
+    unicode-range="U+0041-0042"
+  />
+<missing-glyph 
+d="M33 0v666h265v-666h-265zM66 33h199v600h-199v-600z" />
+    <glyph glyph-name=".notdef" 
+d="M33 0v666h265v-666h-265zM66 33h199v600h-199v-600z" />
+    <glyph glyph-name=".null" horiz-adv-x="0" 
+ />
+    <glyph glyph-name="nonmarkingreturn" 
+ />
+    <glyph glyph-name="A" unicode="A" 
+d="M464.5 654q68.5 0 140 -34t124 -82.5t95 -96.5t64.5 -83l23 -34l-24 -37q-15 -23 -63 -81t-97 -103t-121.5 -81.5t-141 -36.5t-140 34.5t-124 84.5t-95.5 100.5t-64 85.5l-23 34q8 14 23 36t63 79t97.5 101t122 79t141 35zM464.5 96q92.5 0 158 65.5t65.5 158t-65.5 158
+t-158 65.5t-158 -65.5t-65.5 -158t65.5 -158t158 -65.5zM353 319.5q0 111.5 111.5 111.5t111.5 -111.5t-111.5 -111.5t-111.5 111.5z" />
+    <glyph glyph-name="B" unicode="B" 
+d="M464 603q78 108 200 108q102 0 174.5 -72.5t72.5 -176.5v-20l-447 -512l-446 512v20q0 102 72.5 175.5t175.5 73.5q120 0 198 -108z" />
+  </font>
+</defs></svg>

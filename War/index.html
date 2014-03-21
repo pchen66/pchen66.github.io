@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>Web Media Evolution</title>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"> 
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+        <meta name="author" content="Ray Chen" />
+        <link rel="stylesheet" type="text/css" href="css/demo.css" />
+        <link rel="stylesheet" type="text/css" href="css/style5.css" />
+        <link href='http://fonts.googleapis.com/css?family=Lato:300' rel='stylesheet' type='text/css' />
+		
+		<script type="text/javascript" src="js/modernizr.custom.69142.js"></script> 
+		<script type="text/javascript" src="js/three.min.js"></script> 
+		<script src="js/tracking.js"></script>
+		<script src="js/libs/JSARToolKit.min.js"></script>
+		<script src="js/libs/threex.jsartoolkit.js"></script>
+		
+    </head>
+    <body>
+        <div class="container">
+			
+			<header>
+			
+				<h1><span>Web Media Evolution</span></h1>
+				
+			</header>
+
+            <div id="grid" class="main">
+			
+				<div class="title">Image</div>	
+				<img class="view image" />				
+				
+				<div class="title">Video</div>
+				<iframe class="view video" src="http://www.youtube.com/embed/SNgNBsCI4EA?feature=player_embedded&vq=hd1080" frameborder="0" allowfullscreen></iframe>
+
+				<div class="title">Panorama</div>	
+				<a href="http://lmc.gatech.edu/~pchen66/Heery/android.html"><img class="view panorama" /></a>
+				
+				<div class="title">Augmented Reality</div>
+				<div class="view" id="arpreview">		
+					<div class="view-back">
+						<span data-icon="A">566</span>
+						<span data-icon="B">124</span>
+						<span></span>
+						<span>Augmented Reality</span>
+						<span> Team Fortress 2</span>
+						<span> Engineer</span>
+						<a href="http://www.teamfortress.com/classes.php?class=engineer">&rarr;</a>
+					</div>
+					<img src="images/engineer_ar_logo.jpg" />
+				</div>
+				
+				<div id="arcontainer" >
+					<video class="ar" id="arwindow"></video>
+				</div>
+
+			</div>
+        </div>
+		<script type="text/javascript">	
+			
+			Modernizr.load({
+				test: Modernizr.csstransforms3d && Modernizr.csstransitions,
+				yep : ['http://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js','js/jquery.hoverfold.js'],
+				nope: 'css/fallback.css',
+				callback : function( url, result, key ) {
+						
+					if( url === 'js/jquery.hoverfold.js' ) {
+						$( '#grid' ).hoverfold();
+					}
+
+				}
+			});
+			
+			var ARWindow = document.getElementById('arwindow');
+			var ARTracking, renderer;
+			var displayModel, clock;
+			
+			document.getElementById('arpreview').addEventListener('click', onAR, false );
+			
+			function onAR(){
+				
+				this.style.display = 'none';
+				ARWindow.style.display = 'inline';
+				
+				navigator.getUserMedia || (navigator.getUserMedia = navigator.mozGetUserMedia || navigator.webkitGetUserMedia || navigator.msGetUserMedia);
+				
+				if( navigator.userAgent.match(/Chrome/i) && navigator.userAgent.match(/Android/i) && !navigator.userAgent.match(/Opera/i)){	//for Chrome Android
+					var videoSources = [];	
+					MediaStreamTrack.getSources(function(media_sources) {
+						media_sources.forEach(function(media_source){
+						  if (media_source.kind === 'video') {
+							videoSources.push(media_source);
+						  }
+						});
+
+						var video_setting = {video: 
+						{
+							mandatory: {
+								minWidth: window.innerWidth
+							},
+							optional: [
+								{ facingMode: "environment" },
+								{ sourceId: videoSources[videoSources.length-1].id },
+							]
+						}
+					};
+					//GetUserMedia on Video
+					if(navigator.getUserMedia) {
+						navigator.getUserMedia(
+							video_setting, 
+							setCamStream, 
+							function(e) {
+								switch(e.name){
+								case 'PERMISSION_DENIED':
+								case 'PermissionDeniedError':
+									alert('Permission Error: Please reload the page and allow the camera access. On desktop: click on the camera icon on address bar; on mobile chrome: Settings>Content settings>Website settings>allow the site to access camera', true);		
+									break;
+								}	
+							});
+					}
+				});
+				}
+				else{															//for Firefox Android
+					var video_setting = {video: 
+						{
+							mandatory: {
+								minWidth: 1920,
+								minHeight: 1080
+							},
+							optional: [
+								{ facingMode: "environment" }
+							]
+						}
+					};
+					//GetUserMedia on Video
+					if(navigator.getUserMedia) {
+						//navigator.getUserMedia ( constraints, successCallback, errorCallback );
+						navigator.getUserMedia(
+							video_setting, 
+							setCamStream, 
+							function(e) {
+								switch(e.name){
+								case 'PERMISSION_DENIED':
+								case 'PermissionDeniedError':
+									alert('Permission Error: Please reload the page and allow the camera access. On desktop: click on the camera icon on address bar; on mobile chrome: Settings>Content settings>Website settings>allow the site to access camera', true);		
+									break;
+								}				
+							});
+					}
+				}
+			}
+			
+			function setCamStream(stream){
+				
+				//Live Video
+				var video = document.getElementById('arwindow');
+				video.src = window.URL.createObjectURL(stream);
+				video.autoplay = true;	
+				video.play();
+
+				//Initiate 3D Scene
+				ARTracking = new MarkerTracking( video );
+				
+				clock = new THREE.Clock();
+				
+				var webglDetector = ( function () { try { return !! window.WebGLRenderingContext && !! document.createElement( 'canvas' ).getContext( 'experimental-webgl' ); } catch( e ) { return false; } } );
+				renderer = (webglDetector()) ? new THREE.WebGLRenderer({antialias : true}) : new THREE.CanvasRenderer();;
+				renderer.setSize(video.clientWidth, 554);
+				renderer.domElement.style.position = 'absolute';
+				renderer.domElement.style.margin = '8px';
+				
+				document.getElementById('arcontainer').appendChild(renderer.domElement);
+				
+				animate();
+			}
+			
+			function animate() {
+
+				requestAnimationFrame(animate);				
+				render();
+			}
+			
+			function render(){
+			
+				if( displayModel && displayModel.needsUpdate ){
+					var delta = 0.75 * clock.getDelta();
+					THREE.AnimationHandler.update( delta );
+				}
+					
+				if( ARTracking ){
+					ARTracking.jsartoolkit.update();
+					renderer.render(ARTracking.trackScene, ARTracking.trackCamera);
+				}
+			}
+		</script>
+    </body>
+</html>
