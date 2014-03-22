@@ -33,7 +33,7 @@ a{
 }
 .ar{
 	height: initial !important;
-	width: 1000px !important;
+	width: 100% !important;
 	border: 8px solid #fff;
 	position: absolute;
 }

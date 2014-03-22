@@ -35,21 +35,10 @@
 				<iframe class="view video" src="http://www.youtube.com/embed/SNgNBsCI4EA?feature=player_embedded&vq=hd1080" frameborder="0" allowfullscreen></iframe>
 
 				<div class="title">Panorama</div>	
-				<a href="http://tinyurl.com/ne4flsj"><img class="view panorama" /></a>
+				<a href="http://lmc.gatech.edu/~pchen66/Heery/android.html"><img class="view panorama" /></a>
 				
 				<div class="title">Augmented Reality</div>
-				<div class="view" id="arpreview">		
-					<div class="view-back">
-						<span data-icon="A">566</span>
-						<span data-icon="B">124</span>
-						<span></span>
-						<span>Augmented Reality</span>
-						<span> Team Fortress 2</span>
-						<span> Engineer</span>
-						<a href="http://www.teamfortress.com/classes.php?class=engineer">&rarr;</a>
-					</div>
-					<img src="images/engineer_ar_logo.jpg" />
-				</div>
+				<img id="arpreview" class="view image" src="images/engineer_ar_logo.jpg" />
 				
 				<div id="arcontainer" >
 					<video class="ar" id="arwindow"></video>
@@ -77,6 +66,8 @@
 			var displayModel, clock;
 			
 			document.getElementById('arpreview').addEventListener('click', onAR, false );
+			
+			window.addEventListener('resize', onWindowResize, false);
 			
 			function onAR(){
 				
@@ -158,6 +149,18 @@
 				video.src = window.URL.createObjectURL(stream);
 				video.autoplay = true;	
 				video.play();
+				video.addEventListener('timeupdate', CameraSetup, false);	//for video height is not correctly given from browser DOM
+			}
+			
+			function CameraSetup(){
+			
+				//Live Video
+				var video = document.getElementById('arwindow');
+
+				if( ARTracking != undefined ){
+					video.removeEventListener('timeupdate', CameraSetup, false);
+					return;
+				}
 
 				//Initiate 3D Scene
 				ARTracking = new MarkerTracking( video );
@@ -165,14 +168,19 @@
 				clock = new THREE.Clock();
 				
 				var webglDetector = ( function () { try { return !! window.WebGLRenderingContext && !! document.createElement( 'canvas' ).getContext( 'experimental-webgl' ); } catch( e ) { return false; } } );
-				renderer = (webglDetector()) ? new THREE.WebGLRenderer({antialias : true}) : new THREE.CanvasRenderer();;
-				renderer.setSize(video.clientWidth, 554);
+				renderer = (webglDetector()) ? new THREE.WebGLRenderer({antialias : false}) : new THREE.CanvasRenderer();;
+				renderer.setSize(video.clientWidth, video.clientHeight);
 				renderer.domElement.style.position = 'absolute';
 				renderer.domElement.style.margin = '8px';
 				
 				document.getElementById('arcontainer').appendChild(renderer.domElement);
 				
 				animate();
+			}
+			
+			function onWindowResize(){		
+				if(renderer)
+					renderer.setSize(document.getElementById('arwindow').clientWidth, document.getElementById('arwindow').clientHeight);
 			}
 			
 			function animate() {

@@ -27,7 +27,7 @@ THREEx.JSARToolKit	= function(opts){
 	this._debug		= opts.debug !== undefined ? opts.debug : false;
 	this._canvasRasterW	= opts.canvasRasterW	|| this._srcElement.width;
 	this._canvasRasterH	= opts.canvasRasterH	|| this._srcElement.height;
-	this._maxAge		= opts.maxAge		|| 3;
+	this._maxAge		= opts.maxAge		|| 10;
 	this._trackCamera	= opts.camera;
 
 	this._markers		= {};

@@ -19,7 +19,7 @@ MarkerTracking = function(sourceElement, mainWorld){
 		threshold	: this.threshold,
 		camera		: this.trackCamera,
 		canvasRasterW	: this.srcElement.clientWidth,
-		canvasRasterH	: 554,
+		canvasRasterH	: this.srcElement.clientHeight,
 		debug		: false,
 		callback	: function(event){
 			//console.log("event", event.type, event.markerId);
