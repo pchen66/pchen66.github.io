@@ -650,7 +650,11 @@
 					.onComplete(function(){
 						var mov = (document.getElementById(selectedIndex).getElementsByClassName('movieclip'))[0];		
 						if(rot_y == Math.PI ){		//***Warning: All the movies belong to http://periodictable.com/ , Please do not misuse it***//
-							mov.innerHTML = '<embed src="movie/e'+(parseInt(selectedIndex) + 1)+'.mov" bgcolor="black" pluginspage="http://www.apple.com/quicktime/download/" width="100%" height="100%" type="video/quicktime" cache="true" controller="false" autostart="true">';
+							if(parseInt(selectedIndex)<18)
+								mov.innerHTML = '<embed src="movie/e'+(parseInt(selectedIndex) + 1)+'.mov" bgcolor="black" pluginspage="http://www.apple.com/quicktime/download/" width="100%" height="100%" type="video/quicktime" cache="true" controller="false" autostart="true">';
+							else
+								mov.innerHTML = '<embed src="movie/e'+(parseInt(selectedIndex) + 1)+'.MOV" bgcolor="black" pluginspage="http://www.apple.com/quicktime/download/" width="100%" height="100%" type="video/quicktime" cache="true" controller="false" autostart="true">';
+							
 							mov.isPlaying = true;
 							mov.style.display = 'block';
 						}
