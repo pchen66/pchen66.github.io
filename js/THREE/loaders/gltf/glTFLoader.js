@@ -4,6 +4,8 @@
 
 
 THREE.glTFLoader = function (showStatus) {
+	this.useBufferGeometry = (THREE.glTFLoader.useBufferGeometry !== undefined ) ?
+			THREE.glTFLoader.useBufferGeometry : true;
     this.meshesRequested = 0;
     this.meshesLoaded = 0;
     this.pendingMeshes = [];
@@ -84,8 +86,12 @@ THREE.glTFLoader.prototype.load = function( url, callback ) {
 
     var ClassicGeometry = function() {
 
-        this.geometry = new THREE.BufferGeometry;
-
+    	if (theLoader.useBufferGeometry) {
+    		this.geometry = new THREE.BufferGeometry;
+    	}
+    	else {
+    		this.geometry = new THREE.Geometry;
+    	}
         this.totalAttributes = 0;
         this.loadedAttributes = 0;
         this.indicesLoaded = false;
@@ -98,6 +104,42 @@ THREE.glTFLoader.prototype.load = function( url, callback ) {
     };
 
     ClassicGeometry.prototype.constructor = ClassicGeometry;
+
+    ClassicGeometry.prototype.buildArrayGeometry = function() {
+
+    	// Build indexed mesh
+        var geometry = this.geometry;
+        var normals = geometry.normals;
+        var indexArray = this.indexArray;
+        var uvs = this.uvs;
+        var a, b, c;
+        var i, l;
+        var faceNormals = null;
+        var faceTexcoords = null;
+        
+        for(i = 0, l = this.indexArray.length; i < l; i += 3) {
+            a = indexArray[i];
+            b = indexArray[i+1];
+            c = indexArray[i+2];
+            if(normals) {
+                faceNormals = [normals[a], normals[b], normals[c]];
+            }
+            geometry.faces.push( new THREE.Face3( a, b, c, faceNormals, null, null ) );
+            if(uvs) {
+                geometry.faceVertexUvs[0].push([ uvs[a], uvs[b], uvs[c] ]);
+            }
+        }
+
+        // Allow Three.js to calculate some values for us
+        geometry.computeBoundingBox();
+        geometry.computeBoundingSphere();
+        geometry.computeCentroids();
+        geometry.computeFaceNormals();
+        if(!normals) {
+            geometry.computeVertexNormals();
+        }
+
+    }
 
     ClassicGeometry.prototype.buildBufferGeometry = function() {
         // Build indexed mesh
@@ -121,7 +163,12 @@ THREE.glTFLoader.prototype.load = function( url, callback ) {
     ClassicGeometry.prototype.checkFinished = function() {
         if(this.indexArray && this.loadedAttributes === this.totalAttributes) {
         	
-        	this.buildBufferGeometry();
+        	if (theLoader.useBufferGeometry) {
+        		this.buildBufferGeometry();
+        	}
+        	else {
+        		this.buildArrayGeometry();
+        	}
         	
             this.finished = true;
 
@@ -268,8 +315,12 @@ THREE.glTFLoader.prototype.load = function( url, callback ) {
     }
     
     VertexAttributeDelegate.prototype.resourceAvailable = function(glResource, ctx) {
-
-    	this.bufferResourceAvailable(glResource, ctx);
+    	if (theLoader.useBufferGeometry) {
+    		this.bufferResourceAvailable(glResource, ctx);
+    	}
+    	else {
+    		this.arrayResourceAvailable(glResource, ctx);
+    	}
     	
         var geom = ctx.geometry;
         geom.loadedAttributes++;
@@ -1043,14 +1094,13 @@ THREE.glTFLoader.prototype.load = function( url, callback ) {
 
                 var m = description.matrix;
                 if(m) {
+                    threeNode.matrixAutoUpdate = false;
                     threeNode.applyMatrix(new THREE.Matrix4(
                         m[0],  m[4],  m[8],  m[12],
                         m[1],  m[5],  m[9],  m[13],
                         m[2],  m[6],  m[10], m[14],
                         m[3],  m[7],  m[11], m[15]
-                    ));
-                    threeNode.matrixAutoUpdate = false;
-                    threeNode.matrixWorldNeedsUpdate = true;
+                    ));                    
                 }
                 else {
                 	var t = description.translation;
@@ -1070,7 +1120,6 @@ THREE.glTFLoader.prototype.load = function( url, callback ) {
                 	var matrix = new THREE.Matrix4;
                 	matrix.compose(position, rotation, scale);
                     threeNode.matrixAutoUpdate = false;
-                    threeNode.matrixWorldNeedsUpdate = true;
                     threeNode.applyMatrix(matrix);                    
                 }
 
@@ -1216,8 +1265,7 @@ THREE.glTFLoader.prototype.load = function( url, callback ) {
         	                            
                                     	threeMesh.boneInverses = [];
         	                            var jointsIds = skin.jointsIds;
-        	                            var bones = [];
-        	                            var boneInverses = [];
+        	                            var joints = [];
         	                            var i, len = jointsIds.length;
         	                            for (i = 0; i < len; i++) {
         	                            	var jointId = jointsIds[i];
@@ -1226,7 +1274,8 @@ THREE.glTFLoader.prototype.load = function( url, callback ) {
         	                                if (joint) {
         	                                	
         	                                	joint.skin = threeMesh;
-        	                                    bones.push(joint);
+        	                                    joints.push(joint);
+        	                                    threeMesh.bones.push(joint);
         	                                    
         	                                    var m = skin.inverseBindMatrices;
         	                    	            var mat = new THREE.Matrix4(
@@ -1235,14 +1284,13 @@ THREE.glTFLoader.prototype.load = function( url, callback ) {
         	                                            m[i * 16 + 2],  m[i * 16 + 6],  m[i * 16 + 10], m[i * 16 + 14],
         	                                            m[i * 16 + 3],  m[i * 16 + 7],  m[i * 16 + 11], m[i * 16 + 15]
         	                                        );
-        	                                    boneInverses.push(mat);
+        	                                    threeMesh.boneInverses.push(mat);
+        	                                    threeMesh.pose();
         	                                    
         	                                } else {
         	                                    console.log("WARNING: jointId:"+jointId+" cannot be found in skeleton:"+skeleton);
         	                                }
         	                            }
-
-                                        threeMesh.bind(new THREE.Skeleton(bones, boneInverses, false));
                                     }
                                     
                                     if (threeMesh) {

@@ -16,6 +16,12 @@ THREE.CSS3DObject = function ( element ) {
 
 			this.element.parentNode.removeChild( this.element );
 
+			for ( var i = 0, l = this.children.length; i < l; i ++ ) {
+
+				this.children[ i ].dispatchEvent( event );
+
+			}
+
 		}
 
 	} );
@@ -42,11 +48,6 @@ THREE.CSS3DRenderer = function () {
 	var _widthHalf, _heightHalf;
 
 	var matrix = new THREE.Matrix4();
-	
-	var cache = {
-		camera: { fov: 0, style: '' },
-		objects: {}
-	};
 
 	var domElement = document.createElement( 'div' );
 	domElement.style.overflow = 'hidden';
@@ -172,18 +173,11 @@ THREE.CSS3DRenderer = function () {
 			}
 
 			var element = object.element;
-			var cachedStyle = cache.objects[ object.id ];
 
-			if ( cachedStyle === undefined || cachedStyle !== style ) {
-
-				element.style.WebkitTransform = style;
-				element.style.MozTransform = style;
-				element.style.oTransform = style;
-				element.style.transform = style;
-
-				cache.objects[ object.id ] = style;
-
-			}
+			element.style.WebkitTransform = style;
+			element.style.MozTransform = style;
+			element.style.oTransform = style;
+			element.style.transform = style;
 
 			if ( element.parentNode !== cameraElement ) {
 
@@ -205,16 +199,10 @@ THREE.CSS3DRenderer = function () {
 
 		var fov = 0.5 / Math.tan( THREE.Math.degToRad( camera.fov * 0.5 ) ) * _height;
 
-		if ( cache.camera.fov !== fov ) {
-
-			domElement.style.WebkitPerspective = fov + "px";
-			domElement.style.MozPerspective = fov + "px";
-			domElement.style.oPerspective = fov + "px";
-			domElement.style.perspective = fov + "px";
-
-			cache.camera.fov = fov;
-
-		}
+		domElement.style.WebkitPerspective = fov + "px";
+		domElement.style.MozPerspective = fov + "px";
+		domElement.style.oPerspective = fov + "px";
+		domElement.style.perspective = fov + "px";
 
 		scene.updateMatrixWorld();
 
@@ -225,16 +213,10 @@ THREE.CSS3DRenderer = function () {
 		var style = "translate3d(0,0," + fov + "px)" + getCameraCSSMatrix( camera.matrixWorldInverse ) +
 			" translate3d(" + _widthHalf + "px," + _heightHalf + "px, 0)";
 
-		if ( cache.camera.style !== style ) {
-
-			cameraElement.style.WebkitTransform = style;
-			cameraElement.style.MozTransform = style;
-			cameraElement.style.oTransform = style;
-			cameraElement.style.transform = style;
-			
-			cache.camera.style = style;
-
-		}
+		cameraElement.style.WebkitTransform = style;
+		cameraElement.style.MozTransform = style;
+		cameraElement.style.oTransform = style;
+		cameraElement.style.transform = style;
 
 		renderObject( scene, camera );
 

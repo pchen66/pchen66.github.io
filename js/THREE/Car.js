@@ -274,7 +274,7 @@ THREE.Car = function () {
 
 				scope.wheelDiameter = bb.max.y - bb.min.y;
 
-				scope.wheelGeometry.center();
+				THREE.GeometryUtils.center( scope.wheelGeometry );
 
 			}
 

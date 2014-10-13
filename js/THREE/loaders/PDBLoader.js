@@ -2,28 +2,75 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.PDBLoader = function ( manager ) {
-
-	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
-
-};
+THREE.PDBLoader = function () {};
 
 THREE.PDBLoader.prototype = {
 
-	constructor: THREE.PDBLoader,
+	constructor: THREE.OBJLoader,
 
-	load: function ( url, onLoad ) {
+	load: function ( url, callback ) {
 
-		var scope = this;
+		var worker, scope = this;
 
-		var loader = new THREE.XHRLoader( scope.manager );
-		loader.setCrossOrigin( this.crossOrigin );
-		loader.load( url, function ( text ) {
+		this.loadAjaxPDB( this, url, callback );
 
-			var json = scope.parsePDB( text );
-			scope.createModel( json, onLoad );
+	},
 
-		} );
+	loadAjaxPDB: function ( context, url, callback, callbackProgress ) {
+
+		var xhr = new XMLHttpRequest();
+
+		var length = 0;
+
+		xhr.onreadystatechange = function () {
+
+			if ( xhr.readyState === xhr.DONE ) {
+
+				if ( xhr.status === 200 || xhr.status === 0 ) {
+
+					if ( xhr.responseText ) {
+
+						var json = context.parsePDB( xhr.responseText );
+						context.createModel( json, callback );
+
+					} else {
+
+						console.warn( "THREE.PDBLoader: [" + url + "] seems to be unreachable or file there is empty" );
+
+					}
+
+				} else {
+
+					console.error( "THREE.PDBLoader: Couldn't load [" + url + "] [" + xhr.status + "]" );
+
+				}
+
+			} else if ( xhr.readyState === xhr.LOADING ) {
+
+				if ( callbackProgress ) {
+
+					if ( length === 0 ) {
+
+						length = xhr.getResponseHeader( "Content-Length" );
+
+					}
+
+					callbackProgress( { total: length, loaded: xhr.responseText.length } );
+
+				}
+
+			} else if ( xhr.readyState === xhr.HEADERS_RECEIVED ) {
+
+				length = xhr.getResponseHeader( "Content-Length" );
+
+			}
+
+		};
+
+		xhr.open( "GET", url, true );
+		if ( xhr.overrideMimeType ) xhr.overrideMimeType( "text/plain; charset=x-user-defined" );
+		xhr.setRequestHeader( "Content-Type", "text/plain" );
+		xhr.send( null );
 
 	},
 
@@ -67,7 +114,7 @@ THREE.PDBLoader.prototype = {
 					// doesn't really work as almost all PDBs
 					// have just normal bonds appearing multiple
 					// times instead of being double/triple bonds
-					// bonds[bhash[h]][2] += 1;
+					//bonds[bhash[h]][2] += 1;
 
 				}
 
@@ -147,7 +194,6 @@ THREE.PDBLoader.prototype = {
 			var r = atom[ 3 ][ 0 ] / 255;
 			var g = atom[ 3 ][ 1 ] / 255;
 			var b = atom[ 3 ][ 2 ] / 255;
-
 			var color = new THREE.Color();
 			color.setRGB( r, g, b );
 
@@ -172,7 +218,7 @@ THREE.PDBLoader.prototype = {
 
 		}
 
-		callback( geometryAtoms, geometryBonds, json );
+		callback( geometryAtoms, geometryBonds );
 
 	}
 

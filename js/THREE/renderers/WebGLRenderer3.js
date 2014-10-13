@@ -426,7 +426,7 @@ THREE.WebGLRenderer3 = function ( parameters ) {
 	var objectsOpaque = [];
 	var objectsTransparent = [];
 
-	var projectObject = function ( object ) {
+	var projectObject = function ( object, camera ) {
 
 		if ( object.visible === false ) return;
 
@@ -461,7 +461,7 @@ THREE.WebGLRenderer3 = function ( parameters ) {
 
 		for ( var i = 0, l = object.children.length; i < l; i ++ ) {
 
-			projectObject( object.children[ i ] );
+			projectObject( object.children[ i ], camera );
 
 		}
 
@@ -610,7 +610,7 @@ THREE.WebGLRenderer3 = function ( parameters ) {
 		currentMaterial = undefined;
 		currentProgram = undefined;
 
-		projectObject( scene );
+		projectObject( scene, camera );
 
 		if ( objectsOpaque.length > 0 ) {
 

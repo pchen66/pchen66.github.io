@@ -149,12 +149,9 @@
 			// reset Transformations
 
 			this.traverse(function ( child ) {
-				if (child instanceof THREE.Mesh) {
-					child.updateMatrix();
-
+				if (child instanceof THREE.Mesh) {			
 					var tempGeometry = new THREE.Geometry();
-					tempGeometry.merge( child.geometry, child.matrix );
-
+					THREE.GeometryUtils.merge( tempGeometry, child );
 					child.geometry = tempGeometry;
 					child.position.set( 0, 0, 0 );
 					child.rotation.set( 0, 0, 0 );
@@ -218,9 +215,7 @@
 		var arrowGeometry = new THREE.Geometry();
 		var mesh = new THREE.Mesh( new THREE.CylinderGeometry( 0, 0.05, 0.2, 12, 1, false ) );
 		mesh.position.y = 0.5;
-		mesh.updateMatrix();
-
-		arrowGeometry.merge( mesh.geometry, mesh.matrix );
+		THREE.GeometryUtils.merge( arrowGeometry, mesh );
 		
 		var lineXGeometry = new THREE.Geometry();
 		lineXGeometry.vertices.push( new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( 1, 0, 0 ) );
@@ -285,7 +280,7 @@
 		this.setActivePlane = function ( axis, eye ) {
 
 			var tempMatrix = new THREE.Matrix4();
-			eye.applyMatrix4( tempMatrix.getInverse( tempMatrix.extractRotation( this.planes[ "XY" ].matrixWorld ) ) );
+			eye.applyProjection( tempMatrix.getInverse( tempMatrix.extractRotation( this.planes[ "XY" ].matrixWorld ) ) );
 
 			if ( axis == "X" ) {
 				this.activePlane = this.planes[ "XY" ];
@@ -413,7 +408,7 @@
 			tempQuaternion.setFromEuler( worldRotation );
 
 			tempMatrix.makeRotationFromQuaternion( tempQuaternion ).getInverse( tempMatrix );
-			eye.applyMatrix4( tempMatrix );
+			eye.applyProjection( tempMatrix );
 
 			this.traverse(function(child) {
 
@@ -454,9 +449,7 @@
 		var arrowGeometry = new THREE.Geometry();
 		var mesh = new THREE.Mesh( new THREE.BoxGeometry( 0.125, 0.125, 0.125 ) );
 		mesh.position.y = 0.5;
-		mesh.updateMatrix();
-
-		arrowGeometry.merge( mesh.geometry, mesh.matrix );
+		THREE.GeometryUtils.merge( arrowGeometry, mesh );
 
 		var lineXGeometry = new THREE.Geometry();
 		lineXGeometry.vertices.push( new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( 1, 0, 0 ) );
@@ -503,7 +496,7 @@
 		this.setActivePlane = function ( axis, eye ) {
 
 			var tempMatrix = new THREE.Matrix4();
-			eye.applyMatrix4( tempMatrix.getInverse( tempMatrix.extractRotation( this.planes[ "XY" ].matrixWorld ) ) );
+			eye.applyProjection( tempMatrix.getInverse( tempMatrix.extractRotation( this.planes[ "XY" ].matrixWorld ) ) );
 
 			if ( axis == "X" ) {
 				this.activePlane = this.planes[ "XY" ];
@@ -720,7 +713,7 @@
 
 			event.preventDefault();
 
-			var pointer = event.changedTouches ? event.changedTouches[ 0 ] : event;
+			var pointer = event.touches ? event.touches[ 0 ] : event;
 
 			var intersect = intersectObjects( pointer, scope.gizmo[_mode].pickers.children );
 
@@ -747,7 +740,7 @@
 			event.preventDefault();
 			event.stopPropagation();
 
-			var pointer = event.changedTouches ? event.changedTouches[ 0 ] : event;
+			var pointer = event.touches ? event.touches[ 0 ] : event;
 
 			if ( pointer.button === 0 || pointer.button === undefined ) {
 
@@ -791,7 +784,7 @@
 			event.preventDefault();
 			event.stopPropagation();
 
-			var pointer = event.changedTouches? event.changedTouches[0] : event;
+			var pointer = event.touches? event.touches[0] : event;
 
 			var planeIntersect = intersectObjects( pointer, [scope.gizmo[_mode].activePlane] );
 

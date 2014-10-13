@@ -311,6 +311,7 @@ THREE.PLYLoader.prototype = {
 			
 		}
 
+		geometry.computeCentroids();
 		geometry.computeBoundingSphere();
 
 		return geometry;

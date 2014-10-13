@@ -190,9 +190,7 @@ THREE.OBJLoader.prototype = {
 
 		var face_pattern4 = /f( +(-?\d+)\/\/(-?\d+))( +(-?\d+)\/\/(-?\d+))( +(-?\d+)\/\/(-?\d+))( +(-?\d+)\/\/(-?\d+))?/
 
-		// fixes
-
-		text = text.replace( /\\\r\n/g, '' ); // handles line continuations \
+		//
 
 		var lines = text.split( '\n' );
 
@@ -317,6 +315,7 @@ THREE.OBJLoader.prototype = {
 
 			var geometry = children[ i ].geometry;
 
+			geometry.computeCentroids();
 			geometry.computeFaceNormals();
 			geometry.computeBoundingSphere();
 

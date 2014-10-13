@@ -68,8 +68,6 @@ THREE.BinaryLoader.prototype.loadAjaxJSON = function ( context, url, callback, t
 
 THREE.BinaryLoader.prototype.loadAjaxBuffers = function ( json, callback, binaryPath, texturePath, callbackProgress ) {
 
-	var scope = this;
-
 	var xhr = new XMLHttpRequest(),
 		url = binaryPath + json.buffers;
 
@@ -98,7 +96,7 @@ THREE.BinaryLoader.prototype.loadAjaxBuffers = function ( json, callback, binary
 
 		}
 
-		scope.createBinModel( buffer, callback, texturePath, json.materials );
+		THREE.BinaryLoader.prototype.createBinModel( buffer, callback, texturePath, json.materials );
 
 	}, false );
 
@@ -210,6 +208,7 @@ THREE.BinaryLoader.prototype.createBinModel = function ( data, callback, texture
 		init_quads_flat( start_quad_flat );
 		init_quads_smooth( start_quad_smooth );
 
+		this.computeCentroids();
 		this.computeFaceNormals();
 
 		function handlePadding( n ) {
@@ -341,7 +340,7 @@ THREE.BinaryLoader.prototype.createBinModel = function ( data, callback, texture
 				y = coordArray[ i * 3 + 1 ];
 				z = coordArray[ i * 3 + 2 ];
 
-				scope.vertices.push( new THREE.Vector3( x, y, z ) );
+				vertex( scope, x, y, z );
 
 			}
 
@@ -421,11 +420,7 @@ THREE.BinaryLoader.prototype.createBinModel = function ( data, callback, texture
 				u3 = uvs[ uvc*2 ];
 				v3 = uvs[ uvc*2 + 1 ];
 
-				scope.faceVertexUvs[ 0 ].push( [
-					new THREE.Vector2( u1, v1 ),
-					new THREE.Vector2( u2, v2 ),
-					new THREE.Vector2( u3, v3 )
-				] );
+				uv3( scope.faceVertexUvs[ 0 ], u1, v1, u2, v2, u3, v3 );
 
 			}
 
@@ -456,17 +451,7 @@ THREE.BinaryLoader.prototype.createBinModel = function ( data, callback, texture
 				u4 = uvs[ uvd*2 ];
 				v4 = uvs[ uvd*2 + 1 ];
 
-				scope.faceVertexUvs[ 0 ].push( [
-					new THREE.Vector2( u1, v1 ),
-					new THREE.Vector2( u2, v2 ),
-					new THREE.Vector2( u4, v4 )
-				] );
-
-				scope.faceVertexUvs[ 0 ].push( [
-					new THREE.Vector2( u2, v2 ),
-					new THREE.Vector2( u3, v3 ),
-					new THREE.Vector2( u4, v4 )
-				] );
+				uv4( scope.faceVertexUvs[ 0 ], u1, v1, u2, v2, u3, v3, u4, v4 );
 
 			}
 
@@ -487,7 +472,7 @@ THREE.BinaryLoader.prototype.createBinModel = function ( data, callback, texture
 
 				m = materialIndexBuffer[ i ];
 
-				scope.faces.push( new THREE.Face3( a, b, c, null, null, m ) );
+				f3( scope, a, b, c, m );
 
 			}
 
@@ -509,8 +494,7 @@ THREE.BinaryLoader.prototype.createBinModel = function ( data, callback, texture
 
 				m = materialIndexBuffer[ i ];
 
-				scope.faces.push( new THREE.Face3( a, b, d, null, null, m ) );
-				scope.faces.push( new THREE.Face3( b, c, d, null, null, m ) );
+				f4( scope, a, b, c, d, m );
 
 			}
 
@@ -537,23 +521,7 @@ THREE.BinaryLoader.prototype.createBinModel = function ( data, callback, texture
 
 				m = materialIndexBuffer[ i ];
 
-				var nax = normals[ na*3     ],
-					nay = normals[ na*3 + 1 ],
-					naz = normals[ na*3 + 2 ],
-
-					nbx = normals[ nb*3     ],
-					nby = normals[ nb*3 + 1 ],
-					nbz = normals[ nb*3 + 2 ],
-
-					ncx = normals[ nc*3     ],
-					ncy = normals[ nc*3 + 1 ],
-					ncz = normals[ nc*3 + 2 ];
-
-				scope.faces.push( new THREE.Face3( a, b, c, [
-					new THREE.Vector3( nax, nay, naz ),
-					new THREE.Vector3( nbx, nby, nbz ),
-					new THREE.Vector3( ncx, ncy, ncz )
-				], null, m ) );
+				f3n( scope, normals, a, b, c, m, na, nb, nc );
 
 			}
 
@@ -582,33 +550,7 @@ THREE.BinaryLoader.prototype.createBinModel = function ( data, callback, texture
 
 				m = materialIndexBuffer[ i ];
 
-				var nax = normals[ na*3     ],
-					nay = normals[ na*3 + 1 ],
-					naz = normals[ na*3 + 2 ],
-
-					nbx = normals[ nb*3     ],
-					nby = normals[ nb*3 + 1 ],
-					nbz = normals[ nb*3 + 2 ],
-
-					ncx = normals[ nc*3     ],
-					ncy = normals[ nc*3 + 1 ],
-					ncz = normals[ nc*3 + 2 ],
-
-					ndx = normals[ nd*3     ],
-					ndy = normals[ nd*3 + 1 ],
-					ndz = normals[ nd*3 + 2 ];
-
-				scope.faces.push( new THREE.Face3( a, b, d, [
-					new THREE.Vector3( nax, nay, naz ),
-					new THREE.Vector3( nbx, nby, nbz ),
-					new THREE.Vector3( ndx, ndy, ndz )
-				], null, m ) );
-
-				scope.faces.push( new THREE.Face3( b, c, d, [
-					new THREE.Vector3( nbx, nby, nbz ),
-					new THREE.Vector3( ncx, ncy, ncz ),
-					new THREE.Vector3( ndx, ndy, ndz )
-				], null, m ) );
+				f4n( scope, normals, a, b, c, d, m, na, nb, nc, nd );
 
 			}
 
@@ -735,6 +677,106 @@ THREE.BinaryLoader.prototype.createBinModel = function ( data, callback, texture
 			}
 
 		};
+
+	};
+
+	function vertex ( scope, x, y, z ) {
+
+		scope.vertices.push( new THREE.Vector3( x, y, z ) );
+
+	};
+
+	function f3 ( scope, a, b, c, mi ) {
+
+		scope.faces.push( new THREE.Face3( a, b, c, null, null, mi ) );
+
+	};
+
+	function f4 ( scope, a, b, c, d, mi ) {
+
+		scope.faces.push( new THREE.Face3( a, b, d, null, null, mi ) );
+		scope.faces.push( new THREE.Face3( b, c, d, null, null, mi ) );
+
+	};
+
+	function f3n ( scope, normals, a, b, c, mi, na, nb, nc ) {
+
+		var nax = normals[ na*3     ],
+			nay = normals[ na*3 + 1 ],
+			naz = normals[ na*3 + 2 ],
+
+			nbx = normals[ nb*3     ],
+			nby = normals[ nb*3 + 1 ],
+			nbz = normals[ nb*3 + 2 ],
+
+			ncx = normals[ nc*3     ],
+			ncy = normals[ nc*3 + 1 ],
+			ncz = normals[ nc*3 + 2 ];
+
+		scope.faces.push( new THREE.Face3( a, b, c,
+						  [new THREE.Vector3( nax, nay, naz ),
+						   new THREE.Vector3( nbx, nby, nbz ),
+						   new THREE.Vector3( ncx, ncy, ncz )],
+						  null,
+						  mi ) );
+
+	};
+
+	function f4n ( scope, normals, a, b, c, d, mi, na, nb, nc, nd ) {
+
+		var nax = normals[ na*3     ],
+			nay = normals[ na*3 + 1 ],
+			naz = normals[ na*3 + 2 ],
+
+			nbx = normals[ nb*3     ],
+			nby = normals[ nb*3 + 1 ],
+			nbz = normals[ nb*3 + 2 ],
+
+			ncx = normals[ nc*3     ],
+			ncy = normals[ nc*3 + 1 ],
+			ncz = normals[ nc*3 + 2 ],
+
+			ndx = normals[ nd*3     ],
+			ndy = normals[ nd*3 + 1 ],
+			ndz = normals[ nd*3 + 2 ];
+
+		scope.faces.push( new THREE.Face3( a, b, d, [
+			new THREE.Vector3( nax, nay, naz ),
+			new THREE.Vector3( nbx, nby, nbz ),
+			new THREE.Vector3( ndx, ndy, ndz )
+		], null, mi ) );
+
+		scope.faces.push( new THREE.Face3( b, c, d, [
+			new THREE.Vector3( nbx, nby, nbz ),
+			new THREE.Vector3( ncx, ncy, ncz ),
+			new THREE.Vector3( ndx, ndy, ndz )
+		], null, mi ) );
+
+	};
+
+	function uv3 ( where, u1, v1, u2, v2, u3, v3 ) {
+
+		where.push( [
+			new THREE.Vector2( u1, v1 ),
+			new THREE.Vector2( u2, v2 ),
+			new THREE.Vector2( u3, v3 )
+		] );
+
+	};
+
+	function uv4 ( where, u1, v1, u2, v2, u3, v3, u4, v4 ) {
+
+		where.push( [
+			new THREE.Vector2( u1, v1 ),
+			new THREE.Vector2( u2, v2 ),
+			new THREE.Vector2( u4, v4 )
+		] );
+
+		where.push( [
+			new THREE.Vector2( u2, v2 ),
+			new THREE.Vector2( u3, v3 ),
+			new THREE.Vector2( u4, v4 )
+		] );
 
 	};
 

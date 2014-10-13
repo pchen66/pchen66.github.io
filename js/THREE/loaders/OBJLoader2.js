@@ -290,8 +290,7 @@ THREE.OBJLoader.prototype = {
 
 				object = {
 					name: line.substring( 2 ).trim(),
-					geometry: geometry,
-					material: material
+					geometry: geometry
 				};
 
 				objects.push( object )
