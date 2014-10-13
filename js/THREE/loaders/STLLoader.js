@@ -50,7 +50,7 @@ THREE.STLLoader.prototype.load = function ( url, callback ) {
 
 		} else {
 
-			scope.dispatchEvent( { type: 'error', message: 'Couldn\'t load URL [' + url + ']', response: event.target.responseText } );
+			scope.dispatchEvent( { type: 'error', message: 'Couldn\'t load URL [' + url + ']', response: event.target.statusText } );
 
 		}
 
@@ -99,45 +99,44 @@ THREE.STLLoader.prototype.parse = function ( data ) {
 
 };
 
-THREE.STLLoader.prototype.parseBinary = function (data) {
+THREE.STLLoader.prototype.parseBinary = function ( data ) {
 
-	var face, geometry, n_faces, reader, length, normal, i, dataOffset, faceLength, start, vertexstart;
+	var reader = new DataView( data );
+	var faces = reader.getUint32( 80, true );
+	var dataOffset = 84;
+	var faceLength = 12 * 4 + 2;
 
-	reader = new DataView( data );
-	n_faces = reader.getUint32(80,true);
-	geometry = new THREE.Geometry();
-	dataOffset = 84;
-	faceLength = 12 * 4 + 2;
+	var offset = 0;
 
-	for (face = 0; face < n_faces; face++) {
+	var geometry = new THREE.BufferGeometry();
 
-		start = dataOffset + face * faceLength;
-		normal = new THREE.Vector3(
-			reader.getFloat32(start,true),
-			reader.getFloat32(start + 4,true),
-			reader.getFloat32(start + 8,true)
-		);
+	var vertices = new Float32Array( faces * 3 * 3 );
+	var normals = new Float32Array( faces * 3 * 3 );
 
-		for (i = 1; i <= 3; i++) {
+	for ( var face = 0; face < faces; face ++ ) {
 
-			vertexstart = start + i * 12;
-			geometry.vertices.push(
-				new THREE.Vector3(
-					reader.getFloat32(vertexstart,true),
-					reader.getFloat32(vertexstart +4,true),
-					reader.getFloat32(vertexstart + 8,true)
-				)
-			);
+		var start = dataOffset + face * faceLength;
+
+		for ( var i = 1; i <= 3; i ++ ) {
+
+			var vertexstart = start + i * 12;
+
+			vertices[ offset     ] = reader.getFloat32( vertexstart, true );
+			vertices[ offset + 1 ] = reader.getFloat32( vertexstart + 4, true );
+			vertices[ offset + 2 ] = reader.getFloat32( vertexstart + 8, true );
+
+			normals[ offset     ] = reader.getFloat32( start    , true );
+			normals[ offset + 1 ] = reader.getFloat32( start + 4, true );
+			normals[ offset + 2 ] = reader.getFloat32( start + 8, true );
+
+			offset += 3;
 
 		}
 
-		length = geometry.vertices.length;
-		geometry.faces.push(new THREE.Face3(length - 3, length - 2, length - 1, normal));
-
 	}
 
-	geometry.computeCentroids();
-	geometry.computeBoundingSphere();
+	geometry.addAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
+	geometry.addAttribute( 'normal', new THREE.BufferAttribute( normals, 3 ) );
 
 	return geometry;
 
@@ -174,7 +173,6 @@ THREE.STLLoader.prototype.parseASCII = function (data) {
 
 	}
 
-	geometry.computeCentroids();
 	geometry.computeBoundingBox();
 	geometry.computeBoundingSphere();
 
