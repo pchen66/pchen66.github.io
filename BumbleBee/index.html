@@ -135,7 +135,7 @@
 				var panoGeo = new THREE.SphereGeometry( 3000, 60, 40 );
 				panoGeo.applyMatrix( new THREE.Matrix4().makeScale( -1, 1, 1 ) );
 
-				var panoMat = new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'img/panorama2.jpg' )} );
+				var panoMat = new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'img/panorama.jpg' )} );
 
 				var pano = new THREE.Mesh( panoGeo, panoMat );		
 				pano.name = 'Environment';
