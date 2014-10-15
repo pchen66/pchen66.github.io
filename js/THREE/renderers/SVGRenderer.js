@@ -22,9 +22,12 @@ THREE.SVGRenderer = function () {
 	_ambientLight = new THREE.Color(),
 	_directionalLights = new THREE.Color(),
 	_pointLights = new THREE.Color(),
+	_clearColor = new THREE.Color(),
+	_clearAlpha = 1,
 
 	_w, // z-buffer to w-buffer
 	_vector3 = new THREE.Vector3(), // Needed for PointLight
+	_centroid = new THREE.Vector3(),
 
 	_svgPathPool = [], _svgLinePool = [], _svgRectPool = [],
 	_svgNode, _pathCount = 0, _lineCount = 0, _rectCount = 0,
@@ -65,7 +68,8 @@ THREE.SVGRenderer = function () {
 
 	this.setClearColor = function ( color, alpha ) {
 
-		// TODO
+		_clearColor.set( color );
+		_clearAlpha = alpha !== undefined ? alpha : 1;
 
 	};
 
@@ -94,6 +98,8 @@ THREE.SVGRenderer = function () {
 			_svg.removeChild( _svg.childNodes[ 0 ] );
 
 		}
+		
+		_svg.style.backgroundColor = 'rgba(' + ( ( _clearColor.r * 255 ) | 0 ) + ',' + ( ( _clearColor.g * 255 ) | 0 ) + ',' + ( ( _clearColor.b * 255 ) | 0 ) + ',' + _clearAlpha + ')';
 
 	};
 
@@ -122,7 +128,7 @@ THREE.SVGRenderer = function () {
 			var element = _elements[ e ];
 			var material = element.material;
 
-			if ( material === undefined || material.visible === false ) continue;
+			if ( material === undefined || material.opacity === 0 ) continue;
 
 			_elemBox.makeEmpty();
 
@@ -329,7 +335,9 @@ THREE.SVGRenderer = function () {
 
 			_color.copy( _ambientLight );
 
-			calculateLight( _lights, element.centroidModel, element.normalModel, _color );
+			_centroid.copy( v1.positionWorld ).add( v2.positionWorld ).add( v3.positionWorld ).divideScalar( 3 );
+
+			calculateLight( _lights, _centroid, element.normalModel, _color );
 
 			_color.multiply( _diffuseColor ).add( material.emissive );
 

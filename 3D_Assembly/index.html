@@ -222,7 +222,7 @@
 				document.body.appendChild( container );
 
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 50000 );
-				camera.position.set( 600, 500, 700);
+				camera.position.set( 600, 500, 700 );
 
 				scene = new THREE.Scene();
 
@@ -231,7 +231,7 @@
 
 				// Lights
 				var pointLight = new THREE.PointLight( 0xffffff, 3 );
-				pointLight.position = camera.position;
+				pointLight.position.set(600, 500, 700);
 				scene.add( pointLight );
 				var light = new THREE.AmbientLight( 0x404040 ); // soft white light
 				scene.add( light );
@@ -383,11 +383,11 @@
 					var target_temp = model_meshes[ click_number ];
 					//increase model piece number
 						click_number++;		
-					new TWEEN.Tween( temp.position)
+					new TWEEN.Tween( temp.position )
 					.to({
-						x: target_temp.position.x,
-						y: target_temp.position.y,
-						z: target_temp.position.z}, 500)
+						x: target_temp.parent.position.x+target_temp.position.x,
+						y: target_temp.parent.position.y+target_temp.position.y,
+						z: target_temp.parent.position.z+target_temp.position.z}, 500)
 					.easing( TWEEN.Easing.Exponential.Out)
 					.onComplete(function(){
 					
@@ -405,9 +405,9 @@
 					
 					new TWEEN.Tween( temp.rotation)
 					.to({
-						x: target_temp.rotation.x,
-						y: target_temp.rotation.y,
-						z: target_temp.rotation.z}, 500)
+						x: target_temp.parent.rotation.x,
+						y: target_temp.parent.rotation.y,
+						z: target_temp.parent.rotation.z}, 500)
 					.easing( TWEEN.Easing.Exponential.Out)
 					.onComplete(function(){
 						target_temp.material.wireframe = false;			
@@ -473,7 +473,37 @@
 						model_url_index = 0;
 					
 					//get meshes from dae model (with geometry and material)
-					var model_objects = [];
+					
+					dae.traverse(function(node){
+						if( node.children.length === 0 && node.geometry != undefined ){
+							node.translateY( model_fix_transY );
+							//var jiggsaw = new THREE.Mesh( node.geometry.clone(), node.material.clone());
+							var jiggsaw = undefined;
+							//jiggsaw = node.clone( jiggsaw );
+							jiggsaw = new THREE.Mesh(node.geometry.clone(), node.material.clone());
+
+							jiggsaw.position.x = node.position.x + Math.random() * 1000;
+							jiggsaw.position.y = node.position.y + Math.random() * 6000 + 3000;
+							jiggsaw.position.z = node.position.z + Math.random() * 1000;
+						
+							jiggsaw.rotation.x = Math.random() * Math.PI * 2;
+							jiggsaw.rotation.y = Math.random() * Math.PI * 2;
+							jiggsaw.rotation.z = Math.random() * Math.PI * 2;
+
+							jiggsaw.scale.x = dae.scale.x;
+							jiggsaw.scale.y = dae.scale.y;
+							jiggsaw.scale.z = dae.scale.z;
+							
+							//change material to wireframe							
+							node.material = new THREE.MeshBasicMaterial({color: 0xffaa00, wireframe: true});
+							
+							jiggsaws.push( jiggsaw );
+							//model_meshes.length = 0;
+							model_meshes.push( node );
+						}
+					});
+					
+					/*var model_objects = [];
 					dae.getDescendants( model_objects );
 
 					for(var j = 0; j < model_objects.length; j++){
@@ -504,7 +534,7 @@
 							//model_meshes.length = 0;
 							model_meshes.push( model_objects[j] );
 						}
-					}
+					}*/
 					
 
 					for( var i = 0; i < jiggsaws.length; i++){

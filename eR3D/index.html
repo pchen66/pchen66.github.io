@@ -62,6 +62,7 @@
 				top: 0;
 				right: 0;		
 				z-Index: 19;
+				display:none;
 			}
 			
 			#device_content_html{			
@@ -79,6 +80,7 @@
 				z-Index: 20;
 				text-align: center;
 				visibility: hidden;
+				display: none;
 			}
 			
 			#urlbar_input{
@@ -184,7 +186,7 @@
 			var CUBES;
 			var CubeTopVertices = [0,2,5,7];
 			var AnimationTween = [];
-			
+
 			//Model
 			var loader = new THREE.ColladaLoader();
 			loader.options.convertUpAxis = true;
@@ -195,20 +197,17 @@
 				iphone4S.scale.x = iphone4S.scale.y = iphone4S.scale.z = 18;
 				iphone4S.position.set(0,-30,0);
 				iphone4S.rotation.set(0,Math.PI,0);		
-				
-				var childrens = iphone4S.getDescendants();
-				for(var i = 0;i < childrens.length;i++){
-					if( childrens[i].material != undefined ){
-						//console.log(childrens[i].name);
 
-						switch( childrens[i].name ){
+				iphone4S.traverse(function(children){
+					if( children.material != undefined ){
+
+						switch( children.parent.name ){
 						case "Main":
-							childrens[i].material.materials[0].color = new THREE.Color(0xf0f0f0);
-							childrens[i].material.materials[0].metal = true;
-							appleMat = childrens[i].material.materials[0].clone();
+							children.material.materials[0].metal = true;
+							appleMat = children.material.materials[0].clone();
 							break;
 						case "Screen":
-							ScreenMesh = childrens[i];
+							ScreenMesh = children;
 							ScreenMeshCopy = ScreenMesh.clone();
 							// Trailers Texture
 							monitor_video = document.getElementById('video');
@@ -219,27 +218,25 @@
 							monitor_texture.format = THREE.RGBFormat;
 							monitor_texture.generateMipmaps = false;
 							
-							childrens[i].material.map = monitor_texture;
+							children.material.map = monitor_texture;
 
 							break;
 						case "Description":
-							childrens[i].material.materials[0].map = THREE.ImageUtils.loadTexture("img/iphonebackcover.png");
-							childrens[i].material.materials[0].depthWrite = false;
+							children.material.materials[0].transparent = true;
+							children.material.materials[0].map = THREE.ImageUtils.loadTexture("img/iphonebackcover.png");
 							break;
 						case "Home":			
-							childrens[i].material.materials[0].map = THREE.ImageUtils.loadTexture("img/button.png");
-							childrens[i].material.materials[0].depthWrite = false;
-							childrens[i].material.materials[0].side = THREE.DoubleSide;
+							children.material.materials[0].transparent = true;
+							children.material.materials[0].map = THREE.ImageUtils.loadTexture("img/button.png");
+							children.material.materials[0].side = THREE.DoubleSide;
 							break;
 						case "Apple_Logo":
-							appleGeo = childrens[i].geometry.clone();
+							appleGeo = children.geometry.clone();
 							break;
 						}						
 						
 					}
-				}
-				
-				
+				});
 				
 				CUBES = new THREE.Object3D();
 				CUBE_WIDTH = CUBE_WIDTH/iphone4S.scale.x;
@@ -294,17 +291,23 @@
 				// Add the COLLADA
 
 				scene.add( iphone4S );				
-
-				/*SpotLight = new THREE.SpotLight( 0xffffff, 3, 500, true);
-				SpotLight.position = camera.position.clone();
-				SpotLight.target = iphone4S;
-				scene.add( SpotLight );*/
 				
-				var plight = new THREE.PointLight(0xffffff, 0.7);
-				plight.position = camera.position;
+				var plight = new THREE.PointLight(0xffffff, 1);
+				plight.position.set(0,0,300);
 				scene.add(plight);
 				
-
+				plight = new THREE.PointLight(0xffffff, 1);
+				plight.position.set(0,0,-300);
+				scene.add(plight);
+				
+				plight = new THREE.PointLight(0xffffff, 1);
+				plight.position.set(300,300,0);
+				scene.add(plight);
+				
+				plight = new THREE.PointLight(0xffffff, 1);
+				plight.position.set(-300,-300,0);
+				scene.add(plight);
+				
 				
 				var scaleFacotr = 11;
 				
@@ -490,11 +493,10 @@
 					monitor_video.setAttribute("src", monitor_source[0][1]);
 					monitor_video.pause();
 				}
-				
-				var childrenArray = CUBES.getDescendants();
-				for(var i=0; i<childrenArray.length;i++){
-					childrenArray[i].visible = !bool;
-				}
+
+				CUBES.traverse(function(node){
+					node.visible = !bool;
+				});
 			}
 			
 			function setVideoSource(){
@@ -519,9 +521,6 @@
 					css3dHTMLPage.element.children[0].src = UrlString;
 				else
 					css3dHTMLPage.element.children[0].src = "http://" + UrlString;
-				
-				
-				
 			}
 
 			function animate() {		

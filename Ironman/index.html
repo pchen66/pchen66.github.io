@@ -1,5 +1,5 @@
 <!--
-	IRONMAN Made By Ray http://pojui.myweb.hinet.net/ray
+	IRONMAN Made By Ray http://pojuichen.com
 	April 2013
 !-->
 <!DOCTYPE html>
@@ -390,14 +390,12 @@
 				dae = collada.scene;
 				dae.scale.x = dae.scale.y = dae.scale.z = 0.3;
 				dae.position.set(0,-100,-20);
-				
-				var collada_mesh;
-				collada_mesh = dae.getDescendants(collada_mesh);
-				for(var i=0;i<collada_mesh.length;i++){
-					if( collada_mesh[i].material != undefined ){
-						collada_mesh[i].material = new THREE.MeshLambertMaterial( { color: 0x77ffff, wireframe: true } );										
+
+				dae.traverse(function(node){						
+					if( node.material != undefined ){
+						dae.material = new THREE.MeshLambertMaterial( { color: 0x77ffff, wireframe: true } );	
 					}
-				}
+				});
 				
 				scene.add( dae );	
 				
@@ -434,13 +432,11 @@
 				dae.scale.x = dae.scale.y = dae.scale.z = 0.5;
 				dae.position.set( 0,150,700 );
 				
-				var collada_mesh;
-				collada_mesh = dae.getDescendants(collada_mesh);
-				for(var i=0;i<collada_mesh.length;i++){
-					if( collada_mesh[i].material != undefined ){
-						collada_mesh[i].material = new THREE.MeshLambertMaterial( { color: 0x007777, wireframe: false } );										
+				dae.traverse(function(node){
+					if( node.material != undefined ){
+						node.material = new THREE.MeshLambertMaterial( { color: 0x007777, wireframe: false } );
 					}
-				}
+				});
 				
 				// Center Light
 				var pointLight = new THREE.PointLight( 0x007777, 5, 100);
@@ -499,27 +495,17 @@
 				dae_ironman.position.set(0,-80,0);
 				dae_ironman.translateX(-27);
 				
-				var collada_mesh;
-				collada_mesh = dae_ironman.getDescendants(collada_mesh);
-				for(var i=0;i<collada_mesh.length;i++){
-					if( collada_mesh[i].material != undefined ){
-						collada_mesh[i].material = new THREE.MeshLambertMaterial( { color: 0x77ffff, wireframe: true } );
-						/*for(var j=0;j<righthand.length;j++){
-							//right hand
-							if(collada_mesh[i].name == righthand[j]){
-
-								//collada_mesh[i].material = new THREE.MeshBasicMaterial( { color: 0xff77ff, wireframe: true } );
-							}
-						}	*/											
+				dae_ironman.traverse(function(node){
+					if( node.material != undefined ){
+						node.material = new THREE.MeshPhongMaterial( { color: 0x77ffff, wireframe: true, emissive: 0x007777 } );
 					}
-				}
+				});
 				
 				// Arc Reactor Light
-				var pointLight = new THREE.PointLight( 0x007777, 12, 25);
-				pointLight.position.set(350,1400,0);
+				var pointLight = new THREE.PointLight( 0x007777, 12, 55 );
+				pointLight.position.set(350,1400,-200);
 				dae_ironman.add( pointLight );
 				
-				//console.log(collada);
 				scene.add( dae_ironman );
 				
 				}, progressCallback );		
@@ -660,18 +646,13 @@
 								cloneObj.children[k].color = new THREE.Color( tempArcColor );
 						}
 						
-						var collada_mesh, tempColor;
-						collada_mesh = cloneObj.getDescendants(collada_mesh);
-						tempColor = 0xffffff*Math.random();
-						for(var j=0;j<collada_mesh.length;j++){
-
-							if( collada_mesh[j].material != undefined ){	
-								//tempColor = collada_mesh[j].material.color;
-								
-								//console.log( collada_mesh[j].material );
-								collada_mesh[j].material = new THREE.MeshPhongMaterial( { color: tempColor, specular: 0xffffff, shininess: 50, vertexColors: THREE.FaceColors, shading: THREE.SmoothShading} );								
+						var tempColor;						
+						cloneObj.traverse(function(node){						
+							if( node.material != undefined ){
+								tempColor = 0xffffff*Math.random();
+								node.material = new THREE.MeshPhongMaterial( { color: tempColor, specular: 0xffffff, shininess: 50, vertexColors: THREE.FaceColors, shading: THREE.SmoothShading} );	
 							}
-						}
+						});
 						
 						// Top SpotLight for each Ironman
 						spotLight = new THREE.SpotLight( 0xffffff, 5, 300);
