@@ -1,0 +1,334 @@
+<!DOCTYPE HTML>
+<html lang="en">
+	<head>
+		<title>BumbleBee</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link href='http://fonts.googleapis.com/css?family=Lato:100,300,400' rel='stylesheet' type='text/css'>
+		<style>
+			body {
+				font-family: 'Lato', sans-serif;
+				background-color: #000;
+				margin: 0px;
+				overflow: hidden;
+			}
+			
+		</style>
+
+	</head>
+
+	<body>
+		<script src="../js/THREE/three.min.js"></script>
+
+		<script src="../js/THREE/Detector.js"></script>
+		<script src="../js/THREE/libs/stats.min.js"></script>
+		<script src="../js/THREE/libs/tween.min.js"></script>
+		<script src="../js/THREE/controls/OrbitControls.js"></script>
+		<script src="../js/THREE/loaders/MTLLoader.js"></script>
+		<script src="../js/THREE/loaders/OBJMTLLoader.js"></script>
+		<script src="../js/THREE/loaders/ColladaLoader.js"></script>	
+		
+		<script>
+		
+			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			
+			var container, stats;
+			var renderer, camera, scene;
+			var modelScaleFactor = 2;
+			
+			var BumbleBee;
+			var controls;
+			var cubeCamera;
+			var projector;
+	
+			init();
+			animate();
+			
+			function init(){
+
+				container = document.createElement( 'div' );
+
+				// scene
+				scene = new THREE.Scene();
+
+				// camera
+				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.1, 10000 );
+				camera.position.z = 500;			
+				scene.add( camera );
+				
+				// controls
+				controls = new THREE.OrbitControls( camera );
+				controls.autoRotate = true;
+				controls.autoRotateSpeed = 1.0;
+				controls.addEventListener( 'change', render );
+					
+				// renderer
+				renderer = new THREE.WebGLRenderer();
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setFaceCulling( THREE.CullFaceNone );
+				//renderer.autoClear = false;
+				container.appendChild( renderer.domElement );
+				
+				// stats
+				stats = new Stats();
+				stats.domElement.style.position = 'absolute';
+				stats.domElement.style.top = '8px';
+				stats.domElement.style.zIndex = 100;
+				//container.appendChild( stats.domElement );
+				
+				// lighting
+				var ambient = new THREE.AmbientLight( 0xf5f5f5 );
+				scene.add( ambient );
+
+				directionalLight = new THREE.DirectionalLight( 0xffffff, 2 );
+				directionalLight.position.set( 2, 1.2, 10 ).normalize();
+				scene.add( directionalLight );
+
+				directionalLight = new THREE.DirectionalLight( 0xffffff, 1 );
+				directionalLight.position.set( -2, 1.2, -10 ).normalize();
+				scene.add( directionalLight );
+				
+				directionalLight = new THREE.DirectionalLight( 0xffffff, 2 );
+				directionalLight.position.set( 2, -1.2, 1 ).normalize();
+				scene.add( directionalLight );
+
+				pointLight = new THREE.PointLight( 0xffaa00, 2 );
+				pointLight.position.set( 2000, 1200, 10000 );
+				scene.add( pointLight );
+
+				// model loading
+				var manager = new THREE.LoadingManager();
+				manager.onProgress = function ( item, loaded, total ) {
+
+					console.log( item, loaded, total );
+
+				};
+
+				var loader = new THREE.OBJMTLLoader();
+				loader.load( 'model/bumblebee.obj', 'model/bumblebee.mtl', function ( object ) {
+					object.scale.multiplyScalar(modelScaleFactor);
+					object.rotation.set(-Math.PI/2, 0, -Math.PI/2);
+					object.position.y = -800;
+					
+					object.children[1].material.envMap = cubeCamera.renderTarget;
+					object.children[1].material.blending = THREE.MultiplyBlending;
+					object.children[1].material.reflectivity = 0.85;
+					
+					scene.add( object );
+					AddAnnotation( object );
+					
+					BumbleBee = object;
+				} );
+				/*var dae;
+				var DAEloader = new THREE.ColladaLoader();
+				DAEloader.options.convertUpAxis = true;
+				DAEloader.load( 'model/beach/Beach.dae', function ( collada ) {
+
+					dae = collada.scene;
+					//dae.scale.x = dae.scale.y = dae.scale.z = 0.002;
+					dae.updateMatrix();
+					scene.add(dae);
+
+				} );*/
+				
+				// environment
+				var panoGeo = new THREE.SphereGeometry( 3000, 60, 40 );
+				panoGeo.applyMatrix( new THREE.Matrix4().makeScale( -1, 1, 1 ) );
+
+				var panoMat = new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'img/panorama2.jpg' )} );
+
+				var pano = new THREE.Mesh( panoGeo, panoMat );		
+				pano.name = 'Environment';
+				scene.add( pano );
+				
+				// cube camera for envMap
+				cubeCamera = new THREE.CubeCamera( 1, 10000, 256 );
+				cubeCamera.renderTarget.minFilter = THREE.LinearMipMapLinearFilter;
+				scene.add( cubeCamera );
+			
+				// touch event
+				/*projector = new THREE.Projector();
+				var touch = new Hammer( container );
+				touch.on('tap', onTap);*/
+
+				// events
+				window.addEventListener( 'resize', onWindowResize, false );
+				
+				document.body.appendChild(container);
+			}
+			
+			/*function onTap( event ){
+
+				event.preventDefault();
+
+				var vector = new THREE.Vector3( ( event.center.x / window.innerWidth ) * 2 - 1, - ( event.center.y / window.innerHeight ) * 2 + 1, 0.5 );
+				projector.unprojectVector( vector, camera );
+
+				var raycaster = new THREE.Raycaster( camera.position, vector.sub( camera.position ).normalize() );
+
+				var intersects = raycaster.intersectObjects( BumbleBee.children, true );
+
+				if ( intersects.length > 0 && intersects[0].object && intersects[0].object.name != 'Environment' ) {
+
+					new TWEEN.Tween( intersects[ 0 ].object.position ).to( {
+						x: Math.random() * 800 - 400,
+						y: Math.random() * 800 - 400,
+						z: Math.random() * 800 - 400 }, 2000 )
+					.easing( TWEEN.Easing.Elastic.Out).start();
+
+					new TWEEN.Tween( intersects[ 0 ].object.rotation ).to( {
+						x: Math.random() * 2 * Math.PI,
+						y: Math.random() * 2 * Math.PI,
+						z: Math.random() * 2 * Math.PI }, 2000 )
+					.easing( TWEEN.Easing.Elastic.Out).start();
+					console.log(intersects);
+
+				}
+			}*/
+
+			function AddAnnotation( object ){
+				var spritey = makeTextSprite( " Transformer ", 
+					{ fontsize: 30, fontface: "Lato", borderColor: {r:255, g:255, b:255, a:0.6} } );
+				spritey.position.set(-185,155,55);
+				scene.add( spritey );
+
+				var spritey = makeTextSprite( " BumbleBee ", 
+					{ fontsize: 50, fontface: "Lato", borderColor: {r:255, g:255, b:255, a:0.6} } );
+				spritey.position.set(0,0,205);
+				scene.add( spritey );
+
+				/*var spritey = makeImageSprite();
+				spritey.scale.set(200, 200, 1.0);
+				spritey.position.set(0,1,0);
+				var stick = makeStick();
+				stick.position.set(-1,2,0.5);
+				stick.add( spritey );
+				object.add( stick );*/
+			}
+			
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				render();
+				stats.update();
+				TWEEN.update();
+				controls.update();
+				
+			}
+
+			function render() {
+			
+				cubeCamera.updateCubeMap( renderer, scene );
+				
+				renderer.render( scene, camera );
+
+			}
+
+			function makeStick(){
+				var material = new THREE.LineBasicMaterial({
+					color: 0x0000ff
+				});
+
+				var geometry = new THREE.Geometry();
+				var lineScale = 0.5;
+				geometry.vertices.push(
+					new THREE.Vector3( lineScale, -lineScale*2.5, 0 ),
+					new THREE.Vector3( 0, -lineScale*2, 0 ),
+					new THREE.Vector3( 0, 0, 0 )
+				);
+
+				var line = new THREE.Line( geometry, material );
+				return line;
+			}
+
+			function makeImageSprite(){
+				var image = THREE.ImageUtils.loadTexture('textures/ui.png');
+
+				var spriteMaterial = new THREE.SpriteMaterial( 
+					{ map: image } );
+				var sprite = new THREE.Sprite( spriteMaterial );
+
+				return sprite;	
+			}
+
+			function makeTextSprite( message, parameters )
+			{
+				if ( parameters === undefined ) parameters = {};
+				
+				var fontface = parameters.hasOwnProperty("fontface") ? 
+					parameters["fontface"] : "Lato";
+				
+				var fontsize = parameters.hasOwnProperty("fontsize") ? 
+					parameters["fontsize"] : 18;
+				
+				var borderThickness = parameters.hasOwnProperty("borderThickness") ? 
+					parameters["borderThickness"] : 4;
+				
+				var borderColor = parameters.hasOwnProperty("borderColor") ?
+					parameters["borderColor"] : { r:0, g:0, b:0, a:1.0 };
+				
+				var backgroundColor = parameters.hasOwnProperty("backgroundColor") ?
+					parameters["backgroundColor"] : { r:255, g:255, b:255, a:0.0 };
+					
+				var canvas = document.createElement('canvas');
+				
+				var context = canvas.getContext('2d');
+				context.font = fontsize + "px " + fontface;
+			    
+				// get size data (height depends only on font size)
+				var metrics = context.measureText( message );
+				var textWidth = metrics.width;
+				
+				// background color
+				context.fillStyle   = "rgba(" + backgroundColor.r + "," + backgroundColor.g + ","
+											  + backgroundColor.b + "," + backgroundColor.a + ")";
+				// border color
+				context.strokeStyle = "rgba(" + borderColor.r + "," + borderColor.g + ","
+											  + borderColor.b + "," + borderColor.a + ")";
+
+				context.lineWidth = borderThickness;
+				roundRect(context, borderThickness/2, borderThickness/2, textWidth + borderThickness, fontsize * 1.4 + borderThickness);
+				// 1.4 is extra height factor for text below baseline: g,j,p,q.
+				
+				// text color
+				context.fillStyle = "rgba(255, 255, 255, 1.0)";
+
+				context.fillText( message, borderThickness, fontsize + borderThickness);
+				
+				// canvas contents will be used for a texture
+				var texture = new THREE.Texture(canvas) 
+				texture.needsUpdate = true;
+
+				var spriteMaterial = new THREE.SpriteMaterial( 
+					{ map: texture} );
+				var sprite = new THREE.Sprite( spriteMaterial );
+				sprite.scale.set(150,75,1.0);
+				return sprite;	
+			}
+
+			// function for drawing rounded rectangles
+			function roundRect(ctx, x, y, w, h) 
+			{
+			    ctx.beginPath();
+				ctx.moveTo(x,y);
+				ctx.lineTo(x+w,y);
+				ctx.lineTo(x+w,y+h);
+				ctx.lineTo(x,y+h);
+				ctx.lineTo(x,y);
+			    ctx.closePath();
+			    ctx.fill();
+				ctx.stroke();   
+			}
+			
+		</script>
+</html>
