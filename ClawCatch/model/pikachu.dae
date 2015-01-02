@@ -576,19 +576,19 @@
     </library_effects>
     <library_images>
         <image id="ID7">
-            <init_from>Pikachu/__auto_.png</init_from>
+            <init_from>Pikachu/auto_.png</init_from>
         </image>
         <image id="ID16">
-            <init_from>Pikachu/__auto_1.png</init_from>
+            <init_from>Pikachu/auto_1.png</init_from>
         </image>
         <image id="ID33">
-            <init_from>Pikachu/__auto_1_0.png</init_from>
+            <init_from>Pikachu/auto_1_0.png</init_from>
         </image>
         <image id="ID54">
-            <init_from>Pikachu/__auto_2.png</init_from>
+            <init_from>Pikachu/auto_2.png</init_from>
         </image>
         <image id="ID67">
-            <init_from>Pikachu/__auto_3.png</init_from>
+            <init_from>Pikachu/auto_3.png</init_from>
         </image>
     </library_images>
     <scene>
