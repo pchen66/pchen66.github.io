@@ -20,3 +20,11 @@ A tweak from Three.JS example with element events and transitions
 Reconstructed and inspired from Tony Stark's lab in the movie "Ironman"
 [Live Demo](http://pchen66.github.io/Ironman)
 
+* ###*BumbleBee*
+Simple environmental mapping on bumble bee
+[Live Demo](http://pchen66.github.io/BumbleBee)
+
+* ###*Claw Catch*
+A virtual claw catch game with childhood characters
+[Live Demo](http://pchen66.github.io/ClawCatch)
+
