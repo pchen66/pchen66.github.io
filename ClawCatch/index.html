@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>Claw Catch</title>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<link href='http://fonts.googleapis.com/css?family=Lato:300,400' rel='stylesheet' type='text/css'>
+	<link href="css/main.css" rel='stylesheet' type='text/css' ></link>
+</head>
+<body>
+
+	<!-- Main Canvas -->
+	<div id="container"></div>
+	
+	<!-- Controls -->
+	<div id="checkPrizeButton">
+		<div id="checkPrizeIcon"></div>
+	</div>
+	<div id="countdownContainer">
+		<div id="countdownText">01:30</div>
+	</div>
+	
+	<!-- Prize -->
+	<div id="prizeContainer" class="close">
+		<div id="spinbackground"></div>
+		<div id="textContainer">
+			<div class="text multiply"></div>
+			<div class="text count"></div>
+			<div class="text name"></div>
+		</div>
+		<div id="prizeCanvas"></div>
+		<div id="pageContainer"></div>
+		<div class="PrizeArrow right"></div>
+		<div class="PrizeArrow left hide"></div>	
+		
+		<!-- Wiki Page -->
+		<div id="wikiContainer">
+			<iframe id="wikiPage"></iframe>
+			<div id="arrowSymbol"></div><div id="openWikiButton"></div>
+		</div>
+		
+		<!-- Toggle Collection Button -->
+		<div id="PrizeButton" class="btn"></div>
+	</div>
+	
+	<!-- Game Over Menu -->
+	<div id="GameOverMenu">
+		<div class="centerContainer">
+			<div id="starContainer">
+				<div class="star"></div>
+				<div class="star"></div>
+				<div class="star"></div>
+			</div>
+			<div id="viewPrizeButton">
+				<div class="linebtn Prize">My Prize</div>
+			</div>
+			<div id="restartButton">
+				<div class="linebtn Restart">Try Again</div>
+			</div>
+		</div>
+	</div>
+	
+	<!-- Game Intro Container -->
+	<div id="preGameContainer">
+	
+		<!-- Loading Page -->
+		<div id="loadingContainer">
+			<div id="loadingBox">
+				<div id="message">Loading</div>
+				<div id="progressbar"><div id="bar"></div></div>
+			</div>
+			<div id="control-info">
+				<span class="section">
+					<div class="key up"></div>
+					<div class="key left"></div>
+					<div class="key down"></div>
+					<div class="key right"></div>
+					<div class="sectionInfo"> to Move</div>
+				</span>
+				<span class="section">
+					<div class="key space">Space</div>
+					<div class="sectionInfo">to Grab</div>
+				</span>
+				<span class="section">
+					<div class="mouse"></div>
+					<div class="sectionInfo">Drag to Rotate</div>
+				</span>
+			</div>
+			<!-- Counter -->
+			<div id="prepareContainer">
+				<div id="prepareText">3</div>
+			</div>
+		</div>
+		
+		<!-- Start Game -->
+		<div id="startContainer">
+			<div id="startText" class="linebtn">Start</div>
+		</div>
+	
+	</div>
+
+	<!-- THREE.JS -->			
+	<script type="text/javascript" src="../js/THREE/three.min.js"></script>	
+	<script type="text/javascript" src="../js/THREE/loaders/ColladaLoader.js"></script>	
+	
+	<!-- PHYSI.JS -->	
+	<script type="text/javascript" src="js/physijs/physi.js"></script>
+	
+	<!-- TWEEN.JS -->
+	<script type="text/javascript" src="js/tween/tween.min.js"></script>
+
+	<!-- Main JS -->
+	<script type="text/javascript" src="js/main.min.js"></script>
+
+</body>
+</html>

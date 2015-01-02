@@ -1,0 +1,633 @@
+html, body{
+	position:relative;
+	width: 100% ;
+	height: 100% ;
+	overflow: hidden;
+	
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	-o-user-select: none;
+	user-select: none;
+}
+body {
+	font-family: 'Lato', sans-serif;
+	margin: 0;
+	padding: 0;
+}
+.controlPanel{
+	position: absolute;
+	top:0;
+}
+
+.btn{
+	position: absolute;
+	width: 60px;
+	height: 60px;
+	background-size: cover;
+	margin: 20px;
+}
+
+.linebtn{
+	font-size: 50px;
+	color: #fff;
+	border: 4px solid #fff;
+	display: inline-block;
+	padding: 20px;
+	cursor: pointer;
+	text-align: center;
+	margin: 10px;
+	text-transform: uppercase;
+	transition: all 0.2s ease;
+}
+
+.linebtn:active, .linebtn:hover{
+	background: #fff;
+	color: #000;
+	border: 4px solid #fff;
+}
+
+#preGameContainer{
+	transition: all 2s ease;
+}
+
+#loadingContainer{
+	width: 100%;
+	height: 100%;
+	position: absolute;
+	top:0;
+	left:0;
+	background: #000;
+	transition: all 1s ease;
+}
+
+#loadingBox{
+	position: absolute;
+	top: 50%;
+	width: 100%;
+	transition: all 1s ease-out;
+}
+
+#message {
+	color: #ffffff;
+	width: 100%;
+	text-align: center;
+	font-size: 50px;
+	margin-top: -75px;
+	text-transform: uppercase;
+}
+
+#progressbar {
+	position: relative;
+	left: 40%;
+	text-align: center;
+	background: transparent;
+	border: 4px solid rgba(255,255,255,1);
+	width: 20%;
+	height: 50px;
+	margin-left: -8px;
+}
+
+#startContainer{
+	position: absolute;
+	top: 60%;
+	left: 50%;
+	margin-left: -134px;
+	cursor: pointer;
+	opacity: 0;
+	transition: all 2s ease 2s;
+}
+
+#prepareContainer{
+	position: absolute;
+	width: 100%;
+	height: 200px;
+	background: #fff;
+	top: 50%;
+	margin-top: -100px;
+	opacity: 0;
+	transition: all 1s ease;
+}
+
+#prepareText{
+	font-size: 150px;
+	text-align: center;
+	vertical-align: middle;
+	margin: 0 0 0 0;
+	height: 100%;
+}
+
+#startIcon{
+	background-image: url('../img/claw-white.png');
+	background-size: cover;
+	width: 100px;
+	height: 100px;
+	border-radius: 50%;
+	border: 5px solid #fff;
+	transition: all 1s ease;
+	margin-left: 20px;
+}
+
+#startText{
+	margin-top: 15px;
+	text-align: center;
+	width: 200px;
+}
+
+#bar {
+	background:rgba(255,255,255,1);
+	width:0%;
+	height: 40px;
+	margin: 5px;
+	transition: width 0.1s ease;
+}
+
+#collectionDrawer{
+
+	position: absolute;
+	height:100%;
+	right:0;
+	top:0;
+
+	-webkit-transform:translate3d(300px, 0, 0);
+    -moz-transform:translate3d(300px, 0, 0);
+    -ms-transform:translate3d(300px, 0, 0);
+    -o-transform:translate3d(300px, 0, 0);
+    transform:translate3d(300px, 0, 0);
+	
+	-webkit-transition: all 0.8s cubic-bezier(0.7,0,0.3,1);;	
+	-moz-transition: all 0.8s cubic-bezier(0.7,0,0.3,1);;
+	-ms-transition: all 0.8s cubic-bezier(0.7,0,0.3,1);;
+	-o-transition: all 0.8s cubic-bezier(0.7,0,0.3,1);;
+	transition: all 0.8s cubic-bezier(0.7,0,0.3,1);;
+
+}
+
+#collectionDrawer.open{
+	-webkit-transform:translate3d(0, 0, 0);
+    -moz-transform:translate3d(0, 0, 0);
+    -ms-transform:translate3d(0, 0, 0);
+    -o-transform:translate3d(0, 0, 0);
+    transform:translate3d(0, 0, 0);
+}
+
+#collectionIcon{
+	width: 80px;
+	height: 80px;
+	background-image: url('../img/claw.png');
+	background-size: cover;
+	background-color: #fff;
+	float:left;
+	cursor: pointer;
+}
+
+.collectionContainer{
+	width: 300px;
+	height:100%;
+	background: #373a47;
+	float:left;
+	overflow: hidden;
+}
+
+#collections{
+	margin: 0;
+	padding: 0;
+}
+
+#wikiContainer{
+	width: 400px;
+	height: 600px;
+	position: absolute;
+	top: 0px;
+	left: 50px;
+	transform: translateY(-550px);
+	transition: all 0.8s ease;
+}
+
+#wikiContainer.open{
+	transform: translateY(0);
+}
+
+#wikiContainer>iframe{
+	width: 100%;
+	height: 550px;
+	border: none;
+	background: #fff;
+}
+
+#openWikiButton{
+	width: 100%;
+	height: 50px;
+	background: #fff;
+	text-align: center;
+	line-height: 50px;
+	text-transform: uppercase;
+	display: none;
+	cursor: pointer;
+}
+
+#arrowSymbol{
+	position: absolute;
+	font-size: 30px;
+	margin: 5px 10px;
+}
+
+#prizeContainer{
+	position: absolute;
+	top:0;
+	width:100%;
+	height:100%;
+	background: rgba(0,0,0,0.7);
+	overflow: hidden;
+	transition: all 1s ease;
+}
+
+#prizeContainer.close{
+	transform: translate3d(0, 100%, 0);
+	opacity: 0;
+}
+
+#spinbackground{
+	position: absolute;
+	border-radius: 50%;
+	background: url('../img/spin.jpg');
+	width: 600px;
+	height:600px;
+	top: 50%;
+	left: 50%;
+	margin: -300px auto auto -300px;
+	
+	-webkit-animation: spinAround 3s linear infinite;
+	-moz-animation:    spinAround 3s linear infinite;
+	-ms-animation:     spinAround 3s linear infinite;
+	-o-animation:      spinAround 3s linear infinite;
+	animation:         spinAround 3s linear infinite;
+}
+
+#prizeCanvas{
+	position: absolute;
+	width: 600px;
+	height:600px;
+	top: 50%;
+	left: 50%;
+	margin: -300px auto auto -300px;
+}
+
+#PrizeButton{
+	right:0;
+	top:0;
+	background-image: url('../img/close.png');
+	cursor: pointer;
+}
+
+#timerContainer{
+	position: absolute;
+	left: 0;
+	top:0
+}
+
+.timerText{
+	font-size: 150px;
+	color: #fff;
+}
+
+#dropButton{
+	right:0;
+	top: 80px;
+	background: #f0f;
+}
+
+#viewButton{
+	right:0;
+	top: 160px;
+	background: #00f;
+}
+
+#countdownContainer{
+	position: absolute;
+	top:0;
+	left:50%;
+	margin-left: -150px;
+	width: 300px;
+	height: 100px;
+	background: rgba(0,0,0,0.8);
+}
+
+#countdownText{
+	font-size: 70px;
+	text-align: center;
+	margin: 8px 0 0 0;
+	color: #fff;
+}
+
+#checkPrizeButton{
+	position: absolute;
+	top:0;
+	right: 0;
+	width: 100px;
+	height: 100px;
+	background: rgba(0,0,0,0.8);
+	transition: all 1s ease;
+}
+
+#checkPrizeIcon{
+	width:100px;
+	height:100%;
+	background: url('../img/claw-white.png');
+	background-size: cover;
+	cursor: pointer;
+	transition: all 0.2s ease;
+}
+
+#checkPrizeIcon:active{
+	background-image: url('../img/claw.png');
+	background-color: #fff;
+}
+
+.PrizeArrow{
+	position: absolute;
+	top: 50%;
+	margin-top: -30px;
+	width: 70px;
+	height: 70px;
+	background-image: url('../img/arrow.png');
+	background-size: cover;
+	cursor: pointer;
+}
+
+.PrizeArrow.hide{
+	display: none;
+}
+
+.PrizeArrow:active{
+	background-image: url('../img/arrow-active.png');
+}
+
+.PrizeArrow.right{
+	right: 100px;
+}
+
+.PrizeArrow.left{
+	transform: rotate(180deg);
+	left: 100px;
+}
+
+#pageContainer{
+	position: absolute;
+	bottom: 10px;
+	text-align: center;
+	width: 100%;
+}
+
+.pageDot{
+	width: 20px;
+	height:20px;
+	border-radius: 50%;
+	background-color: #f0f0f0;
+	background-size: cover;
+	opacity: 0.5;
+	display: inline-block;
+	margin: 0 5px;
+	cursor: pointer;
+}
+
+.pageDot.active{
+	opacity: 1;
+}
+
+.pageDot.acquired{
+	background-color: transparent;
+}
+
+.pageDot.acquired:nth-child(1){
+	background-image:url('../img/thumb_angrybird.png');
+}
+
+.pageDot.acquired:nth-child(2){
+	background-image:url('../img/thumb_pikachu.png');
+}
+
+.pageDot.acquired:nth-child(3){
+	background-image:url('../img/thumb_pokeball.png');
+}
+
+.pageDot.acquired:nth-child(4){
+	background-image:url('../img/thumb_maruko.png');
+}
+
+.pageDot.acquired:nth-child(5){
+	background-image:url('../img/thumb_kenny.png');
+}
+
+.pageDot.acquired:nth-child(6){
+	background-image:url('../img/thumb_gabumon.png');
+}
+
+.pageDot.acquired:nth-child(7){
+	background-image:url('../img/thumb_spongebob.png');
+}
+
+.pageDot.acquired:nth-child(8){
+	background-image:url('../img/thumb_wukong.png');
+}
+
+
+#textContainer{
+	position: absolute;
+	top:0;
+	left:0;
+	width:100%;
+	height:100%;
+	opacity: 0;
+	transition: all 1s ease;
+}
+
+#textContainer.show{
+	opacity: 1;
+}
+
+.text{
+	position: absolute;
+	font-size: 40px;
+	color: #fff;
+}
+
+.text.multiply{
+	top: 50%;
+	margin-top: -20px;
+	left: 50%;
+	margin-left: 400px;
+}
+
+.text.count{
+	top: 50%;
+	margin-top: -50px;
+	left: 50%;
+	margin-left: 500px;
+	font-size: 100px;
+}
+
+.text.name{
+	top: 100px;
+	left: 100px;
+	font-size: 100px;
+}
+
+#control-info{
+	position: absolute;
+	width: 100%;
+	text-align: center;
+	top: 20%;
+	opacity: 0;
+	transition: all 1s ease;
+}
+
+.section{
+	display: inline-block;
+	margin-left: 30px;
+}
+
+.key{
+	width: 50px;
+	height: 50px;
+	border: 2px solid #fff;
+	border-radius: 3px;
+	display: inline-block;
+	color: #fff;
+	background-image: url('../img/keyarrow-white.png');
+	background-size: 8px 20px;
+	background-repeat: no-repeat;
+	background-position: 50%;
+	transition: all 0.5s ease;
+}
+
+.key:active, .key.space:active{
+	background-color: #fff;
+	color: #000;
+}
+
+.key.up{
+	display: block;
+	margin-left: 57px;
+	margin-bottom:3px;
+	transform: rotate(180deg);
+}
+
+.key.left{
+	transform: rotate(90deg);
+}
+
+.key.right{
+	transform: rotate(-90deg);
+}
+
+.key.space{
+	background: none;
+	width: 250px;
+	height: 56px;
+	text-align: center;
+	vertical-align: middle;
+	line-height: 50px;
+	text-transform: uppercase;
+	font-size: 20px;
+}
+
+.mouse{
+	background-image: url('../img/mouse.png');
+	background-size: cover;
+	width: 80px;
+	height: 80px;
+	margin-left: 20px;
+}
+
+.sectionInfo{
+	width: 100%;
+	text-align: center;
+	font-size: 15px;
+	color: #fff;
+	text-transform: uppercase;
+	margin-top: 10px;
+}
+
+#GameOverMenu{
+	position: absolute;
+	width: 100%;
+	height:100%;
+	top:0;
+	background: rgba(0,0,0,0.8);
+	transform: translateY(-100%);
+	transition: all 1s ease;
+}
+
+#GameOverMenu.open{
+	transform: translateY(0);
+}
+
+.centerContainer{
+	position: absolute;
+	top:50%;
+	left: 50%;
+	margin-top: -200px;
+	margin-left: -200px;
+}
+
+#starContainer{
+	position: relative;
+	top:20%;
+	text-align: center;
+	margin-bottom: 100px;
+}
+
+.star{
+	display: inline-block;
+	width:128px;
+	height:128px;
+	background: url('../img/star_dim.png');
+}
+
+.star.active{
+	background: url('../img/star.png');
+	
+	-webkit-animation: spinAround 8s linear infinite;
+	-moz-animation:    spinAround 8s linear infinite;
+	-ms-animation:     spinAround 8s linear infinite;
+	-o-animation:      spinAround 8s linear infinite;
+	animation:         spinAround 8s linear infinite;
+}
+
+#viewPrizeButton{
+	text-align: center;
+}
+
+#restartButton{
+	text-align: center;
+}
+
+.Prize, .Restart{
+	width: 300px;
+}
+
+@-webkit-keyframes spinAround {
+    from { -webkit-transform: rotate3d(0,0,1,0); }
+    to { -webkit-transform: rotate3d(0,0,1,360deg); }
+}
+
+@-moz-keyframes spinAround { 
+    from {-moz-transform: rotate3d(0,0,1,0); } 
+    to {-moz-transform: rotate3d(0,0,1,360deg);}
+}
+
+@-ms-keyframes spinAround { 
+    from {-moz-transform: rotate3d(0,0,1,0); } 
+    to {-moz-transform: rotate3d(0,0,1,360deg);}
+}
+
+@-o-keyframes spinAround { 
+    from {-moz-transform: rotate3d(0,0,1,0); } 
+    to {-moz-transform: rotate3d(0,0,1,360deg);}
+}
+
+@keyframes spinAround {
+    from {transform:rotate3d(0,0,1,0);}
+    to {transform:rotate3d(0,0,1,360deg);}
+}
