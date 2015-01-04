@@ -95,7 +95,7 @@ body {
 	margin-left: -134px;
 	cursor: pointer;
 	opacity: 0;
-	transition: all 2s ease 2s;
+	transition: all 1s ease 1s;
 }
 
 #prepareContainer{
