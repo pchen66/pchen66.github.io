@@ -334,6 +334,9 @@ var App = {
 	loadingReadyCount: 0,
 	
 	preloadAssets: function(){
+	
+		var bgSound = document.getElementById( 'backgroundSound' );
+		bgSound.volume = 0.5;
 
 		for( var model in this.toys ){
 		
