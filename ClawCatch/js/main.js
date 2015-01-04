@@ -100,6 +100,8 @@ var App = {
 		
 		App.timer = App.initialTime;
 		document.getElementById( 'countdownText' ).textContent = '01:30';
+		
+		App.generateSound('button');
 
 		while( App.toysArray.length > 0 ){
 			App.scene.remove( App.toysArray[App.toysArray.length-1] );
@@ -453,12 +455,14 @@ var App = {
 		App.init();
 
 		startContainer.style.opacity = 1;
+		startContainer.style.zIndex = 10;
 		startContainer.addEventListener( 'click', function(){
+		
+			App.generateSound('button');
 			
 			loadingContainer.style.background = 'rgba(0,0,0,0)';
 			controlInfo.style.opacity = 0;
-			startContainer.style.transition = 'all 1s ease';
-			startContainer.style.opacity = 0;			
+			startContainer.style.display = 'none';
 								
 			var dropTimer = setInterval(function(){
 				if( App.leftAmount < App.initialItemCount ){
@@ -898,6 +902,8 @@ var App = {
 			if( App.status === 'Initial' ){
 				return;
 			}
+			
+			App.generateSound('prize');
 		
 			// Remove caught item
 			App.scene.remove(other_object);
@@ -1403,6 +1409,19 @@ var App = {
 		
 	},
 	
+	generateSound: function(soundName){
+		var audio;
+		switch(soundName){
+		case 'button':
+			audio = document.getElementById('buttonSound');
+			break;
+		case 'prize':
+			audio = document.getElementById('prizeSound');
+			break;
+		}
+		audio.play();
+	},
+	
 	updateArrowUI: function(){
 		var ToyNameArray = Object.keys(App.toys);
 		var arrowRightButton = document.getElementsByClassName( 'PrizeArrow right' )[0];
@@ -1492,6 +1511,8 @@ var App = {
 	},
 	
 	togglePrizeContainer: function( openOnly ){
+	
+		openOnly === true ? '' : App.generateSound('button');
 	
 		var prizeContainer = document.getElementById( 'prizeContainer' ),
 			checkPrizeButton = document.getElementById( 'checkPrizeButton' );
