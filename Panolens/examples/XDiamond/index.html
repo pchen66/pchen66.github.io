@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>XDiamond</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link rel='stylesheet' type='text/css' href='css/main.css'>
+	</head>
+	<body>
+		<div id="game-container">
+
+			<!-- 3D Rendering Container -->
+			<div id="container"></div>
+
+			<!-- Stats Container -->
+			<div id="statsContainer" class="stats-container bgimage">
+
+				<!-- Stats - Steps Down -->
+				<div id="stepsdownContainer" class="stats-title bgimage">
+					<div class="stats-description" id="stepsdownDescription">MOVES</div>
+					<div id="stepsdownText"></div>
+				</div>
+
+				<!-- Stats - Points -->
+				<div id="scoreContainer" class="stats-title bgimage">
+					<div id="scoreText"></div>
+				</div>
+
+				<div class="item bgimage" data-name="swap">
+					<div class="itemCounter">
+						<div class="itemCounterText">1</div>
+					</div>
+				</div>
+
+				<div class="item bgimage" data-name="bomb">
+					<div class="itemCounter">
+						<div class="itemCounterText">1</div>
+					</div>
+				</div>
+
+			</div>
+		</div>
+
+		<!-- Splash Screen -->
+		<div id="splash" class="bgimage">
+
+			<div id="game-logo" class="bgimage">
+				<div id="game-tutorial" class="bgimage">
+					<div class="tutorial-diamond bgimage green"></div>
+					<div id="diamondSwappingRight" class="tutorial-diamond bgimage green swappingToRight">
+						<div id="arrowRight" class="bgimage"></div>
+					</div>
+					<div id="diamondSwappingLeft" class="tutorial-diamond bgimage yellow swappingToLeft"></div>
+					<div class="tutorial-diamond bgimage green"></div>
+					<div class="tutorial-diamond bgimage green"></div>
+				</div>
+			</div>
+
+			<!-- Game Name -->
+			<div id="gameTitleContainer">
+
+				<!-- Ttitle -->
+				<div id="game-title" class="titles bgimage">
+					<div class="game-tutorial-text">Swapping adjacent diamond to match three or more in a row</div>
+				</div>
+				<div id="game-subtitle" class="titles bgimage"></div>
+
+				<!-- Loading -->
+				<div id="loadingDialog">
+					<div id="loadingBox">
+						<div id="loadingBar">START</div>
+					</div>
+				</div>
+
+			</div>
+			
+		</div>
+
+		<!-- Game Complete -->
+		<div id="postgame-container" class="bgimage">
+			<div id="stats-score-container" class="row-container">
+				<div class="row">
+					<div class="stats-score bgimage"></div>
+					<div class="stats-score bgimage"></div>
+					<div class="stats-score bgimage"></div>
+				</div>
+			</div>
+			<div id="stats-text-container" class="row-container">
+				<div class="row align-top">
+					<span class="stats-score-text yourscore">Your Score<div id="your-score">0</div></span>
+					<span class="stats-score-text bestscore">Best Scroe<div id="best-score">0</div></span>
+				</div>
+			</div>
+			<div id="playagain-button-container" class="row-container">
+				<div id="playagain-button" class="bgimage"></div>
+			</div>
+			<div id="option-container" class="row-container">
+				<div class="row">
+					<span class="option bgimage trophy"></span>
+					<span class="option bgimage info"></span>
+					<span class="option bgimage share"></span>
+				</div>
+			</div>
+
+		</div>
+	
+		<script type="text/javascript" src="../../js/panolens.min.js"></script>
+
+		<!--<script type="text/javascript" src="js/libs/three.min.js"></script>
+		<script type="text/javascript" src="js/libs/tween.min.js"></script>
+
+		<script type="text/javascript" src="js/controls/DeviceOrientationControls.js"></script>
+		<script type="text/javascript" src="js/controls/OrbitControls.js"></script>-->
+
+		<script type="text/javascript" src="js/loadingManager.js"></script>
+		<script type="text/javascript" src="js/game.js"></script>
+		<script type="text/javascript" src="js/main.js"></script>
+
+	</body>
+</html>
