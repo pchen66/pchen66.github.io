@@ -18,15 +18,15 @@
 	</head>
 
 	<body>
-		<script src="../js/THREE/three.min.js"></script>
+		<script src="../js/three/three.min.js"></script>
 
-		<script src="../js/THREE/Detector.js"></script>
-		<script src="../js/THREE/libs/stats.min.js"></script>
-		<script src="../js/THREE/libs/tween.min.js"></script>
-		<script src="../js/THREE/controls/OrbitControls.js"></script>
-		<script src="../js/THREE/loaders/MTLLoader.js"></script>
-		<script src="../js/THREE/loaders/OBJMTLLoader.js"></script>
-		<script src="../js/THREE/loaders/ColladaLoader.js"></script>	
+		<script src="../js/three/Detector.js"></script>
+		<script src="../js/three/libs/stats.min.js"></script>
+		<script src="../js/three/libs/tween.min.js"></script>
+		<script src="../js/three/controls/OrbitControls.js"></script>
+		<script src="../js/three/loaders/MTLLoader.js"></script>
+		<script src="../js/three/loaders/OBJLoader.js"></script>
+		<script src="../js/three/loaders/ColladaLoader.js"></script>	
 		
 		<script>
 		
@@ -63,7 +63,8 @@
 				controls.addEventListener( 'change', render );
 					
 				// renderer
-				renderer = new THREE.WebGLRenderer();
+				renderer = new THREE.WebGLRenderer({antialias: true});
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setFaceCulling( THREE.CullFaceNone );
 				//renderer.autoClear = false;
@@ -104,32 +105,34 @@
 
 				};
 
-				var loader = new THREE.OBJMTLLoader();
-				loader.load( 'model/bumblebee.obj', 'model/bumblebee.mtl', function ( object ) {
-					object.scale.multiplyScalar(modelScaleFactor);
-					object.rotation.set(-Math.PI/2, 0, -Math.PI/2);
-					object.position.y = -800;
-					
-					object.children[1].material.envMap = cubeCamera.renderTarget;
-					object.children[1].material.blending = THREE.MultiplyBlending;
-					object.children[1].material.reflectivity = 0.85;
-					
-					scene.add( object );
-					AddAnnotation( object );
-					
-					BumbleBee = object;
-				} );
-				/*var dae;
-				var DAEloader = new THREE.ColladaLoader();
-				DAEloader.options.convertUpAxis = true;
-				DAEloader.load( 'model/beach/Beach.dae', function ( collada ) {
+				var mtlLoader = new THREE.MTLLoader();
+				mtlLoader.setBaseUrl( 'model/' );
+				mtlLoader.setPath( 'model/' );
+				mtlLoader.load( 'bumblebee.mtl', function( materials ) {
 
-					dae = collada.scene;
-					//dae.scale.x = dae.scale.y = dae.scale.z = 0.002;
-					dae.updateMatrix();
-					scene.add(dae);
+					materials.preload();
 
-				} );*/
+					var objLoader = new THREE.OBJLoader();
+					objLoader.setMaterials( materials );
+					objLoader.setPath( 'model/' );
+					objLoader.load( 'bumblebee.obj', function ( object ) {
+
+						object.scale.multiplyScalar(modelScaleFactor);
+						object.rotation.set(-Math.PI/2, 0, -Math.PI/2);
+						object.position.y = -800;
+						
+						object.children[0].material.envMap = cubeCamera.renderTarget;
+						object.children[0].material.blending = THREE.MultiplyBlending;
+						object.children[0].material.reflectivity = 0.85;
+						
+						scene.add( object );
+						AddAnnotation( object );
+						
+						BumbleBee = object;
+
+					});
+
+				});
 				
 				// environment
 				var panoGeo = new THREE.SphereGeometry( 3000, 60, 40 );
@@ -143,7 +146,7 @@
 				
 				// cube camera for envMap
 				cubeCamera = new THREE.CubeCamera( 1, 10000, 256 );
-				cubeCamera.renderTarget.minFilter = THREE.LinearMipMapLinearFilter;
+				cubeCamera.renderTarget.texture.minFilter = THREE.LinearMipMapLinearFilter;
 				scene.add( cubeCamera );
 			
 				// touch event

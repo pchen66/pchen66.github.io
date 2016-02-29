@@ -30,8 +30,9 @@
 				background-repeat:no-repeat;
 				background-size:100% 100%;				
 				border: 0px;
-				width: 128px;
-				height: 128px;
+				width: 64px;
+			    height: 64px;
+			    margin: 5px;
 				cursor: pointer;
 			}
 			
@@ -133,13 +134,13 @@
 			<button id="urlbar_submit">GO</button>
 		</div>
 
-		<script src="../js/THREE/three.min.js"></script>
-		<script src="../js/THREE/renderers/CSS3DRenderer.js"></script>
+		<script src="../js/three/three.min.js"></script>
+		<script src="../js/three/renderers/CSS3DRenderer.js"></script>
 
-		<script src="../js/THREE/controls/OrbitControls.js"></script>
-		<script src="../js/THREE/loaders/ColladaLoader.js"></script>
-		<script src="../js/THREE/libs/tween.min.js"></script>
-		<script src="../js/THREE/Detector.js"></script>
+		<script src="../js/three/controls/OrbitControls.js"></script>
+		<script src="../js/three/loaders/ColladaLoader.js"></script>
+		<script src="../js/three/libs/tween.min.js"></script>
+		<script src="../js/three/Detector.js"></script>
 		<script>
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
@@ -163,12 +164,11 @@
 			var controls;
 			var monitor_video, monitor_texture;
 			var monitor_source = new Array();
-			monitor_source[0] = ["../textures/video/sintel.mp4","../textures/video/sintel.ogv"];
-			monitor_source[1] = ["../textures/video/ironman3.mp4","../textures/video/ironman3.ogv"];
+			monitor_source[0] = ["video/sintel.mp4","video/sintel.ogv"];
+			monitor_source[1] = ["video/ironman3.mp4","video/ironman3.ogv"];
 			var Mindex = 1;
 			
 			//CSS3D HTML Page
-			var projector;
 			var mouseX, mouseY;
 			var css3dHTMLPage, fakeplane;
 			var isInHTMLMode = false;
@@ -334,9 +334,8 @@
 				css3dHTMLPage.scale.multiplyScalar( 1 / scaleFacotr );				
 				//scene2.add( css3dHTMLPage );		
 				
-				projector = new THREE.Projector();
-				
-				renderer = new THREE.WebGLRenderer( {antialias: true });
+				renderer = new THREE.WebGLRenderer({antialias: true});
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.domElement.style.position = 'absolute';
 				renderer.domElement.style.zIndex = 2;
@@ -386,7 +385,6 @@
 				// If mouseover on the HTML page (fakeplane)
 				renderer2.domElement.style.zIndex = 1;
 				var vector = new THREE.Vector3( ( mouseX / window.innerWidth ) * 2 - 1, - ( mouseY / window.innerHeight ) * 2 + 1, 0.5 );
-				projector.unprojectVector( vector, camera );
 				var raycaster = new THREE.Raycaster(camera.position, vector.sub( camera.position ).normalize() );			
 				var intersects = raycaster.intersectObjects( scene.children, true );
 				

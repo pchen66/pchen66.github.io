@@ -1,0 +1,33 @@
+{
+  "name": "pchen66.github.io",
+  "version": "1.0.0",
+  "description": "Personal Projects",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pchen66/pchen66.github.io.git"
+  },
+  "keywords": [
+    "pchen66",
+    "3d",
+    "3d",
+    "visualization"
+  ],
+  "author": "Ray Chen",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/pchen66/pchen66.github.io/issues"
+  },
+  "homepage": "https://github.com/pchen66/pchen66.github.io#readme",
+  "devDependencies": {
+    "gulp": "^3.9.1",
+    "gulp-concat": "^2.6.0",
+    "gulp-strip-debug": "^1.1.0",
+    "gulp-uglify": "^1.5.3"
+  },
+  "dependencies": {
+    "three": "^0.74.0"
+  }
+}

@@ -39,6 +39,15 @@
 				text-align: center;
 			}
 
+			.movieclip {
+				overflow: hidden;
+			}
+
+			.movieclip > video {
+				height: 100%;
+				margin-left: -65%;
+			}
+
 			.element {
 				width: 140px;
 				height: 180px;
@@ -86,10 +95,15 @@
 					color: rgba(255,255,255,0.75);
 				}
 				
-				.element .photo {
+				.element .video {
 					position: absolute;
-					width: 100%;
-					height: 100%;		
+					width: 20px;
+					height: 20px;
+					background-image: url('img/video.png');
+					background-position: center;
+				    background-size: cover;
+				    top: 20px;
+				    left: 20px;		
 				}
 				
 				.element .movieclip {
@@ -124,24 +138,23 @@
 		</style>
 	</head>
 	<body id="main_body">
-		<script src="../js/THREE/three.min.js"></script>
-		<script src="../js/THREE/libs/tween.min.js"></script>
-		<script src="../js/THREE/controls/TrackballControls.js"></script>
-		<script src="../js/THREE/renderers/CSS3DRenderer.js"></script>
+		<script src="../js/three/three.min.js"></script>
+		<script src="../js/three/libs/tween.min.js"></script>
+		<script src="../js/three/controls/TrackballControls.js"></script>
+		<script src="../js/three/controls/OrbitControls.js"></script>
+		<script src="../js/three/renderers/CSS3DRenderer.js"></script>		
 		
-		<script src="http://mrdoob.github.com/three.js/examples/fonts/helvetiker_regular.typeface.js"></script>
-		
-		
-		<div id="info"><a href="http://threejs.org" target="_blank">three.js css3d</a> - periodic table by <a href="http://pojuichen.com" target="_blank">Ray</a>. Tweak from <a href="https://plus.google.com/113862800338869870683/posts/QcFk5HrWran" target="_blank">Mr.doob</a>.</div>
+		<div id="info"><a href="http://threejs.org" target="_blank">three.js css3d</a> - periodic table tweak from <a href="https://plus.google.com/113862800338869870683/posts/QcFk5HrWran" target="_blank">Mr.doob</a>.</div>
 		<div id="container"></div>
 		<div id="menu">			
 			<button id="table">TABLE</button>
+			<button id="random">RANDOM</button>
+			<button id="cone">CONE</button>
 			<button id="sphere">SPHERE</button>
 			<button id="helix">HELIX</button>
 			<button id="grid">GRID</button>
-			<button id="cone">CONE</button>
-			<button id="random">RANDOM</button>
-			<button id="3datom">3D ATOM</button>
+		</div>
+		<video loop id='movie' src="movie/e3.mp4"></video>
 
 		<script>
 
@@ -273,6 +286,7 @@
 			var objects = [];
 			var targets = { table: [], sphere: [], helix: [], grid: [], cone: [], random: []};
 			var category = ['Alkali','Alkaline','Transition','PostTransition','Metalloid','Other', 'Halogen', 'Noble','Lanthanide','Actinide','Unknown'];
+			var videoCoverage = [ 3, 4, 5, 6, 7, 9, 11, 12, 13, 14, 15, 16, 17, 19, 20, 21, 22, 29 ];
 			
 			var scene2, renderer2;
 			var atom_objects = [], surrounding_objects = [];
@@ -292,6 +306,13 @@
 			
 			//light
 			var particleLight, pointLight;
+
+			var videoElement = document.getElementById( 'movie' );
+			videoElement.addEventListener('click', function(event){
+
+				this.paused ? this.play() : this.pause();
+
+			}, false );
 			
 			init();
 			animate();
@@ -367,9 +388,11 @@
 					details.innerHTML = item[ 1 ] + '<br>' + item[ 2 ];
 					element.appendChild( details );
 					
-					var photo = document.createElement( 'div' );
-					photo.className = 'photo';
-					element.appendChild( photo );
+					if ( videoCoverage.indexOf( i + 1 ) >= 0 ) {
+						var video = document.createElement( 'div' );
+						video.className = 'video';
+						element.appendChild( video );
+					}
 					
 					var movieclip = document.createElement( 'div' );
 					movieclip.className = 'movieclip';
@@ -587,13 +610,13 @@
 
 				}, false );
 
-				transform( targets.table, 5000 );
+				transform( targets.table, 0 );
 				
-				var button = document.getElementById( '3datom' );
+				/*var button = document.getElementById( '3datom' );
 				button.addEventListener( 'click', function ( event ) {
 					shape = '3datom';
 
-				}, false );
+				}, false );*/
 
 				//
 
@@ -604,6 +627,8 @@
 
 			function onElementMouseClick( event ) {
 			
+				var scope = this;
+
 				//Tween : Pan to Element
 				new TWEEN.Tween( camera.position ).to( {
 					x: objects[this.id].position.x,
@@ -617,12 +642,12 @@
 					
 					if( el.isSelected && this.id != selectedIndex) {					
 						el.isSelected = false;
+						el.lock = false;
 
 						//Hide movie clip
 						var mov = (el.getElementsByClassName('movieclip'))[0];
 						if(mov.isPlaying){	
-							mov.innerHTML = '';							
-						
+							videoElement.parentElement && videoElement.parentElement.removeChild( videoElement );						
 						new TWEEN.Tween( objects[ selectedIndex ].rotation ).to( {
 							x: 0,
 							y: 0,
@@ -638,7 +663,7 @@
 				}
 				
 				//Tween : Flip current element
-				if( this.isSelected){				
+				if( this.isSelected && !this.lock ){				
 					var rot_y = (objects[ this.id ].rotation.y == Math.PI) ? 0 : Math.PI;
 		
 					new TWEEN.Tween( objects[ this.id ].rotation ).to( {
@@ -650,16 +675,41 @@
 					.onComplete(function(){
 						var mov = (document.getElementById(selectedIndex).getElementsByClassName('movieclip'))[0];		
 						if(rot_y == Math.PI ){		//***Warning: All the movies belong to http://periodictable.com/ , Please do not misuse it***//
-							if(parseInt(selectedIndex)<18)
-								mov.innerHTML = '<embed src="movie/e'+(parseInt(selectedIndex) + 1)+'.mov" bgcolor="black" pluginspage="http://www.apple.com/quicktime/download/" width="100%" height="100%" type="video/quicktime" cache="true" controller="false" autostart="true">';
-							else
-								mov.innerHTML = '<embed src="movie/e'+(parseInt(selectedIndex) + 1)+'.MOV" bgcolor="black" pluginspage="http://www.apple.com/quicktime/download/" width="100%" height="100%" type="video/quicktime" cache="true" controller="false" autostart="true">';
-							
+							switch ( parseInt( selectedIndex ) + 1 ) {
+								case 3:
+								case 4:
+								case 5:
+								case 6:
+								case 7:
+								case 9:
+								case 11:
+								case 12:
+								case 13:
+								case 14:
+								case 15:
+								case 16:
+								case 17:
+								case 19:
+								case 20:
+								case 21:
+								case 22:
+								case 29:
+									mov.appendChild( videoElement );
+									mov.style.display = 'block';
+									videoElement.src = 'movie/e' + (parseInt(selectedIndex) + 1) + '.mp4';
+									videoElement.load();
+									videoElement.play();
+									videoElement.playbackRate = 12;
+									
+									scope.lock = true;
+									break;
+								default:
+									break;
+							}
 							mov.isPlaying = true;
-							mov.style.display = 'block';
 						}
 						else{
-							mov.innerHTML = '';
+							//mov.removeChild( videoElement );
 							mov.isPlaying = false;
 							mov.style.display = 'none';
 						}
@@ -783,7 +833,7 @@
 				//materials.push( new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'img/earth.jpg'), transparent: true } ) );
 				//materials.push( new THREE.MeshBasicMaterial( { map: texture, transparent: true } ) );
 				//materials.push( new THREE.MeshBasicMaterial( { envMap: THREE.ImageUtils.loadTexture( 'img/envmap.png', new THREE.SphericalReflectionMapping() ) } ));
-				materials.push( new THREE.MeshPhongMaterial( { map: texture, ambient: 0x030303, color: 0xdddddd, specular: 0x009900, shininess: 30, shading: THREE.FlatShading, wireframe: true, transparent: true } ) );
+				materials.push( new THREE.MeshPhongMaterial( { map: texture, emissive: 0x030303, color: 0xdddddd, specular: 0x009900, shininess: 30, shading: THREE.FlatShading, wireframe: true, transparent: true } ) );
 				// geometry
 				
 				var geometry_smooth = new THREE.SphereGeometry( 100, 32, 16 );
@@ -801,7 +851,7 @@
 
 				var sphere, geometry, material;
 
-				var text3d = new THREE.TextGeometry( "H", {
+				/*var text3d = new THREE.TextGeometry( "H", {
 
 					size: 50,
 					height: 10,
@@ -818,7 +868,7 @@
 				text.position.z = 0;
 				
 				atom_text3d = new THREE.Object3D();
-				atom_text3d.add(text);
+				atom_text3d.add(text);*/
 				
 				//scene2.add(atom_text3d);
 				
@@ -835,9 +885,9 @@
 					sphere.position.y = 0;
 					sphere.position.z = 0;
 					
-					atom_text3d.position.x = ( 50 - 100 )/2;
+					/*atom_text3d.position.x = ( 50 - 100 )/2;
 					atom_text3d.position.y = ( 50 - 100 )/2;
-					sphere.add(atom_text3d);
+					sphere.add(atom_text3d);*/
 					
 					//sphere.rotation.x = Math.random() * 200 - 100;
 					//sphere.rotation.y = Math.random() * 200 - 100;
@@ -847,7 +897,7 @@
 
 					//surrounding sphere
 					for(var j=0;j<4;j++){
-						var littlespere = new THREE.Mesh(new THREE.SphereGeometry( 50, 32, 32 ), new THREE.MeshPhongMaterial( { map: THREE.ImageUtils.loadTexture('img/lavatile.jpg'), bumpMap: THREE.ImageUtils.loadTexture('img/lavatile.jpg'), bumpScale: 1, color: 0xffffff, ambient: 0x777777, specular: 0x333333, shininess: 50, shading: THREE.SmoothShading } ));
+						var littlespere = new THREE.Mesh(new THREE.SphereGeometry( 50, 32, 32 ), new THREE.MeshPhongMaterial( {color: 0xffffff, emissive: 0x777777, specular: 0x333333, shininess: 50, shading: THREE.SmoothShading } ));
 						littlespere.position.x = 100;
 						littlespere.position.y = 0;
 						littlespere.position.z = 0;
@@ -945,7 +995,7 @@
 					surrounding_objects[ i ].position.z = 380 * Math.cos( phi * time);
 					/*console.log(parseInt(time));
 					if(parseInt(time) % 10 == 0){
-					var sss = new THREE.Mesh(new THREE.SphereGeometry( 50, 32, 32 ), new THREE.MeshPhongMaterial( { bumpMap: THREE.ImageUtils.loadTexture('img/lavatile.jpg'), bumpScale: 1, color: 0xffffff, ambient: 0x777777, specular: 0x333333, shininess: 50, shading: THREE.SmoothShading } ));
+					var sss = new THREE.Mesh(new THREE.SphereGeometry( 50, 32, 32 ), new THREE.MeshPhongMaterial( { bumpMap: THREE.ImageUtils.loadTexture('img/lavatile.jpg'), bumpScale: 1, color: 0xffffff, emissive: 0x777777, specular: 0x333333, shininess: 50, shading: THREE.SmoothShading } ));
 						sss.position.x = surrounding_objects[ i ].position.x;
 						sss.position.y = surrounding_objects[ i ].position.y;
 						sss.position.z = surrounding_objects[ i ].position.z;

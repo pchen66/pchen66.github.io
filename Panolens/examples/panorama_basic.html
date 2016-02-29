@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width">
-    <title>Panolens.js panorama basic</title>
+    <title>Panolens.js panorama basic panorama</title>
     <style>
       body {
         margin: 0;
@@ -28,17 +28,29 @@
 
   <body>
 
-    <div class="credit"><a href="https://github.com/pchen66/panolens.js">Panolens.js</a> panorama cube example. Image from <a href="http://adaptivesamples.com/tag/equirectangular/">Adaptive Samples</a></div>
+    <div class="credit"><a href="https://github.com/pchen66/panolens.js">Panolens.js</a> basic panorama example.</div>
     
-    <script src="../js/panolens.min.js"></script>
+    <script src="../../js/three/three.min.js"></script>
+    <script src="../../js/panolens/panolens.min.js"></script>
 
     <script>
 
-      var panorama, viewer;
-
-      panorama = new PANOLENS.ImagePanorama( 'equirectangular', 'asset/textures/equirectangular/field.jpg' );
+      var panorama, viewer, object;
 
       viewer = new PANOLENS.Viewer();
+      panorama = new PANOLENS.BasicPanorama();
+
+      object = new THREE.Mesh( new THREE.TorusKnotGeometry( 10, 3, 100, 16 ), new THREE.MeshNormalMaterial() );
+      object.position.z = -50;
+
+      // Rotate the object
+      viewer.addUpdateCallback( function () {
+
+        object.rotation.y += 0.01;
+
+      } );
+      
+      panorama.add( object );
       viewer.add( panorama );
 
     </script>

@@ -191,30 +191,57 @@
 			}
 			
 			#loadingImage {
+				position: fixed;
+			    top: 0;
+			    z-index: 9999999;
 				width: 100%;
 				height:100%;
+				display: -webkit-flex;
+				display: -ms-flexbox;
+				display: flex;
+				-webkit-box-align: center;
+				-webkit-align-items: center;
+				-ms-flex-align: center;
+				        align-items: center;
+				-webkit-box-pack: center;
+				-webkit-justify-content: center;
+				-ms-flex-pack: center;
+				        justify-content: center;
+				-webkit-box-orient: vertical;
+				-webkit-box-direction: normal;
+				-webkit-flex-direction: column;
+				    -ms-flex-direction: column;
+				        flex-direction: column;
+				background: rgb(63,127,127);
+				background-image: -webkit-radial-gradient(top, circle cover, rgb(63,127,127) 0%, #252233 90%);
+				background-image: -moz-radial-gradient(top, circle cover, rgb(127,255,255) 0%, #252233 90%);
+				background-image: -o-radial-gradient(top, circle cover, rgb(127,255,255) 0%, #252233 90%);
+				background-image: radial-gradient(top, circle cover, rgb(127,255,255) 0%, #252233 90%);
+			}
+
+			#loadingImage.ready {
+			  -webkit-transform: translateY(-100%);
+			      -ms-transform: translateY(-100%);
+			          transform: translateY(-100%);
+				-webkit-transition: all 1s ease 2s;
+      			transition: all 1s ease 2s;
 			}
 			
 			#message {
 			
-				position: absolute;
 				color: #ffffff;
-				bottom: 40%;
-				right: 0%;
-				width: 50%;
 				text-align: center;
 				font-size: 50px;
+				margin: 20px;
 			}
 			
 			#progressbar {
-				position: absolute;
-				bottom: 30%;
-				right: 5%;
 				text-align: center;
 				background: transparent;
-				border: 4px solid rgba(127,255,255,0.25);
+				border: 1px solid #fff;
 				width: 45%;
 				height: 10px;
+				margin: 20px;
 			}
 
 			#bar {
@@ -244,20 +271,20 @@
 		
 		<!-- Loading Page !-->
 		<div id="loadingImage">
-			<img src="img/ironman_loading.png" width="100%" height="100%"/>
+			<div id="message">Loading</div>
+			<div id="progressbar">
+				<div id="bar"></div>
+			</div>
 		</div>
-		<div id="message">Loading</div>
-		<div id="progressbar">
-			<div id="bar"></div>
-		</div>
-
-		<script src="../js/THREE/three.min.js"></script>
-		<script src="../js/THREE/renderers/CSS3DRenderer.js"></script>
 		
-		<script src="../js/THREE/controls/OrbitControls.js"></script>
-		<script src="../js/THREE/loaders/ColladaLoader.js"></script>
-		<script src="../js/THREE/libs/tween.min.js"></script>
-		<script src="../js/THREE/Detector.js"></script>
+
+		<script src="../js/three/three.min.js"></script>
+		<script src="../js/three/renderers/CSS3DRenderer.js"></script>
+		
+		<script src="../js/three/controls/OrbitControls.js"></script>
+		<script src="../js/three/loaders/ColladaLoader.js"></script>
+		<script src="../js/three/libs/tween.min.js"></script>
+		<script src="../js/three/Detector.js"></script>
 		<script>
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
@@ -265,7 +292,7 @@
 			var container, stats;
 
 			var camera, scene, scene2, renderer, objects, renderer2;
-			var controls, pointLight, projector;
+			var controls, pointLight;
 			
 			//Model Loading
 			var model_loading = [{loaded: 0, total: 0}];
@@ -286,6 +313,9 @@
 			var pelements = [];
 			var targets = { table: [] };
 			var periodictable_object;
+
+			// Raycaster
+			var raycaster = new THREE.Raycaster();
 			
 			//Models
 			var dae_ironman, dae_armrobot, dae_disc, dae_wardrobe_right, dae_wardrobe_left, dae_arc_model, 
@@ -489,7 +519,6 @@
 			loader.load( 'model/ironman/ironman.dae', function ( collada ) {
 
 				dae_ironman = collada.scene;
-				//skin = collada.skins[ 0 ];
 
 				dae_ironman.scale.x = dae_ironman.scale.y = dae_ironman.scale.z = 0.08;
 				dae_ironman.position.set(0,-80,0);
@@ -650,7 +679,7 @@
 						cloneObj.traverse(function(node){						
 							if( node.material != undefined ){
 								tempColor = 0xffffff*Math.random();
-								node.material = new THREE.MeshPhongMaterial( { color: tempColor, specular: 0xffffff, shininess: 50, vertexColors: THREE.FaceColors, shading: THREE.SmoothShading} );	
+								node.material = new THREE.MeshPhongMaterial( { color: tempColor, specular: 0xffffff, shininess: 50, vertexColors: THREE.FaceColors} );	
 							}
 						});
 						
@@ -697,10 +726,10 @@
 					document.getElementById('menu').style.display = '';
 					
 					//hide progress bar
-					document.getElementById('loadingImage').style.display = 'none';
-					document.getElementById('message').style.display = 'none';
+					document.getElementById('loadingImage').classList.add( 'ready' );
+					/*document.getElementById('message').style.display = 'none';
 					document.getElementById('progressbar').style.display = 'none';
-					document.getElementById('bar').style.width = '0%';
+					document.getElementById('bar').style.width = '0%';*/
 				}
 				
 				for(var i=0;i<model_loading.length;i++){
@@ -770,9 +799,6 @@
 				loadPeriodicTable( pd_z );
 				scene.add( periodictable_object );
 				
-				// Projector
-				projector = new THREE.Projector();
-				
 				// Controls
 				controls = new THREE.OrbitControls( camera );
 				controls.addEventListener( 'change', render );
@@ -809,6 +835,7 @@
 				container.appendChild( renderer2.domElement );
 				
 				renderer = new THREE.WebGLRenderer({antialias: true});
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
@@ -870,9 +897,8 @@
 					return;
 			
 				var vector = new THREE.Vector3( ( event.clientX / window.innerWidth ) * 2 - 1, - ( event.clientY / window.innerHeight ) * 2 + 1, 0.5 );
-				projector.unprojectVector( vector, camera );
-				//console.log(  );
-				var raycaster = new THREE.Raycaster(camera.position, vector.sub( camera.position ).normalize() );			
+
+				raycaster.setFromCamera( vector, camera );			
 				var intersects = raycaster.intersectObjects( scene.children, true );
 				if ( intersects.length > 0 ) {
 					//console.log(intersects[0].object);

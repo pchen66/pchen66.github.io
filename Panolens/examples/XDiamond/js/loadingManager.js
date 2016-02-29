@@ -108,7 +108,7 @@ var loadingManager = {
 			},500);
 
 			var panorama, viewer;
-			panorama = new PANOLENS.ImagePanorama( 'equirectangular', 'images/nebula2.png' );
+			panorama = new PANOLENS.ImagePanorama( 'images/nebula2.png' );
 			viewer = new PANOLENS.Viewer( { container: loadingmanager.canvasContainerElement } );
 			viewer.add( panorama );
 
@@ -119,6 +119,8 @@ var loadingManager = {
 
 			Game.scene = viewer.getScene();
 			Game.camera = viewer.getCamera();
+			Game.camera.fov = 90;
+			Game.camera.updateProjectionMatrix();
 			Game.container = loadingmanager.canvasContainerElement;
 			Game.TARGET_DISTANCE = panorama.orbitRadius;
 
