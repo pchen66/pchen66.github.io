@@ -61,7 +61,7 @@
 
   function generateProgressManager () {
 
-    var manager = {}, animationEndEvents, launchElement, subtitleTextElement, maskElement, loadingElement, enterElement, ytElements;
+    var manager = {}, animationEndEvents, launchElement, subtitleTextElement, maskElement, loadingElement, enterElement, ytElements, progressTextElement;
 
     animationEndEvents = [ 'animationend', 'webkitAnimationEnd' ];
 
@@ -69,11 +69,15 @@
     subtitleTextElement = document.getElementById( 'subtitle-text' );
     maskElement = document.getElementById( 'progress-container-mask' );
     loadingElement = document.getElementById( 'progress-indicator' );
-    enterElement = document.getElementById( 'enter-button' ); 
+    enterElement = document.getElementById( 'enter-button' );
+    progressTextElement = document.getElementById( 'progress-text' );
 
     animationEndEvents.forEach( function( event ){
 
-      subtitleTextElement.addEventListener( event, loadFont );
+      subtitleTextElement.addEventListener( event, function(){
+        loadingElement.classList.add( 'ready' );
+        loadFont();
+      } );
 
     } );
 
@@ -103,6 +107,8 @@
         }
 
       }
+
+      progressTextElement.textContent = Math.round( this.loaded / this.total * 100 );
 
     };
 
