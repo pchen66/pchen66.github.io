@@ -141,19 +141,6 @@
     shadeHeight = 5;
 
     panorama = new PANOLENS.EmptyPanorama();
-    panorama.addEventListener( 'click', function ( event ) {
-      if(event.intersects.length > 0) {
-        SOUND_CLICK.stop();SOUND_CLICK.play();
-        var intersect = event.intersects[0].object;
-        if( intersect.category ){
-          moviePanorama.movieData = movies[ intersect.category ];
-          moviePanorama.movie = moviePanorama.movieData.results[ 0 ];
-          moviePanorama.category = intersect.category;
-          moviePanorama.movieIndex = 0;
-          setPanorama( moviePanorama );
-        }
-      }
-    } );
 
     progressManager.addTotal( categories.length );
     tiles = generateClassifiedWall( categories );
@@ -753,6 +740,14 @@
       tile.tween( 'moveFront', tile.position, { z: 0 }, 1000, undefined, i * staggering );
       tile.tween( 'fadeOut', tile.material, { opacity: 0 }, 1000, undefined, i * staggering, null, null, makeInvisible.bind( tile ) );
       tile.tween( 'fadeIn', tile.material, { opacity: 1 }, 1000, undefined, i * staggering, makeVisible.bind( tile ), null, null );
+      tile.addEventListener( 'click-entity', function(){
+        SOUND_CLICK.stop();SOUND_CLICK.play();
+        moviePanorama.movieData = movies[ this.category ];
+        moviePanorama.movie = moviePanorama.movieData.results[ 0 ];
+        moviePanorama.category = this.category;
+        moviePanorama.movieIndex = 0;
+        setPanorama( moviePanorama );
+      } );
 
       edge = new THREE.EdgesHelper( tile.clone(), 0xffffff );
       edge.material.transparent = true;
@@ -772,6 +767,7 @@
       shade.material.opacity = 0;
       shade.material.color.set( 0x000000 );
       shade.renderOrder = 2;
+      shade.setEntity( tile );
       shade.passThrough = true;
       shade.tween( 'fadeOut', shade.material, { opacity: 0 }, 1000, undefined, i * staggering, null, null, makeInvisible.bind( shade ) );
       shade.tween( 'fadeIn', shade.material, { opacity: 0.7 }, 1000, undefined, i * staggering, makeVisible.bind( shade ), null, null );
@@ -783,6 +779,7 @@
       text.rotation.y = Math.PI;
       text.position.set( 0, (hUnit < 2 ? 2.2 : 1.2) * hUnit, 0.2 );
       text.renderOrder = 3;
+      text.setEntity( tile );
       text.passThrough = true;
       text.tween( 'fadeOut', text.mesh.material.uniforms.opacity, { value: 0 }, 300, undefined, i * staggering, null, null, makeInvisible.bind( text ) );
       text.tween( 'fadeIn', text.mesh.material.uniforms.opacity, { value: 1 }, 300, undefined, i * staggering, makeVisible.bind( text ), null, null );
@@ -1325,8 +1322,9 @@
 
   function generateCSS3DVideoElement () {
 
-    var widget, scene, stereoscene, renderer, stereorenderer, iframe, object, stereoobject;
+    var widget, scene, stereoscene, renderer, stereorenderer, iframe, object, stereoobject, scale;
 
+    scale = { x: 3.56, y: 2 };
     widget = { currentTime: 0 };
     scene = new THREE.Scene();
     stereoscene = new THREE.Scene();
@@ -1349,15 +1347,15 @@
     iframe.paused = true;
 
     object = new THREE.CSS3DObject( iframe );
-    object.position.z = -radius;
-    object.scale.x = tileLength * 3.2 / window.innerWidth;
-    object.scale.y = tileLength * 2.25 / window.innerHeight;
+    object.position.z = -radius * 0.8;
+    object.scale.x = tileLength * scale.x / window.innerWidth;
+    object.scale.y = tileLength * scale.y / window.innerHeight;
     scene.add( object );
 
     stereoobject = new THREE.CSS3DStereoObject( iframe );
-    stereoobject.position.z = -radius;
-    stereoobject.scale.x = tileLength * 3.2 / window.innerWidth;
-    stereoobject.scale.y = tileLength * 2.25 / window.innerHeight;
+    stereoobject.position.z = -radius * 0.8;
+    stereoobject.scale.x = tileLength * scale.x / window.innerWidth;
+    stereoobject.scale.y = tileLength * scale.y / window.innerHeight;
     stereoscene.add( stereoobject );
 
     // Pre-render
@@ -1391,9 +1389,8 @@
     });
 
     viewer.addEventListener( 'window-resize', function(){
-      object.scale.x = tileLength * 3.2 / window.innerWidth;
-      object.scale.y = tileLength * 2.25 / window.innerHeight;
       renderer.setSize( window.innerWidth, window.innerHeight );
+      stereorenderer.setSize( window.innerWidth, window.innerHeight );
     } );
 
     widget.paused = true;

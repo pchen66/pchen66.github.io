@@ -100,16 +100,24 @@ p {
   filter: alpha(opacity=0);
 }
 
+#progress-container-mask.ready > #enter-button {
+  opacity: 1;
+  filter: alpha(opacity=1);
+  cursor: pointer;
+}
+
 #enter-button:hover:before, #enter-button:hover:after {
   width: 50px;
 }
 
 #enter-button{
+  opacity: 0;
   overflow: hidden;
   text-align: center;
   margin-top: 1px;
   font-size: 2em;
-  cursor: pointer;
+  -webkit-transition: opacity 1s ease;
+          transition: opacity 1s ease;
 }
 
 #enter-button:hover{
