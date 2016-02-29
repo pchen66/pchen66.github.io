@@ -1540,6 +1540,7 @@
             this.title.mesh.material.uniforms.opacity.value = initialOpacity;
           } );
           tile.addEventListener( 'click-entity', function(){
+            SOUND_CLICK.stop();SOUND_CLICK.play();
             moviePanorama.movieData = movies[ 'All' ];
             moviePanorama.movie = movie;
             moviePanorama.category = 'All';
