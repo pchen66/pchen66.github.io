@@ -38,10 +38,13 @@
 	 * @param {THREE.Camera} [options.camera=THREE.PerspectiveCamera] - A THREE.Camera to view the scene
 	 * @param {THREE.WebGLRenderer} [options.renderer=THREE.WebGLRenderer] - A THREE.WebGLRenderer to render canvas
 	 * @param {boolean} [options.controlBar=true] - Show/hide control bar on the bottom of the container
+	 * @param {array}   [options.controlButtons=[ 'fullscreen', 'navigation', 'vr', 'video' ]] - Button names to mount on controlBar if controlBar exists
 	 * @param {boolean} [options.autoHideControlBar=false] - Auto hide control bar when click on non-active area
 	 * @param {boolean} [options.autoHideInfospot=false] - Auto hide infospots when click on non-active area
 	 * @param {boolean} [options.horizontalView=false] - Allow only horizontal camera control
-	 * @param {number}  [options.clickTolerance] - Distance tolerance to tigger click / tap event
+	 * @param {number}  [options.clickTolerance=10] - Distance tolerance to tigger click / tap event
+	 * @param {number}  [options.cameraFov=60] - Camera field of view value
+	 * @param {boolean} [options.reverseDragging=false] - Reverse dragging direction
 	 */
 	PANOLENS.Viewer = function ( options ) {
 
@@ -56,18 +59,42 @@
 
 		options = options || {};
 		options.controlBar = options.controlBar !== undefined ? options.controlBar : true;
+		options.controlButtons = options.controlButtons || [ 'fullscreen', 'navigation', 'vr', 'video' ];
 		options.autoHideControlBar = options.autoHideControlBar !== undefined ? options.autoHideControlBar : false;
 		options.autoHideInfospot = options.autoHideInfospot !== undefined ? options.autoHideInfospot : true;
 		options.horizontalView = options.horizontalView !== undefined ? options.horizontalView : false;
 		options.clickTolerance = options.clickTolerance || 10;
+		options.cameraFov = options.cameraFov || 60;
+		options.reverseDragging = options.reverseDragging || false;
 		
 		this.options = options;
+		this.container;
 
-		this.camera = options.camera || new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 10000 );
+		// Container
+		if ( options.container ) {
+
+			this.container = options.container;
+
+		} else {
+
+			this.container = document.createElement( 'div' );
+			this.container.style.width = window.innerWidth + 'px';
+			this.container.style.height = window.innerHeight + 'px';
+			document.body.appendChild( this.container );
+
+			// For matching body's width and height dynamically on the next tick to 
+			// avoid 0 height in the beginning
+			setTimeout( function () {
+				this.container.style.width = '100%';
+				this.container.style.height = '100%';
+			}.bind( this ), 0 );
+
+		}
+
+		this.camera = options.camera || new THREE.PerspectiveCamera( this.options.cameraFov, this.container.clientWidth / this.container.clientHeight, 1, 10000 );
 		this.scene = options.scene || new THREE.Scene();
 		this.renderer = options.renderer || new THREE.WebGLRenderer( { alpha: true, antialias: true } );
 		this.effect;
-		this.container;
 
 		this.mode = PANOLENS.Modes.NORMAL;
 
@@ -90,23 +117,12 @@
 
 		// Renderer
 		this.renderer.setPixelRatio( window.devicePixelRatio );
-		this.renderer.setSize( window.innerWidth, window.innerHeight );
+		this.renderer.setSize( this.container.clientWidth, this.container.clientHeight );
 		this.renderer.setClearColor( 0x000000, 1 );
-
-		// Container
-		if ( options.container ) {
-
-			this.container = options.container;
-
-		} else {
-
-			this.container = document.createElement('div');
-			document.body.appendChild( this.container );
-
-		}
 
 		// Append Renderer Element to container
 		this.renderer.domElement.classList.add( 'panolens-canvas' );
+		this.renderer.domElement.style.display = 'block';
 		this.container.appendChild( this.renderer.domElement );
 
 		// Camera Controls
@@ -119,7 +135,7 @@
 
 		// Cardboard effect
         this.effect = new THREE.CardboardEffect( this.renderer );
-        this.effect.setSize( window.innerWidth, window.innerHeight );
+        this.effect.setSize( this.container.clientWidth, this.container.clientHeight );
 
 		this.controls = [ this.OrbitControls, this.DeviceOrientationControls ];
 		this.control = this.OrbitControls;
@@ -132,7 +148,12 @@
 
 		// Add Control UI
 		if ( this.options.controlBar !== false ) {
-			this.addDefaultControlBar();
+			this.addDefaultControlBar( this.options.controlButtons );
+		}
+
+		// Reverse dragging direction
+		if ( this.options.reverseDragging ) {
+			this.reverseDraggingDirection();
 		}
 		
 		// Mouse / Touch Event
@@ -181,6 +202,7 @@
 
 		}
 
+		// Hookup default panorama event listeners
 		if ( object.type === 'panorama' ) {
 
 			this.addPanoramaEventListener( object );
@@ -195,7 +217,9 @@
 
 	};
 
-	PANOLENS.Viewer.prototype.addDefaultControlBar = function () {
+	PANOLENS.Viewer.prototype.addDefaultControlBar = function ( array ) {
+
+		var scope = this;
 
 		if ( this.widget ) {
 
@@ -206,7 +230,12 @@
 
 		this.widget = new PANOLENS.Widget( this.container );
 		this.widget.addEventListener( 'panolens-viewer-handler', this.eventHandler.bind( this ) );
-		this.widget.addDefaultControlBar();
+		this.widget.addControlBar();
+		array.forEach( function( buttonName ){
+
+			scope.widget.addControlButton( buttonName );
+
+		} );
 
 	};
 
@@ -405,6 +434,13 @@
 
 	};
 
+	PANOLENS.Viewer.prototype.setCameraFov = function ( fov ) {
+
+		this.camera.fov = fov;
+		this.camera.updateProjectionMatrix();
+
+	};
+
 	PANOLENS.Viewer.prototype.enableControl = function ( index ) {
 
 		index = ( index >= 0 &amp;&amp; index &lt; this.controls.length ) ? index : 0;
@@ -435,14 +471,35 @@
 
 	};
 
+	PANOLENS.Viewer.prototype.toggleFullscreen = function ( isFullscreen ) {
+
+		if ( isFullscreen ) {
+			this.container._width = this.container.clientWidth;
+			this.container._height = this.container.clientHeight;
+			this.container.style.width = '100%';
+			this.container.style.height = '100%';
+		} else {
+			this.container._width &amp;&amp; ( this.container.style.width = this.container._width + 'px' );
+			this.container._height &amp;&amp; ( this.container.style.height = this.container._height + 'px' );
+		}
+
+	};
+
+	PANOLENS.Viewer.prototype.reverseDraggingDirection = function () {
+
+		this.OrbitControls.rotateSpeed *= -1;
+		this.OrbitControls.momentumScalingFactor *= -1;
+
+	};
+
 	PANOLENS.Viewer.prototype.onWindowResize = function () {
 
-		this.camera.aspect = window.innerWidth / window.innerHeight;
+		this.camera.aspect = this.container.clientWidth / this.container.clientHeight;
 		this.camera.updateProjectionMatrix();
 
-		this.renderer.setSize( window.innerWidth, window.innerHeight );
+		this.renderer.setSize( this.container.clientWidth, this.container.clientHeight );
 
-		this.dispatchEvent( { type: 'window-resize', width: window.innerWidth, height: window.innerHeight })
+		this.dispatchEvent( { type: 'window-resize', width: this.container.clientWidth, height: this.container.clientHeight })
 	};
 
 	PANOLENS.Viewer.prototype.render = function () {
@@ -525,7 +582,7 @@
 		if ( type === 'click' ) {
 
 			this.options.autoHideInfospot &amp;&amp; this.panorama &amp;&amp; this.panorama.toggleChildrenVisibility();
-			this.options.autoHideControlBar &amp;&amp; toggleControlBar();
+			this.options.autoHideControlBar &amp;&amp; this.toggleControlBar();
 
 		}
 
@@ -535,8 +592,8 @@
 
 		var point = {}, object, intersects, intersect_entity, intersect;
 
-		point.x = ( event.clientX / window.innerWidth ) * 2 - 1;
-		point.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+		point.x = ( ( event.clientX - this.renderer.domElement.offsetLeft ) / this.renderer.domElement.clientWidth ) * 2 - 1;
+    	point.y = - ( ( event.clientY - this.renderer.domElement.offsetTop ) / this.renderer.domElement.clientHeight ) * 2 + 1;
 
 		this.raycaster.setFromCamera( point, this.camera );
 
@@ -715,9 +772,7 @@
 
 			}
 
-			if ( type === 'click' &amp;&amp; object.onClick ) {
-
-				object.onClick();
+			if ( type === 'click' ) {
 
 				return true;
 
@@ -773,7 +828,7 @@
 
 	PANOLENS.Viewer.prototype.toggleControlBar = function () {
 
-		widget &amp;&amp; widget.dispatchEvent( { type: 'control-bar-toggle' } );
+		this.widget &amp;&amp; this.widget.dispatchEvent( { type: 'control-bar-toggle' } );
 
 	};
 
@@ -817,7 +872,7 @@
 <br clear="both">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha5</a> on Tue Mar 01 2016 00:20:27 GMT-0800 (PST)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha5</a> on Tue Mar 08 2016 21:05:43 GMT-0800 (PST)
 </footer>
 
 <script> prettyPrint(); </script>

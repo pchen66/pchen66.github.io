@@ -36,7 +36,7 @@
 
 		THREE.EventDispatcher.call( this );
 
-		this.container = container;
+		this.container = container || document.body;
 
 		this.barElement;
 		this.fullscreenElement;
@@ -50,7 +50,7 @@
 
 	PANOLENS.Widget.prototype.constructor = PANOLENS.Widget;
 
-	PANOLENS.Widget.prototype.addDefaultControlBar = function () {
+	PANOLENS.Widget.prototype.addControlBar = function () {
 
 		if ( !this.container ) {
 
@@ -58,31 +58,23 @@
 			return; 
 		}
 
-		var scope = this, bar;
+		var scope = this, bar, styleTranslate, styleOpacity;
 
 		bar = document.createElement( 'div' );
 		bar.style.width = '100%';
 		bar.style.height = '44px';
-		bar.style.position = 'fixed';
-		bar.style.bottom = '0';
+		bar.style.float = 'left';
+		bar.style.transform = bar.style.webkitTransform = bar.style.msTransform = 'translateY(-100%)';
 		bar.style.background = 'rgba( 0, 0, 0, 0.3 )';
 		bar.style.transition = 'all 0.5s ease';
+		bar.isHidden = false;
 		bar.toggle = function () {
-
-			bar.style.transform = ( bar.style.transform !== 'translateY(100%)' ) ? 'translateY(100%)' : 'translateY(0)';
-
+			bar.isHidden = !bar.isHidden;
+			styleTranslate = bar.isHidden ? 'translateY(0)' : 'translateY(-100%)';
+			styleOpacity = bar.isHidden ? 0 : 1;
+			bar.style.transform = bar.style.webkitTransform = bar.style.msTransform = styleTranslate;
+			bar.style.opacity = styleOpacity;
 		};
-
-		this.fullscreenElement = this.createFullscreenButton();
-		this.navigationElement = this.createCameraControlButton();
-		this.vrElement = this.createVRButton();
-		this.videoElement = this.createVideoControl();
-
-		// Add Control Items
-		bar.appendChild( this.fullscreenElement );
-		bar.appendChild( this.navigationElement );
-		bar.appendChild( this.vrElement );
-		bar.appendChild( this.videoElement );
 
 		this.container.appendChild( bar );
 
@@ -90,6 +82,21 @@
 		this.addEventListener( 'control-bar-toggle', bar.toggle );
 
 		this.barElement = bar;
+
+	};
+
+	PANOLENS.Widget.prototype.addControlButton = function ( name ) {
+
+		this.fullscreenElement = name === 'fullscreen' ? this.createFullscreenButton() : this.fullscreenElement;
+		this.navigationElement = name === 'navigation' ? this.createCameraControlButton() : this.navigationElement;
+		this.vrElement = name === 'vr' ? this.createVRButton() : this.vrElement;
+		this.videoElement = name === 'video' ? this.createVideoControl() : this.videoElement;
+
+		// Add Control Items
+		this.fullscreenElement &amp;&amp; this.barElement.appendChild( this.fullscreenElement );
+		this.navigationElement &amp;&amp; this.barElement.appendChild( this.navigationElement );
+		this.vrElement &amp;&amp; this.barElement.appendChild( this.vrElement );
+		this.videoElement &amp;&amp; this.barElement.appendChild( this.videoElement );
 
 	};
 
@@ -121,42 +128,47 @@
 
 	PANOLENS.Widget.prototype.createFullscreenButton = function () {
 
-		var scope = this, item;
+		var scope = this, item, isFullscreen = false;
 
 		function onTap () {
 
-			var fullscreenElement;
-
-			if (!document.fullscreenElement &amp;&amp;
-			    !document.mozFullScreenElement &amp;&amp;
-			    !document.webkitFullscreenElement &amp;&amp;
-			    !document.msFullscreenElement ) {
-			  if (document.documentElement.requestFullscreen) {
-			    document.documentElement.requestFullscreen();
-			  } else if (document.documentElement.msRequestFullscreen) {
-			    document.documentElement.msRequestFullscreen();
-			  } else if (document.documentElement.mozRequestFullScreen) {
-			    document.documentElement.mozRequestFullScreen();
-			  } else if (document.documentElement.webkitRequestFullscreen) {
-			    document.documentElement.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
-			  }
+			if ( !isFullscreen ) {
+			    scope.container.requestFullscreen &amp;&amp; scope.container.requestFullscreen();
+			    scope.container.msRequestFullscreen &amp;&amp; scope.container.msRequestFullscreen();
+			    scope.container.mozRequestFullScreen &amp;&amp; scope.container.mozRequestFullScreen();
+			    scope.container.webkitRequestFullscreen &amp;&amp; scope.container.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
+				isFullscreen = true;
+				attachInfospotsToContainer();
 			} else {
-			  if (document.exitFullscreen) {
-			    document.exitFullscreen();
-			  } else if (document.msExitFullscreen) {
-			    document.msExitFullscreen();
-			  } else if (document.mozCancelFullScreen) {
-			    document.mozCancelFullScreen();
-			  } else if (document.webkitExitFullscreen) {
-			    document.webkitExitFullscreen();
-			  }
+			    document.exitFullscreen &amp;&amp; document.exitFullscreen();
+			    document.msExitFullscreen &amp;&amp; document.msExitFullscreen();
+			    document.mozCancelFullScreen &amp;&amp; document.mozCancelFullScreen();
+			    document.webkitExitFullscreen &amp;&amp; document.webkitExitFullscreen();
+				isFullscreen = false;
 			}
 
-			fullscreenElement = document.fullscreenElement || document.mozFullScreenElement || document.webkitFullscreenElement;
-
-			this.style.backgroundImage = ( fullscreenElement !== null ) 
+			this.style.backgroundImage = ( isFullscreen ) 
 				? 'url("' + PANOLENS.DataImage.FullscreenLeave + '")' 
 				: 'url("' + PANOLENS.DataImage.FullscreenEnter + '")';
+
+			scope.dispatchEvent( { type: 'panolens-viewer-handler', method: 'toggleFullscreen', data: isFullscreen } );
+
+		}
+
+		// Attach infospot to container when fullscreen
+		function attachInfospotsToContainer () {
+
+			var infospotElements = document.querySelectorAll( '.panolens-infospot' );
+
+			for ( var i = 0; i &lt; infospotElements.length; i++ ) {
+
+				if ( infospotElements[ i ].parentElement !== scope.container ) {
+
+					scope.container.appendChild( infospotElements[ i ] );
+
+				}
+				
+			}
 
 		}
 
@@ -448,7 +460,7 @@
 
 		for ( var property in options ){
 
-			if ( options.hasOwnProperty( property ) &amp;&amp; element.style.hasOwnProperty( property ) ) {
+			if ( options.hasOwnProperty( property ) ) {
 
 				element.style[ property ] = options[ property ];
 
@@ -476,7 +488,7 @@
 <br clear="both">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha5</a> on Tue Mar 01 2016 00:20:27 GMT-0800 (PST)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha5</a> on Tue Mar 08 2016 21:05:43 GMT-0800 (PST)
 </footer>
 
 <script> prettyPrint(); </script>
