@@ -16,10 +16,25 @@ p{
 ul, li{
 	padding: 0;
 	padding-left: 0 !important;
+	margin: 10px;
+}
+
+li {
+	display: inline-block;
+    width: 30%;
+    text-align: center;
 }
 
 #one.wrapper{
 	padding-bottom: 1em;
+}
+
+#documentation{
+	padding-top: 0;
+}
+
+#documentation a{
+	border-bottom: dotted 1px;
 }
 
 .menu{
