@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width, shrink-to-fit=no">
+    <title>Panolens.js panorama simple gallery</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href='https://fonts.googleapis.com/css?family=Roboto:400,300' rel='stylesheet' type='text/css'>
+    <style>
+      body {
+        margin: 0;
+        width: 100%;
+        height: 100%;
+        font-family: 'Roboto', sans-serif;
+        background-color: #eee;
+      }
+
+      a:link, a:visited{
+        color: #bdc3c7;
+      }
+
+      .credit{
+        position: absolute;
+        text-align: center;
+        width: 100%;
+        padding: 20px 0;
+        color: #fff;
+      }
+
+      #gallery-container {
+        display: flex;
+        flex-wrap: wrap;
+        margin-bottom: 4px;
+      }
+
+      .title {
+        width: 100%;
+        height: 80px;
+        line-height: 80px;
+        text-align: center;
+        font-size: 24px;
+      }
+
+      #panorama-container {
+        position: fixed;
+        display: flex;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        background: rgba(0,0,0,0.9);
+        transform: scale(0,0);
+        opacity: 0;
+        -webkit-transition: all 0.5s ease-out;
+        transition: all 0.5s ease-out;
+      }
+
+      #panorama-container.open {
+        opacity: 1;
+        transform: scale(1,1);
+      }
+
+      .photo {
+        flex-grow: 1;
+        width: 360px;
+        height: 240px;
+        background-image: url( 'asset/textures/field-thumb.jpg' );
+        background-size: cover;
+        margin: 4px;
+        border: 1px solid #ccc;
+        cursor: pointer;
+      }
+
+      .photo:hover {
+        border-color: #000;
+      }
+
+      #progress-bar {
+        position: fixed;
+        top: 0;
+        width: 0;
+        height: 5px;
+        background-color: #fff;
+        transition: opacity 0.5s ease;
+      }
+
+      .close {
+        width: 44px;
+        height: 44px;
+        position: absolute;
+        right: 0;
+        margin: 20px;
+        cursor: pointer;
+      }
+
+      .close > i {
+        color: #fff;
+        font-size: 44px;
+      }
+
+      #main-container {
+        width: 100%;
+        height: 80%;
+        align-self: center;
+        background-color: rgba( 255, 255, 0, 0.5 );
+      }
+    </style>
+  </head>
+
+  <body>
+
+    <div id="gallery-container">
+      <div class="title">Panolens Gallery Example</div>  
+    </div>
+
+    <div id="panorama-container">
+
+      <!-- Progress bar -->
+      <div id="progress-bar"></div>
+
+      <!-- Close button -->
+      <div class="close">
+        <i class="material-icons">close</i>
+      </div>
+
+      <!-- Main container -->
+      <div id="main-container">
+        
+      </div>
+    </div>
+    
+    <script src="../../js/three/three.min.js"></script>
+    <script src="../../js/panolens/panolens.min.js"></script>
+
+    <script>
+
+      var gallery, galleryContainer, photo, desc, panoramaContainer, mainContainer, closeButton, animationEndEvents, viewer, panorama, progress, path, format, url;
+
+      gallery = [ 'cabin', 'field', 'golf', 'lamp', 'leaf', 'lookout', 'pier', 'rock', 'suite', 'tent' ];
+      path = 'asset/textures/equirectangular/';
+      format = '.jpg';
+
+      galleryContainer = document.getElementById( 'gallery-container' );
+      panoramaContainer = document.getElementById( 'panorama-container' );
+      mainContainer = document.getElementById( 'main-container' );
+      progressBar = document.getElementById( 'progress-bar' );
+      closeButton = panoramaContainer.querySelector( '.close' );
+      
+      function buildGallery () {
+
+        for ( i = 0; i < gallery.length; i++ ) {
+
+          url = path + gallery[ i ] + format;
+
+          photo = document.createElement( 'div' );
+          photo.url = url;
+          photo.classList.add( 'photo' );
+          photo.style.backgroundImage = 'url(' + url + ')';
+          photo.addEventListener( 'click', function () {
+
+            // Dynamically generate panorama
+            panorama = new PANOLENS.ImagePanorama( this.url );
+            panorama.addEventListener( 'progress', function ( event ) {
+
+              progress = event.progress.loaded / event.progress.total * 100;
+
+              progressBar.style.width = progress + '%';
+
+              if ( progress === 100 ) {
+
+                progressBar.style.opacity = 0;
+
+              }
+
+            } );
+            viewer.add( panorama );
+            viewer.setPanorama( panorama ); 
+
+            panoramaContainer.classList.add( 'open' );
+
+          }, false );
+
+          galleryContainer.appendChild( photo );
+
+        }
+        
+      }
+
+      function setupPanolens () {
+
+        viewer = new PANOLENS.Viewer( { container: mainContainer } );
+
+      }
+
+      function disposePanorama () {
+
+        panorama.dispose();
+        viewer.remove( panorama );
+        panorama = null;
+      }
+
+      function init () {
+
+        // Build up gallery 
+        buildGallery();
+
+        // Setup panolens
+        setupPanolens();
+
+        // Dispose panorama when close
+        closeButton.addEventListener( 'click', function () {
+
+          disposePanorama();
+
+          progressBar.style.width = 0;
+          progressBar.style.opacity = 1;
+
+          panoramaContainer.classList.remove( 'open' );
+
+        }, false );
+
+      }
+
+      init();
+
+    </script>
+
+  </body>
