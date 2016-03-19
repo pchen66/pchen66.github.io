@@ -129,6 +129,7 @@
 				width: 100%;
 				text-align: center;
 				z-index: 2000;
+				display: none;
 			}
 			
 			button {
@@ -295,8 +296,8 @@
 			var controls, pointLight;
 			
 			//Model Loading
-			var model_loading = [{loaded: 0, total: 0}];
-			var currentProgress = 0, totalProgress = 0;
+			var progressObject = {};
+			var completedState = { loaded: 1, total: 1 };
 			
 			//Car
 			var isLookAtCarLeft = false, isLookAtCarRight = false;
@@ -448,8 +449,9 @@
 				// start the first
 				tweenClockWise.start();
 				
-				
-				} );					
+				progressCallback( 'arc', completedState );
+
+				}, progressCallback.bind( this, 'arc' ) );					
 			}	
 
 			function loadSideModel(){
@@ -475,9 +477,11 @@
 				
 				dae_earth_model = dae;
 				
-				scene.add( dae );		
+				scene.add( dae );	
+
+				progressCallback( 'earth', completedState );		
 				
-				}, progressCallback );
+				}, progressCallback.bind( this, 'earth' ) );
 
 				var dae2;
 				var loader2 = new THREE.ColladaLoader();
@@ -491,9 +495,11 @@
 				dae2.name = "car_right";
 				
 				dae_car_right = dae2;
-				scene.add( dae2 );		
+				scene.add( dae2 );
+
+				progressCallback( 'car1', completedState );		
 				
-				}, progressCallback );
+				}, progressCallback.bind( this, 'car1' ) );
 				
 				var dae3;
 				var loader3 = new THREE.ColladaLoader();
@@ -507,9 +513,11 @@
 				dae3.name = "car_left";
 				
 				dae_car_left = dae3;
-				scene.add( dae3 );		
+				scene.add( dae3 );
+
+				progressCallback( 'car2', completedState );	
 				
-				}, progressCallback );
+				}, progressCallback.bind( this, 'car2' ) );
 			}
 		
 			//Model
@@ -536,8 +544,10 @@
 				dae_ironman.add( pointLight );
 				
 				scene.add( dae_ironman );
+
+				progressCallback( 'ironman', completedState );
 				
-				}, progressCallback );		
+				}, progressCallback.bind( this, 'ironman' ) );		
 				return dae_ironman;
 			}
 			
@@ -568,8 +578,10 @@
 
 				// start the first
 				tweenClockWise.start();
+
+				progressCallback( 'armRobot', completedState );
 				
-				}, progressCallback );		
+				}, progressCallback.bind( this, 'armRobot' ) );		
 				return dae_armrobot;
 			}
 			
@@ -605,7 +617,9 @@
 
 				// start the first
 				tweenUp.start();
-				}, progressCallback );
+
+				progressCallback( 'disc', completedState );
+				}, progressCallback.bind( this, 'disc' ) );
 
 				return dae_disc;
 			}
@@ -630,8 +644,9 @@
 				
 				scene.add( dae );
 				loadIronmanDollModel( dae );
+				progressCallback( 'wardrobe', completedState );
 							
-				}, progressCallback );
+				}, progressCallback.bind( this, 'wardrobe' ) );
 
 				
 				return dae;	
@@ -694,54 +709,40 @@
 						
 						// reset 
 						cloneObj = undefined;
-						//collada_mesh.length = 0;
+
 					}				
 					
-					dae.add( dae2 );						
-				}, progressCallback );
+					dae.add( dae2 );
+					progressCallback( 'ironmanDoll', completedState );				
+				}, progressCallback.bind( this, 'ironmanDoll' ) );
 			}
 			
-			function progressCallback( progress ){
-				
-				var tmp = 0, tmp2 = 0;			
-				for(var i=0;i<model_loading.length;i++){
-					tmp += parseInt( model_loading[i].loaded );
-					tmp2 += parseInt( model_loading[i].total );
+			function progressCallback( name, progress ){
+
+				var tempProgress = 0, currentProgress = 0;
+
+				progressObject[name] = progress.loaded / progress.total * 100;
+
+				for ( var i in progressObject ) {
+					tempProgress += progressObject[i];
 				}
-				currentProgress = tmp;
-				totalProgress = tmp2;
-				//console.log( currentProgress+"/"+totalProgress);
-				
-				//hide UI control
-				document.getElementById('menu').style.display = 'none';
-				
+
+				currentProgress = tempProgress / Object.keys(progressObject).length;
+
 				//show progress bar
-				document.getElementById('bar').style.width = (currentProgress/totalProgress * 100) + '%';
+				document.getElementById('bar').style.width = currentProgress + '%';
 				
-				if( currentProgress/totalProgress * 100 > 98 ){
+				if( currentProgress === 100 ){
 					//play Ironman Trailer
 					onMonitorPlayClick();
 				
 					//show UI control
-					document.getElementById('menu').style.display = '';
+					document.getElementById('menu').style.display = 'block';
 					
 					//hide progress bar
 					document.getElementById('loadingImage').classList.add( 'ready' );
-					/*document.getElementById('message').style.display = 'none';
-					document.getElementById('progressbar').style.display = 'none';
-					document.getElementById('bar').style.width = '0%';*/
 				}
-				
-				for(var i=0;i<model_loading.length;i++){
-					tmp += parseInt( model_loading[i].loaded );
-					if( model_loading[i].total == progress.total ){
-						model_loading[i] = progress;
-						return;					
-					}
-				}
-				var tmpProgress = progress;
-				model_loading.push( tmpProgress );
-				//console.log(model_loading);
+
 			}
 
 			init();
