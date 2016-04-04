@@ -19,7 +19,8 @@ var THREEJS_COMPONENTS = [
   'node_modules/three/examples/js/loaders/OBJLoader.js',
 	'node_modules/three/examples/js/controls/OrbitControls.js',
   'node_modules/three/examples/js/controls/TrackballControls.js',
-  'node_modules/three/examples/js/renderers/CSS3DRenderer.js'
+  'node_modules/three/examples/js/renderers/CSS3DRenderer.js',
+  'node_modules/three/examples/js/modifiers/ExplodeModifier.js'
 
 ];
 

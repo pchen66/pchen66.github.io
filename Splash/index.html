@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width, shrink-to-fit=no">
+    <style>
+      body {
+        margin: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        position: fixed;
+      }
+    </style>
+    <title>Splash</title>
+  </head>
+
+  <body>
+    
+    <script src="js/dat.gui.min.js"></script>
+    <script src="../js/three/three.min.js"></script>
+    <script src="../js/three/libs/tween.min.js"></script>
+    <script src="../js/three/modifiers/ExplodeModifier.js"></script>
+    <script src="../js/three/controls/OrbitControls.js"></script>
+    <script>
+      
+      var container, stats, loader;
+
+      var camera, scene, renderer, control;
+
+      var mesh, ball;
+
+      var faces = [];
+      var shatterAnimations = [];
+      var resetAllAnimation;
+      
+      var vector = new THREE.Vector3( 1, 1, 1 );
+
+      var ANIMATION_DURATION = 2000;
+      var BALL_SEGMENTS = 32;
+      var GRAVITY = -0.001;
+      var FLOOR_Y = -5;
+      var DECAY = 0.95;
+      var BLOOM_SPEED = 0.02;
+
+      var data = {
+        color: [ 255, 255, 255 ]
+      };
+
+      var gui = new dat.GUI();
+      var isReset = false;
+      var ballFolder;
+
+      init();
+      animate();
+
+      function init() {
+
+        container = document.createElement( 'div' );
+        document.body.appendChild( container );
+
+        camera = new THREE.PerspectiveCamera( 36, window.innerWidth / window.innerHeight, 1, 10000 );
+        camera.position.z = 2000;
+
+        control = new THREE.OrbitControls( this.camera );
+        control.maxDistance = 4000;
+
+        scene = new THREE.Scene();
+
+        // LIGHTS
+
+        scene.add( new THREE.HemisphereLight( 0x443333, 0x111122 ) );
+
+        spotLight = new THREE.SpotLight( 0xffffbb, 2 );
+        spotLight.position.set( 0.5, 0, 1 );
+        spotLight.position.multiplyScalar( 1000 );
+        scene.add( spotLight );
+
+        spotLight.castShadow = true;
+        spotLight.shadow.mapSize.width = 2048;
+        spotLight.shadow.mapSize.height = 2048;
+        spotLight.shadow.bias = -0.005;
+        spotLight.shadow.camera.near = 200;
+        spotLight.shadow.camera.far = 1500;
+        spotLight.shadow.camera.fov = 60;
+
+        loader = new THREE.JSONLoader();
+        loader.load( "model/leeperrysmith/LeePerrySmith.js", function( geometry ) { 
+          addHeadMesh( geometry );
+          addWreckingBacll();
+          addDatGui();
+        } );
+
+        renderer = new THREE.WebGLRenderer();
+        renderer.setPixelRatio( window.devicePixelRatio );
+        renderer.setSize( window.innerWidth, window.innerHeight );
+        container.appendChild( renderer.domElement );
+
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.cullFace = THREE.CullFaceBack;
+
+        renderer.gammaInput = true;
+        renderer.gammaOutput = true;
+
+        // Animation
+        resetAllAnimation = new TWEEN.Tween( this )
+          .to( {}, ANIMATION_DURATION )
+          .onComplete( function () {
+            isReset = false;
+        } );
+
+        window.addEventListener( 'resize', onWindowResize, false );
+
+      }
+
+      function addHeadMesh( geometry ) {
+
+        var scale = 100;
+
+        var mapHeight = new THREE.TextureLoader().load( "model/leeperrysmith/Infinite-Level_02_Disp_NoSmoothUV-4096.jpg" );
+
+        var map = new THREE.TextureLoader().load( "model/leeperrysmith/Map-COL.jpg" );
+
+        mapHeight.anisotropy = 4;
+        mapHeight.repeat.set( 0.998, 0.998 );
+        mapHeight.offset.set( 0.001, 0.001 );
+        mapHeight.wrapS = mapHeight.wrapT = THREE.RepeatWrapping;
+        mapHeight.format = THREE.RGBFormat;
+
+        var material = new THREE.MeshPhongMaterial( {
+          color: 0xffffff,
+          specular: 0x303030,
+          shininess: 25,
+          bumpMap: mapHeight,
+          bumpScale: 12,
+          map: map,
+          side: THREE.DoubleSide
+        } );
+
+        // Explode modifier
+        var explodeModifier = new THREE.ExplodeModifier();
+        explodeModifier.modify( geometry );
+
+        mesh = new THREE.Mesh( geometry, material );
+        mesh.position.y = - 50;
+        mesh.scale.set( scale, scale, scale );
+        mesh.castShadow = true;
+        mesh.receiveShadow = true;
+            scene.add( mesh );
+
+        for( var i = 0; i < geometry.faces.length; i++ ) {
+
+          var face = geometry.faces[ i ], v1, v2, v3;
+
+          v1 = mesh.geometry.vertices[ face.a ];
+          v2 = mesh.geometry.vertices[ face.b ];
+          v3 = mesh.geometry.vertices[ face.c ];
+
+          face.boundingBox = new THREE.Box3( 
+            v1.clone().min( v2 ).min( v3 ),
+            v1.clone().max( v2 ).max( v3 )
+          );
+
+          face.boundingBox.isActive = false;
+
+          face.move = function ( vector ) {
+
+            this.v1.add( vector );
+            this.v2.add( vector );
+            this.v3.add( vector );
+
+          };
+
+          face.reset = function () {
+
+            this.v1.copy( this.v1.cv );
+            this.v2.copy( this.v2.cv );
+            this.v3.copy( this.v3.cv );
+
+            var invVector = this.v1.clone().add( this.v2 ).add( this.v3 );
+            vector.copy( invVector ).multiplyScalar( - 1 / 3 );
+            this.move( vector );
+
+          };
+
+          v1.cv = v1.clone();
+          v2.cv = v2.clone();
+          v3.cv = v3.clone();
+
+          face.v1 = v1;
+          face.v2 = v2;
+          face.v3 = v3;
+
+          // Bloom
+          face.mvx = ( Math.random() < 0.5 ? -1 : 1 ) * Math.random() * BLOOM_SPEED;
+          face.mvy = ( Math.random() < 0.5 ? -1 : 1 ) * Math.random() * BLOOM_SPEED;
+          face.mvz = ( Math.random() < 0.5 ? -1 : 1 ) * Math.random() * BLOOM_SPEED;
+
+          // Splash
+          face.stepVector = new THREE.Vector3();
+
+          // Gravity
+          face.gravity = GRAVITY;
+
+          face.resetAnimation = new TWEEN.Tween( { face: face, ratio: 0 } )
+            .to( { ratio: 1 }, ANIMATION_DURATION * Math.random() )
+            .onUpdate( function () {
+
+              var face = this.face, ratio = this.ratio;
+
+              face.v1.lerp( face.v1.cv, ratio );
+              face.v2.lerp( face.v2.cv, ratio );
+              face.v3.lerp( face.v3.cv, ratio );
+
+            } )
+            .onComplete( function () {
+
+              this.ratio = 0;
+
+            } );
+
+          faces.push( face );
+
+        }
+
+      }
+
+      function addWreckingBacll () {
+
+        var path = 'textures/pisa/';
+        var format = '.png';
+        var urls = [
+            path + 'px' + format, path + 'nx' + format,
+            path + 'py' + format, path + 'ny' + format,
+            path + 'pz' + format, path + 'nz' + format
+        ];
+        var textureCube = new THREE.CubeTextureLoader().load( urls );
+        textureCube.format = THREE.RGBFormat;
+        textureCube.mapping = THREE.CubeReflectionMapping;
+
+        var geometry = new THREE.SphereGeometry( 1, BALL_SEGMENTS, BALL_SEGMENTS );
+        var material = new THREE.MeshPhongMaterial( { envMap: textureCube } );
+        
+        ball = new THREE.Mesh( geometry, material );
+        ball.scale.multiplyScalar( 0.5 );
+        ball.position.set( 3, 0, 1 );
+        ball.lastPosition = ball.position.clone();
+
+        var pointLight = new THREE.PointLight( 0xffffff, 1 );
+        ball.add(pointLight);
+
+        mesh.add( ball );
+
+      }
+
+      function addDatGui () {
+
+        var color = new THREE.Color();
+
+        data.ballPosition = ball.position;
+        data.radius = 0.5;
+        data.velocity = 0.1;
+        data.bloom = false;
+        data.envMap = false;
+        data.reset = reset;
+
+        ballFolder = gui.addFolder( 'Ball' );
+        ballFolder.add( data.ballPosition, 'x', -10, 10 );
+        ballFolder.add( data.ballPosition, 'y', -10, 10 );
+        ballFolder.add( data.ballPosition, 'z', -10, 10 );
+        ballFolder.add( data, 'radius', 0.1, 5 ).onChange( updateBallRadius );
+        ballFolder.open();
+
+        gui.addColor( data, 'color' ).onChange( function ( value ) {
+          color.r = value[ 0 ] / 255;
+          color.g = value[ 1 ] / 255;
+          color.b = value[ 2 ] / 255;
+          mesh.material.color.copy( color );
+        } );
+        gui.add( data, 'envMap' ).onChange( function ( on ) {
+          mesh.material.envMap = on ? ball.material.envMap : null;
+          mesh.material.needsUpdate = true;
+        } );
+        gui.add( data, 'velocity', 0.05, 0.5 );
+        gui.add( data, 'bloom' ).onChange( function ( isBloom ) {
+          stopTweenAnimations();
+          if ( isBloom ) {
+            ballFolder.close();
+            ball.visible = false;
+          }
+        } );
+        gui.add( data, 'reset' );
+
+      }
+
+      function stopTweenAnimations () {
+
+        shatterAnimations.forEach( function ( animation ) { animation.stop(); } );
+        shatterAnimations.length = 0;
+
+        // Tween back each face
+        for ( var i = 0; i < faces.length; i++ ) {
+          var face = faces[ i ];
+          face.resetAnimation.stop();
+          face.boundingBox.isActive = true;
+        }
+
+      }
+
+      function reset() {
+
+        isReset = true;
+
+        // Reset ball
+        ball.position.set( 3, 0, 1 );
+        ball.visible = true;
+        updateBallRadius( 0.5 );
+        data.velocity = 0.1;
+        data.bloom = false;
+
+        ballFolder.open();
+
+        // Iterate over all controllers
+          for ( var i in gui.__controllers ) {
+            gui.__controllers[i].updateDisplay();
+          }
+
+          // Update inner folder controllers
+          for ( var i in gui.__folders ) {
+            for ( var j in gui.__folders[ i ].__controllers ) {
+              gui.__folders[ i ].__controllers[ j ].updateDisplay();
+            }
+          }
+
+        // Remove and reuse shatter animation
+        shatterAnimations.forEach( function ( animation ) { animation.stop(); } );
+        shatterAnimations.length = 0;
+
+        // Tween back each face
+        for ( var i = 0; i < faces.length; i++ ) {
+
+          var face = faces[ i ];
+
+          if ( face.boundingBox.isActive ) {
+
+            // Reset face animation
+            face.resetAnimation.start();
+
+            // Reset boundingbox activation
+            face.boundingBox.isActive = false;
+
+          }
+
+        }
+
+        // Set flag after animation completes
+        resetAllAnimation.start();
+
+      }
+
+      function updateBallRadius( radius ) {
+        data.radius = radius;
+        ball.scale.set( 1, 1, 1 );
+        ball.scale.multiplyScalar( radius );
+      }
+
+      function onWindowResize( event ) {
+
+        renderer.setSize( window.innerWidth, window.innerHeight );
+
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+
+      }
+
+      function animate() {
+
+        requestAnimationFrame( animate );
+
+        render();
+
+        TWEEN.update();
+
+      }
+
+      function render() {
+
+        if ( mesh ) {
+
+          mesh.geometry.verticesNeedUpdate = true;
+
+        }
+
+        if ( ball && !isReset ) {
+
+          for ( var i = 0, face, box, center, dis, animation; i < faces.length; i++ ) {
+
+            face = faces[ i ];
+            box = face.boundingBox;
+
+            dis = box.distanceToPoint( ball.position );
+
+            if ( dis < data.radius && !box.isActive ) {
+
+              box.isActive = true;
+
+              face.stepVector.copy( ball.position )
+                .add( new THREE.Vector3(
+                  ( 0.5 - Math.random() ) * 100, 
+                  ( 0.5 - Math.random() ) * 100, 
+                  ( 0.5 - Math.random() ) * 100 ) )
+                .clamp( box.min, box.max )
+                .sub( ball.position )
+                .multiplyScalar( data.velocity );
+
+              face.gravity = GRAVITY;
+
+              animation = new TWEEN.Tween( { face: face } )
+              .to( {}, ANIMATION_DURATION )
+              .onUpdate( function () {
+
+                var face = this.face;
+
+                vector.copy( face.stepVector );
+                vector.y += face.gravity;
+
+                face.move( vector );
+                face.gravity += face.gravity * 0.1;
+
+                if ( face.v1.y <= FLOOR_Y  ) {
+
+                  face.v1.y = FLOOR_Y;
+                  face.stepVector.multiplyScalar( DECAY );
+
+                }
+
+                if ( face.v2.y <= FLOOR_Y  ) {
+
+                  face.v2.y = FLOOR_Y;
+                  face.stepVector.multiplyScalar( DECAY );
+
+                }
+
+                if ( face.v3.y <= FLOOR_Y  ) {
+
+                  face.v3.y = FLOOR_Y;
+                  face.stepVector.multiplyScalar( DECAY );
+
+                }
+
+              } );
+
+              animation.start();
+              shatterAnimations.push( animation );
+
+            }
+
+            if ( data.bloom ) {
+
+              vector.set( 
+                face.mvx * ( 1 + data.velocity ), 
+                face.mvy * ( 1 + data.velocity ), 
+                face.mvz * ( 1 + data.velocity )
+              );
+
+              face.boundingBox.isActive = true;
+              face.move( vector );
+
+              if ( face.v1.length() > Math.random() * 40 + 2 ) {
+
+                face.reset();
+
+              }
+
+            }
+
+          }
+
+          ball.lastPosition = ball.position.clone();
+
+        }
+        
+        renderer.render( scene, camera );
+
+      }
+
+    </script>
+
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-74433652-1', 'auto');
+      ga('send', 'pageview');
+    </script>
+
+  </body>
