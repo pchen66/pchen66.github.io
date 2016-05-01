@@ -1,83 +1,165 @@
 <!DOCTYPE HTML>
 <html>
-	<head>
-		<title>Panolens.js</title>
-		<meta charset="utf-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1" />
-		<!--[if lte IE 8]><script src="assets/js/ie/html5shiv.js"></script><![endif]-->
-		<link href='https://fonts.googleapis.com/css?family=Roboto:400,300,100' rel='stylesheet' type='text/css'>
-		<link rel="stylesheet" href="assets/css/main.css" />
-		<link rel="stylesheet" href="assets/css/style.css" />
-		<!--[if lte IE 8]><link rel="stylesheet" href="assets/css/ie8.css" /><![endif]-->
-		<!--[if lte IE 9]><link rel="stylesheet" href="assets/css/ie9.css" /><![endif]-->
-	</head>
-	<body id="top">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width, shrink-to-fit=no">
+    <link href='https://fonts.googleapis.com/css?family=Roboto:400,300,100' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Oswald:400,300' rel='stylesheet' type='text/css'>
+    <link href='css/prism.css' rel='stylesheet'>
+    <link href='css/style.css' rel='stylesheet'>
+    <title>Panolens.js</title>
+  </head>
 
-		<a href="https://github.com/pchen66/panolens.js"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/38ef81f8aca64bb9a64448d0d70f1308ef5341ab/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6461726b626c75655f3132313632312e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png"></a>
+  <body>
+    
+    <main>
 
-		<!-- One -->
-			<section id="one" class="wrapper style2 special">
-				<header class="major">
-					<h1>Panolens.js</h1>
-				</header>
-				<h4>A JavaScript Panorama Viewer based on <a href="https://github.com/mrdoob/three.js">Three.js</a></h4>
-			</section>
+      <section class="background full"></section>
 
-			
-			<section id="documentation" class="wrapper special more">
-				<div class="menu">
-					<h3><a href="docs/index.html">Documentation</a></h3>
-				</div>
-			</section>
+      <section class="content">
 
-		<!-- Example Panorama Infospot -->
-			<section class="wrapper special more">
-				<h3>Examples</h3>
-				<ul>
-					<li><a href="examples/panorama_image.html">Panorama Image</a></li>
-					<li><a href="examples/panorama_cube.html">Panorama Cube</a></li>
-					<li><a href="examples/panorama_basic.html">Panorama Basic</a></li>
-					<li><a href="examples/panorama_googlestreetview.html">Panorama Google Street View</a></li>
-					<li><a href="examples/panorama_video.html">Panorama Video</a></li>
-					<li><a href="examples/panorama_infospot.html">Panorama Infospot</a></li>
-					<li><a href="examples/panorama_linking.html">Panorama Linking</a></li>
-					<li><a href="examples/panorama_loading_progress.html">Panorama Loading Progress</a></li>
-					<li><a href="examples/panorama_simple_gallery.html">Panorama Simple Gallery</a></li>
-					<li><a href="examples/panorama_reticle.html">Panorama Reticle Event</a></li>
-					<li><a href="examples/panorama_ui.html">Panorama UI</a></li>
-					<li><a href="examples/XDiamond">Panorama Match 3 Game</a></li>
-					<li><a href="examples/panorama_interactive.html">Panorama Interactive</a></li>
-					<li><a href="http://pchen66.github.io/PanoTheater">Pano Theater</a></li>
-				</ul>
-			</section>
+        <section class="title">
+          <header>PANOLENS.JS</header>
+          <article>A Javascript Panorama Viewer</article>
+        </section>
 
-		<!-- Example Panorama Image -->
-			<section class="wrapper example">
-				<iframe allowfullscreen src="examples/panorama_image.html"></iframe>
-			</section>
+        <section class="documentation hide">
+          <section class="introduction">
+            <header><h3>Getting Started</h3></header>
+            <article>Panolens.js is based on Three.JS (a 3D framework) with specific interest area in panorama, virtual reality, and potentially augmented reality. To start using panolens.js, download <a href="http://threejs.org/build/three.min.js" target="_blank">minified three.js</a> and <a href="https://raw.githubusercontent.com/pchen66/panolens.js/master/build/panolens.min.js" target="_blank">minified panolens.js</a> and include these two files in your project<br/><pre><code class="language-javascript">&lt;script src=&quot;js/three.min.js&quot;>&lt;/script>&#13;&lt;script src=&quot;js/panolens.min.js&quot;>&lt;/script></code></pre>
+            </article>
 
-		<!-- Footer -->
-			<footer id="footer">
-				<p class="copyright">Panolens.js &copy; by <a href="https://github.com/pchen66">pchen66</a></p>
-			</footer>
+            <header><h3>Basic Usage</h3></header>
+            <article>To create an image panorama, an <a href="http://wiki.panotools.org/Panorama_formats#Equirectangular" target="_blank">equirectangular</a> image (2 to 1 ratio e.g. width and height is 1024 x 512) is required. The following code creates a viewer and an image panorama with given url. To be able to see the panorama, the panorama has to be added to the viewer<br/><pre><code class="language-javascript">&lt;script>&#13;&#13;var panorama, viewer;&#13;&#13;panorama = new PANOLENS.ImagePanorama( 'asset/textures/equirectangular/field.jpg' );&#13;&#13;viewer = new PANOLENS.Viewer();&#13;viewer.add( panorama );&#13;&#13;&lt;/script></code></pre>
+            </article>
 
-		<!-- Scripts -->
-			<script src="assets/js/jquery.min.js"></script>
-			<script src="assets/js/jquery.scrolly.min.js"></script>
-			<script src="assets/js/skel.min.js"></script>
-			<script src="assets/js/util.js"></script>
-			<!--[if lte IE 8]><script src="assets/js/ie/respond.min.js"></script><![endif]-->
-			<script src="assets/js/main.js"></script>
+            <header><h3>Embedded Iframe</h3></header>
+            <article>The above code will generate an image panorama that takes document.body as full viewport if not provided when initiating a viewer. Let's put it in an iframe so it can be embedded into any webpage that supports WebGL<br/>
+            <pre><code class="language-javascript">&lt;iframe allowfullscreen src="examples/panorama_image.html">&lt;/iframe></code></pre>
+              <iframe allowfullscreen src="examples/panorama_image.html"></iframe>
+            </article>
+          </section>
+        </section>
 
-			<script>
-				(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-				(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-				m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-				})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+        <section class="example hide">
+          <figure class="card image" data-url="examples/panorama_image.html">
+            <figcaption>
+              <h4>Image Panorama</h4>
+              <article>Panorama by equirectangular image</article>
+            </figcaption>
+          </figure>
+          <figure class="card cube" data-url="examples/panorama_cube.html">
+            <figcaption>
+              <h4>Cube Panorama</h4>
+              <article>Panorama with a six-face cubemap</article>
+            </figcaption>
+          </figure>
+          <figure class="card basic" data-url="examples/panorama_basic.html">
+            <figcaption>
+              <h4>Basic Panorama</h4>
+              <article>Virtual environment with grid texture</article>
+            </figcaption>
+          </figure>
+          <figure class="card gsv" data-url="examples/panorama_googlestreetview.html">
+            <figcaption>
+              <h4>Google Street View Panorama</h4>
+              <article>Google street view panorama by panoId</article>
+            </figcaption>
+          </figure>
+          <figure class="card video" data-url="examples/panorama_video.html">
+            <figcaption>
+              <h4>Video Panorama</h4>
+              <article>360 video texture with built-in controls (mobile friendly)</article>
+            </figcaption>
+          </figure>
+          <figure class="card infospot" data-url="examples/panorama_infospot.html">
+            <figcaption>
+              <h4>Infospot</h4>
+              <article>Demo of infospots with can be either hovering text or custom DOM element</article>
+            </figcaption>
+          </figure>
+          <figure class="card linking" data-url="examples/panorama_linking.html">
+            <figcaption>
+              <h4>Panorama Linking</h4>
+              <article>Linking two panoramas with built-in infospot for navigation back and forth</article>
+            </figcaption>
+          </figure>
+          <figure class="card loading" data-url="examples/panorama_loading_progress.html">
+            <figcaption>
+              <h4>Panorama Loading Progress</h4>
+              <article>Event-driven listeners for loading progress tracking</article>
+            </figcaption>
+          </figure>
+          <figure class="card gallery" data-url="examples/panorama_simple_gallery.html">
+            <figcaption>
+              <h4>Simple Panorama Gallery</h4>
+              <article>A simple gallery with dynamic creation and disposal</article>
+            </figcaption>
+          </figure>
+          <figure class="card reticle" data-url="examples/panorama_reticle.html">
+            <figcaption>
+              <h4>Reticle</h4>
+              <article>Dispatching hoverenter and hoverleave event for mouseless interaction</article>
+            </figcaption>
+          </figure>
+          <figure class="card ui" data-url="examples/panorama_ui.html">
+            <figcaption>
+              <h4>3D User Interface</h4>
+              <article>Custom 3D tile with bendability and 3D text with shader sprite</article>
+            </figcaption>
+          </figure>
+          <figure class="card interactive" data-url="examples/panorama_interactive.html">
+            <figcaption>
+              <h4>Interactive Panorama</h4>
+              <article>A room with interactive 3D model</article>
+            </figcaption>
+          </figure>
+          <figure class="card xdiamond" data-url="examples/XDiamond">
+            <figcaption>
+              <h4>XDiamond</h4>
+              <article>360 Match 3 game with consecutive diamond wall</article>
+            </figcaption>
+          </figure>
+          <figure class="card panotheater" data-url="http://pchen66.github.io/PanoTheater">
+            <figcaption>
+              <h4>Pano Theater</h4>
+              <article>A panoramic way of browsing movie information</article>
+            </figcaption>
+          </figure>
+        </section>
+        
+      </section>
 
-				ga('create', 'UA-74433652-1', 'auto');
-				ga('send', 'pageview');
-			</script>
+    </main>
 
-	</body>
-</html>
+    <nav>
+      <li class="item selected" name="Home" data-hash="#Home">Home</li>
+      <li class="item" name="Documentation" data-hash="#Documentation">Documentation</li>
+      <li class="item" name="Example" data-hash="#Example">Example</li>
+      <a href="https://github.com/pchen66/panolens.js"><li class="item">Github</li></a>
+    </nav>
+
+    <div class="menu-icon">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+
+    <footer>background images from flickr<img src="images/cc.svg"></footer>
+
+    <script src="../js/three/three.min.js"></script>
+    <script src="../js/panolens/panolens.min.js"></script>
+    <script src="js/prism.js"></script>
+    <script src="js/main.js"></script>
+
+    <script>
+		(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+		(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+		m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+		})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+		ga('create', 'UA-74433652-1', 'auto');
+		ga('send', 'pageview');
+	</script>
+
+  </body>
