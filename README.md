@@ -1,7 +1,7 @@
 ## Current Projects
 
 <span>
-	<a title="Pano Theater" href="http://pchen66.github.io/Splash">
+	<a title="Splash" href="http://pchen66.github.io/Splash">
 		<img src="http://pojuichen.com/_include/img/work/thumbs/Splash.png" width="33%">
 	</a>
 	<a title="Pano Theater" href="http://pchen66.github.io/PanoTheater">
