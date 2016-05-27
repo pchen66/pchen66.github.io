@@ -39,7 +39,7 @@
 
       panorama = new PANOLENS.ImagePanorama( 'asset/textures/equirectangular/field.jpg' );
 
-      viewer = new PANOLENS.Viewer();
+      viewer = new PANOLENS.Viewer( { passiveRendering: true } );
       viewer.add( panorama );
 
     </script>

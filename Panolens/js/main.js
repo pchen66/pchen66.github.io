@@ -28,7 +28,7 @@
   menuIcon = document.querySelector( '.menu-icon' );
   items = document.querySelectorAll( '.item' );
 
-  viewer = new PANOLENS.Viewer( { container: container, controlBar: false } );
+  viewer = new PANOLENS.Viewer( { container: container, controlBar: false, passiveRendering: true } );
 
   function addDomEvents () {
 
