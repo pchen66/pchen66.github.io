@@ -6,7 +6,7 @@ var uglify = require('gulp-uglify');
 var THREEJS_OUTPUT = 'js/three';
 var THREEJS = [
 	
-	'node_modules/three/three.min.js',
+	'node_modules/three/build/three.min.js',
 
 ];
 var THREEJS_COMPONENTS = [
@@ -14,13 +14,15 @@ var THREEJS_COMPONENTS = [
 	'node_modules/three/examples/js/Detector.js',
 	'node_modules/three/examples/js/libs/stats.min.js',
 	'node_modules/three/examples/js/libs/tween.min.js',
+  'node_modules/three/examples/js/libs/dat.gui.min.js',
 	'node_modules/three/examples/js/loaders/ColladaLoader.js',
   'node_modules/three/examples/js/loaders/MTLLoader.js',
   'node_modules/three/examples/js/loaders/OBJLoader.js',
 	'node_modules/three/examples/js/controls/OrbitControls.js',
   'node_modules/three/examples/js/controls/TrackballControls.js',
   'node_modules/three/examples/js/renderers/CSS3DRenderer.js',
-  'node_modules/three/examples/js/modifiers/ExplodeModifier.js'
+  'node_modules/three/examples/js/modifiers/ExplodeModifier.js',
+  'node_modules/three/examples/js/GPUParticleSystem.js'
 
 ];
 
