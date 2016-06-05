@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>Tail</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,300' rel='stylesheet' type='text/css'>
+	<style>
+		body {
+			background-color: #000000;
+			margin: 0px;
+			overflow: hidden;
+			font-family: 'Source Sans Pro', sans-serif;
+		}
+
+		.button {
+			width: 120px;
+			height: 120px;
+			background-color: transparent;
+			border: 2px solid #fff;
+			text-align: center;
+			color: #fff;
+			font-size: 16px;
+			position: absolute;
+			border-radius: 50%;
+		    display: flex;
+		    align-items: center;
+		    justify-content: center;
+		    transition: all 0.5s ease;
+		}
+
+		.button:hover{
+			background-color: #ecf0f1;
+			color: #444;
+			cursor: pointer;
+		}
+
+		.top-left {
+			top: 40px;
+			left: 40px;
+		}
+
+		.bottom-left {
+			width: 100px;
+			height: 100px;
+			bottom: 30px;
+			left: 30px;
+		}
+
+		.bottom-right {
+			width: 140px;
+			height: 140px;
+			bottom: 50px;
+			right: 50px;
+		}
+
+	</style>
+</head>
+
+<body>
+
+	<div class="button top-left" data-radius="70">Button 1</div>
+	<div class="button bottom-left" data-radius="60">Button 2</div>
+	<div class="button bottom-right" data-radius="80">Button 3</div>
+
+	<script src="../js/three/three.min.js"></script>
+	<script src="../js/three/libs/dat.gui.min.js"></script>
+	<script src="../js/three/libs/tween.min.js"></script>
+	<script src="../js/three/GPUParticleSystem.js" charset="utf-8"></script>
+
+	<script>
+		var camera,
+			scene, 
+			renderer, 
+			container, 
+			gui = new dat.GUI(),
+			options, 
+			spawnerOptions, 
+			particleSystem,
+			mouse = new THREE.Vector3(),
+			screenVector = new THREE.Vector3(),
+			deltaVector = new THREE.Vector2(),
+			angle,
+			inRadius = false,
+			lastPoint = new THREE.Vector3( Infinity, Infinity, 0 ),
+			startTime = performance.now(),
+			lastFrameTime = performance.now(),
+			target,
+			cursors = [],
+			cursor1,
+			cursor2,
+			buttons;
+
+		var halfWidth = window.innerWidth / 2,
+			halfHeight = window.innerHeight / 2;
+
+		init();
+		animate();
+
+		function init() {
+
+			buttons = document.querySelectorAll( '.button' );
+
+			container = document.createElement('div');
+			document.body.appendChild(container);
+
+			camera = new THREE.OrthographicCamera( 
+				window.innerWidth / - 2, 
+				window.innerWidth / 2, 
+				window.innerHeight / 2, 
+				window.innerHeight / - 2, 
+				1, 
+				10000 
+			);
+			camera.position.z = 1000;
+
+			scene = new THREE.Scene();
+
+			particleSystem = new THREE.GPUParticleSystem({
+				maxParticles: 100000
+			});
+			scene.add( particleSystem );
+
+			// options passed during each spawned
+			options = {
+				position: new THREE.Vector3(),
+				positionRandomness: 2,
+				velocity: new THREE.Vector3(),
+				velocityRandomness: 0.6,
+				color: 0xE6E082,
+				colorRandomness: 0,
+				turbulence: .15,
+				lifetime: 10,
+				size: 8,
+				sizeRandomness: 10,
+				rotationRadius: 70,
+				rotationSpeed: 0.1,
+				cursorSpeed: 0.2,
+				cursorRadius: 7,
+				cursorSize: 25,
+				particleColor: [ 230,224,130 ],
+				cursor1Color: [ 237,8,8 ],
+				cursor2Color: [ 230,153,13 ],
+				particle: true,
+				speed: 7
+			};
+
+			spawnerOptions = {
+				spawnRate: 600,
+				horizontalSpeed: 0.5,
+				verticalSpeed: 0.33,
+				timeScale: 10
+			}
+
+			gui.add(options, "velocityRandomness", 0, 30);
+			gui.add(options, "positionRandomness", 0, 30);
+			gui.add(options, "size", 1, 20);
+			gui.add(options, "sizeRandomness", 0, 25);
+			gui.add(options, "colorRandomness", 0, 1);
+			gui.add(options, "lifetime", .1, 20);
+			gui.add(options, "turbulence", 0, 1);
+			gui.add(options, "speed", 0, 10);
+
+			gui.add(spawnerOptions, "spawnRate", 10, 30000);
+			gui.add(spawnerOptions, "timeScale", 0, 100);
+
+			gui.add(options, "rotationRadius", 0, 200);
+			gui.add(options, "rotationSpeed", 0, 0.2);
+
+			gui.add(options, "cursorSpeed", 0, 1);
+			gui.add(options, "cursorRadius", 1, 50).onChange( function ( value ) {
+				for( var i = 0; i < cursors.length; i++ ) {
+					var sprite = cursors[ i ].children[ 0 ];
+					var theta = sprite.theta;
+					sprite.position.set( value * Math.cos( theta ), value * Math.sin( theta ), 0 );
+				}
+			} );
+			gui.add(options, "cursorSize", 1, 50).onChange( function ( value ) {
+				for( var i = 0; i < cursors.length; i++ ) {
+					var sprite = cursors[ i ].children[ 0 ];
+					sprite.scale.set( value, value, 1 );
+				}
+			} );
+
+			gui.addColor( options, "particleColor" ).onChange( function ( value ) {
+	          var color = normalizeRGB( value );
+	          color = new THREE.Color( color[ 0 ], color[ 1 ], color[ 2 ] );
+	          options.color = color.getHex();
+	        } );
+			gui.addColor( options, "cursor1Color" ).onChange( function ( value ) {
+	          var color = normalizeRGB( value );
+	          var material = cursor1.children[ 0 ].material;
+	          material.color.setRGB( color[ 0 ], color[ 1 ], color[ 2 ] );
+	        } );
+	        gui.addColor( options, "cursor2Color" ).onChange( function ( value ) {
+	          var color = normalizeRGB( value );
+	          var material = cursor2.children[ 0 ].material;
+	          material.color.setRGB( color[ 0 ], color[ 1 ], color[ 2 ] );
+	        } );
+
+	        gui.add(options, "particle");
+
+			cursor1 = new THREE.Object3D();
+			cursor2 = new THREE.Object3D();
+
+			cursors.push( cursor1 );
+			cursors.push( cursor2 );
+
+			target = new THREE.Object3D();
+			target.add( cursor1, cursor2 );
+
+			scene.add( target );
+
+			setupTrail();
+
+			renderer = new THREE.WebGLRenderer();
+			renderer.setPixelRatio(window.devicePixelRatio);
+			renderer.setSize(window.innerWidth, window.innerHeight);
+			
+			container.appendChild(renderer.domElement);
+
+			window.addEventListener('resize', onWindowResize, false);
+			document.addEventListener('mousemove', onMouseMove, false);
+
+			for ( var i = 0; i < buttons.length; i++ ) {
+
+				buttons[ i ].addEventListener( 'mouseover', onMouseOver, false );
+				buttons[ i ].addEventListener( 'mouseout', onMouseOut, false );
+
+			}
+
+		}
+
+		function onMouseOver() {
+
+			inRadius = true;
+			lastPoint.x = this.clientWidth / 2 + this.offsetLeft - window.innerWidth / 2;
+			lastPoint.y = - ( this.clientHeight / 2 + this.offsetTop - window.innerHeight / 2 );
+			options.rotationRadius = this.getAttribute( 'data-radius' );
+
+		}
+
+		function onMouseOut() {
+
+			inRadius = false;
+
+		}
+
+		function setupTrail() {
+
+		    var map = new THREE.TextureLoader().load( "textures/particle2.png" );
+            var material = new THREE.SpriteMaterial( { map: map, transparent: true, opacity: 1, blending: THREE.AdditiveBlending } );
+            var theta;
+            var color;
+            var sprite;
+            var radius = options.cursorRadius;
+            var size = options.cursorSize;
+            
+            theta = 0;
+            color = normalizeRGB( options.cursor1Color );
+        	sprite = new THREE.Sprite( material );
+        	sprite.material.color.setRGB( color[ 0 ], color[ 1 ], color[ 2 ] );
+            sprite.scale.set( size, size, 1 );
+            sprite.theta = theta;
+		    sprite.position.set( radius * Math.cos( theta ), radius * Math.sin( theta ), 0 );
+            cursor1.add( sprite );
+
+            theta += Math.PI / 2;
+            color = normalizeRGB( options.cursor2Color );
+            sprite = new THREE.Sprite( material.clone() );
+            sprite.material.color.setRGB( color[ 0 ], color[ 1 ], color[ 2 ] );
+            sprite.scale.set( size, size, 1 );
+            sprite.theta = theta;
+		    sprite.position.set( radius * Math.cos( theta ), radius * Math.sin( theta ), 0 );
+            cursor2.add( sprite );
+
+		}
+
+		function normalizeRGB( array ) {
+
+			return array.map( function( c ) { return c /= 255; } );
+
+		}
+
+		function onWindowResize() {
+
+			camera.aspect = window.innerWidth / window.innerHeight;
+			camera.left   = - window.innerWidth / 2;
+			camera.right  =   window.innerWidth / 2;
+			camera.top    =   window.innerHeight / 2;
+			camera.bottom = - window.innerHeight / 2;
+			camera.updateProjectionMatrix();
+
+			renderer.setSize(window.innerWidth, window.innerHeight);
+
+		}
+
+		function onMouseMove( event ) {
+
+			mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+			mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+
+			deltaVector.x = ( mouse.x * window.innerWidth / 2 - options.position.x ) ;
+			deltaVector.y = ( mouse.y *  window.innerHeight / 2 - options.position.y ) ;
+			deltaVector.normalize();
+
+			if ( !inRadius ) {
+				angle = undefined;
+			}
+
+			screenVector = mouse.clone();
+			screenVector.x *= window.innerWidth / 2;
+			screenVector.y *= window.innerHeight / 2;
+			
+			target.lookAt( screenVector );
+			target.rotation.y = Math.abs( target.rotation.y );
+
+			lastOptions = options.position.clone();
+
+		}
+
+		function animate() {
+
+			requestAnimationFrame(animate);
+
+			TWEEN.update();
+
+			var position = options.position;
+
+			if ( inRadius ) {
+
+				var y = position.y - screenVector.y;
+				var x = position.x - screenVector.x;
+				angle = angle === undefined ? Math.atan2( y, x ) : angle;
+				
+				position.x = lastPoint.x + options.rotationRadius * Math.cos( angle );
+				position.y = lastPoint.y + options.rotationRadius * Math.sin( angle );
+
+				angle += options.rotationSpeed;
+
+			} else {
+
+				if ( position.distanceTo( screenVector ) > options.speed ) {
+
+					position.x += deltaVector.x * options.speed;
+					position.y += deltaVector.y * options.speed;
+
+				} else {
+
+					// Self-spin
+					target.rotation.set( 0, 0, 0 );
+
+				}
+
+			}
+
+			target.position.x = position.x;
+			target.position.y = position.y;
+
+			for ( var i = 0; i < cursors.length; i++ ) {
+
+				var cursor = cursors[ i ];
+				var sprite = cursor.children[ 0 ];
+				cursor.rotation.z += options.cursorSpeed;
+			
+				var dot = new THREE.Sprite( sprite.material.clone() );
+				dot.scale.multiplyScalar( options.cursorSize );
+				dot.position.setFromMatrixPosition( sprite.matrixWorld );
+
+				scene.add( dot );
+
+				new TWEEN.Tween( dot.material )
+				.to( { opacity: 0 }, 1000 )
+				.easing( TWEEN.Easing.Linear.None )
+				.onComplete( function(){
+					scene.remove( this );
+				}.bind( dot ) )
+				.start();
+
+			}
+
+			var elapsed = ( performance.now() - startTime ) * 0.01;
+
+			if ( options.particle ) {
+
+				var delta = ( performance.now() - lastFrameTime ) * 0.01;
+				
+				for ( var i = 0; i < spawnerOptions.spawnRate * delta; i++ ) {
+					
+					particleSystem.spawnParticle( options );
+				}
+
+			}
+
+			particleSystem.update( elapsed );
+
+			render();
+
+			lastFrameTime = performance.now();
+
+		}
+
+		function render() {
+
+			renderer.render(scene, camera);
+
+		}
+	</script>
+</body>
+
+</html>
