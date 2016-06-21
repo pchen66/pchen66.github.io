@@ -291,6 +291,9 @@ figcaption > article {
 .card.infospot{
   background-image: url( '../images/panorama_infospot.png' );
 }
+.card.infospot-focus{
+  background-image: url( '../images/panorama_infospot_focus.png' );
+}
 .card.linking{
   background-image: url( '../images/panorama_link.png' );
 }
