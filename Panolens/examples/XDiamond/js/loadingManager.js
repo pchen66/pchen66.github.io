@@ -122,7 +122,7 @@ var loadingManager = {
 			Game.camera.fov = 90;
 			Game.camera.updateProjectionMatrix();
 			Game.container = loadingmanager.canvasContainerElement;
-			Game.TARGET_DISTANCE = panorama.orbitRadius;
+			Game.TARGET_DISTANCE = 100;
 
 			Game.init && Game.init();
 

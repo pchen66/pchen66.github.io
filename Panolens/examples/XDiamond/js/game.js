@@ -81,10 +81,9 @@ function PANOGAME( scene, camera, container, radius ){
 	textureLoader = new THREE.TextureLoader();
 	colors.map(function(color){
 		textureLoader.load('images/'+color+'.png', function(texture){
-			var spriteMaterial = new THREE.SpriteMaterial({map: texture, transparent: true, depthTest: false}),
-				imageColor = texture.image.src.split('/').pop().split('.').shift();
-			scope.STONE[imageColor].sprite = new THREE.Sprite(spriteMaterial);
-			scope.STONE[imageColor].sprite.scale.set(scope.STONE_WIDTH, scope.STONE_WIDTH, 1);
+			var spriteMaterial = new THREE.SpriteMaterial({map: texture, transparent: true, depthTest: false});
+			scope.STONE[color].sprite = new THREE.Sprite(spriteMaterial);
+			scope.STONE[color].sprite.scale.set(scope.STONE_WIDTH, scope.STONE_WIDTH, 1);
 		});
 	});
 }
