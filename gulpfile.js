@@ -26,14 +26,14 @@ var THREEJS_COMPONENTS = [
 
 ];
 
-gulp.task( 'default', [ 'copy-library', 'copy-library-component' ] );
+gulp.task( 'default', [ 'copy-three-library', 'copy-three-library-component' ] );
 
-gulp.task('copy-library', function () {
+gulp.task('copy-three-library', function () {
   return gulp.src( THREEJS )
     .pipe( gulp.dest( THREEJS_OUTPUT ) );
 });
 
-gulp.task('copy-library-component', function () {
+gulp.task('copy-three-library-component', function () {
   return gulp.src( THREEJS_COMPONENTS, { base: 'node_modules/three/examples/js/' } )
     .pipe( gulp.dest( THREEJS_OUTPUT ) );
 });
