@@ -303,6 +303,9 @@ figcaption > article {
 .card.gallery{
   background-image: url( '../images/panorama_simple_gallery.png' );
 }
+.card.lp-image{
+  background-image: url( '../images/littleplanet_image.png' );
+}
 .card.reticle{
   background-image: url( '../images/panorama_reticle_event.png' );
 }
