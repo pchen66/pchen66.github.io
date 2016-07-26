@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width">
+	<title>Documentation Source: panorama/LittlePlanet.js</title>
+
+	<!--[if lt IE 9]>
+	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+	<![endif]-->
+	<link type="text/css" rel="stylesheet" href="styles/sunlight.default.css">
+
+	<link type="text/css" rel="stylesheet" href="styles/site.paper.css">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-default navbar-fixed-top ">
+<div class="container">
+	<div class="navbar-header">
+		<a class="navbar-brand" href="index.html">Documentation</a>
+		<button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#topNavigation">
+			<span class="icon-bar"></span>
+			<span class="icon-bar"></span>
+			<span class="icon-bar"></span>
+        </button>
+	</div>
+	<div class="navbar-collapse collapse" id="topNavigation">
+		<ul class="nav navbar-nav">
+			
+			<li class="dropdown">
+				<a href="namespaces.list.html" class="dropdown-toggle" data-toggle="dropdown">Namespaces<b class="caret"></b></a>
+				<ul class="dropdown-menu ">
+					<li><a href="PANOLENS.html">PANOLENS</a></li><li><a href="PANOLENS.Utils.html">PANOLENS.Utils</a></li><li><a href="PANOLENS.Utils.CubeTextureLoader.html">PANOLENS.Utils.CubeTextureLoader</a></li><li><a href="PANOLENS.Utils.ImageLoader.html">PANOLENS.Utils.ImageLoader</a></li><li><a href="PANOLENS.Utils.TextureLoader.html">PANOLENS.Utils.TextureLoader</a></li>
+				</ul>
+			</li>
+			
+			<li class="dropdown">
+				<a href="classes.list.html" class="dropdown-toggle" data-toggle="dropdown">Classes<b class="caret"></b></a>
+				<ul class="dropdown-menu ">
+					<li><a href="PANOLENS.BasicPanorama.html">PANOLENS.BasicPanorama</a></li><li><a href="PANOLENS.CubePanorama.html">PANOLENS.CubePanorama</a></li><li><a href="PANOLENS.EmptyPanorama.html">PANOLENS.EmptyPanorama</a></li><li><a href="PANOLENS.GoogleStreetviewPanorama.html">PANOLENS.GoogleStreetviewPanorama</a></li><li><a href="PANOLENS.ImagePanorama.html">PANOLENS.ImagePanorama</a></li><li><a href="PANOLENS.Infospot.html">PANOLENS.Infospot</a></li><li><a href="PANOLENS.Panorama.html">PANOLENS.Panorama</a></li><li><a href="PANOLENS.SpriteText.html">PANOLENS.SpriteText</a></li><li><a href="PANOLENS.Tile.html">PANOLENS.Tile</a></li><li><a href="PANOLENS.TileGroup.html">PANOLENS.TileGroup</a></li><li><a href="PANOLENS.VideoPanorama.html">PANOLENS.VideoPanorama</a></li><li><a href="PANOLENS.Viewer.html">PANOLENS.Viewer</a></li><li><a href="PANOLENS.Widget.html">PANOLENS.Widget</a></li>
+				</ul>
+			</li>
+			
+			<li class="dropdown">
+				<a href="events.list.html" class="dropdown-toggle" data-toggle="dropdown">Events<b class="caret"></b></a>
+				<ul class="dropdown-menu ">
+					<li><a href="PANOLENS.Infospot.html#event:dismiss">PANOLENS.Infospot#event:dismiss</a></li><li><a href="PANOLENS.Infospot.html#event:panolens-container">PANOLENS.Infospot#event:panolens-container</a></li><li><a href="PANOLENS.Infospot.html#event:panolens-dual-eye-effect">PANOLENS.Infospot#event:panolens-dual-eye-effect</a></li><li><a href="PANOLENS.Panorama.html#event:enter">PANOLENS.Panorama#event:enter</a></li><li><a href="PANOLENS.Panorama.html#event:enter-animation-start">PANOLENS.Panorama#event:enter-animation-start</a></li><li><a href="PANOLENS.Panorama.html#event:enter-complete">PANOLENS.Panorama#event:enter-complete</a></li><li><a href="PANOLENS.Panorama.html#event:error">PANOLENS.Panorama#event:error</a></li><li><a href="PANOLENS.Panorama.html#event:infospot-animation-complete">PANOLENS.Panorama#event:infospot-animation-complete</a></li><li><a href="PANOLENS.Panorama.html#event:leave">PANOLENS.Panorama#event:leave</a></li><li><a href="PANOLENS.Panorama.html#event:load">PANOLENS.Panorama#event:load</a></li><li><a href="PANOLENS.Panorama.html#event:panolens-viewer-handler">PANOLENS.Panorama#event:panolens-viewer-handler</a></li><li><a href="PANOLENS.Panorama.html#event:progress">PANOLENS.Panorama#event:progress</a></li><li><a href="PANOLENS.Viewer.html#event:control-bar-toggle">PANOLENS.Viewer#event:control-bar-toggle</a></li><li><a href="PANOLENS.Viewer.html#event:video-control-hide">PANOLENS.Viewer#event:video-control-hide</a></li><li><a href="PANOLENS.Viewer.html#event:video-control-show">PANOLENS.Viewer#event:video-control-show</a></li><li><a href="PANOLENS.Viewer.html#event:video-time">PANOLENS.Viewer#event:video-time</a></li><li><a href="PANOLENS.Viewer.html#event:video-toggle">PANOLENS.Viewer#event:video-toggle</a></li><li><a href="PANOLENS.Viewer.html#event:video-update">PANOLENS.Viewer#event:video-update</a></li><li><a href="PANOLENS.Viewer.html#event:window-resize">PANOLENS.Viewer#event:window-resize</a></li>
+				</ul>
+			</li>
+			
+		</ul>
+		<div class="col-sm-3 col-md-3">
+            <form class="navbar-form" role="search">
+                <div class="input-group">
+                    <input type="text" class="form-control" placeholder="Search" name="q" id="search-input">
+                    <div class="input-group-btn">
+                        <button class="btn btn-default" id="search-submit"><i class="glyphicon glyphicon-search"></i></button>
+                    </div>
+                </div>
+            </form>
+        </div>
+	</div>
+
+</div>
+</div>
+
+
+<div class="container" id="toc-content">
+<div class="row">
+
+	
+	<div class="col-md-12">
+	
+		<div id="main">
+			
+
+		<h1 class="page-title">Source: panorama/LittlePlanet.js</h1>
+    
+<section>
+    <article>
+        <pre
+            class="sunlight-highlight-javascript ">( function () {
+
+	/**
+	 * Little Planet
+	 * @param {string} type 		- Type of little planet basic class
+	 * @param {string} source 		- URL for the image source
+	 * @param {number} [size=10000] - Size of plane geometry
+	 * @param {number} [ratio=0.5]  - Ratio of plane geometry's height against width
+	 */
+	PANOLENS.LittlePlanet = function ( type, source, size, ratio ) {
+
+		type = type || 'image';
+
+		type === 'image' &amp;&amp; PANOLENS.ImagePanorama.call( this, source, size );
+
+		this.size = size || 10000;
+		this.ratio = ratio || 0.5;
+		this.EPS = 0.000001;
+		this.frameId;
+
+		this.geometry = this.createGeometry();
+		this.material = this.createMaterial( this.size );
+
+		this.dragging = false;
+		this.passiveRendering = false;
+		this.userMouse = new THREE.Vector2();
+
+		this.quatA = new THREE.Quaternion();
+		this.quatB = new THREE.Quaternion();
+		this.quatCur = new THREE.Quaternion();
+		this.quatSlerp = new THREE.Quaternion();
+
+		this.vectorX = new THREE.Vector3( 1, 0, 0 );
+		this.vectorY = new THREE.Vector3( 0, 1, 0 );
+
+		this.addEventListener( 'panolens-passive-rendering', this.onPassiveRendering );
+		this.addEventListener( 'window-resize', this.onWindowResize );
+
+	};
+
+	PANOLENS.LittlePlanet.prototype = Object.create( PANOLENS.ImagePanorama.prototype );
+
+	PANOLENS.LittlePlanet.prototype.constructor = PANOLENS.LittlePlanet;
+
+	PANOLENS.LittlePlanet.prototype.createGeometry = function () {
+
+		return new THREE.PlaneGeometry( this.size, this.size * this.ratio );
+
+	};
+
+	PANOLENS.LittlePlanet.prototype.createMaterial = function ( size ) {
+
+		var uniforms = PANOLENS.StereographicShader.uniforms;
+        uniforms.zoom.value = size;
+
+        return new THREE.ShaderMaterial( {
+
+            uniforms: uniforms,
+            vertexShader: PANOLENS.StereographicShader.vertexShader,
+            fragmentShader: PANOLENS.StereographicShader.fragmentShader
+
+        } );
+		
+	};
+
+	PANOLENS.LittlePlanet.prototype.registerMouseEvents = function () {
+
+		this.container.addEventListener( 'mousedown', this.onMouseDown.bind( this ), false );
+        this.container.addEventListener( 'mousemove', this.onMouseMove.bind( this ), false );
+        this.container.addEventListener( 'mouseup', this.onMouseUp.bind( this ), false );
+        this.container.addEventListener( 'touchstart', this.onMouseDown.bind( this ), false );
+        this.container.addEventListener( 'touchmove', this.onMouseMove.bind( this ), false );
+        this.container.addEventListener( 'touchend', this.onMouseUp.bind( this ), false );
+        this.container.addEventListener( 'mousewheel', this.onMouseWheel.bind( this ), false );
+        this.container.addEventListener( 'DOMMouseScroll', this.onMouseWheel.bind( this ), false );
+        this.container.addEventListener( 'contextmenu', this.onContextMenu.bind( this ), false );
+		
+	};
+
+	PANOLENS.LittlePlanet.prototype.unregisterMouseEvents = function () {
+
+		this.container.removeEventListener( 'mousedown', this.onMouseDown.bind( this ), false );
+        this.container.removeEventListener( 'mousemove', this.onMouseMove.bind( this ), false );
+        this.container.removeEventListener( 'mouseup', this.onMouseUp.bind( this ), false );
+        this.container.removeEventListener( 'touchstart', this.onMouseDown.bind( this ), false );
+        this.container.removeEventListener( 'touchmove', this.onMouseMove.bind( this ), false );
+        this.container.removeEventListener( 'touchend', this.onMouseUp.bind( this ), false );
+        this.container.removeEventListener( 'mousewheel', this.onMouseWheel.bind( this ), false );
+        this.container.removeEventListener( 'DOMMouseScroll', this.onMouseWheel.bind( this ), false );
+        this.container.removeEventListener( 'contextmenu', this.onContextMenu.bind( this ), false );
+		
+	};
+
+	PANOLENS.LittlePlanet.prototype.onMouseDown = function ( event ) {
+
+		var x = ( event.clientX >= 0 ) ? event.clientX : event.touches[ 0 ].clientX;
+        var y = ( event.clientY >= 0 ) ? event.clientY : event.touches[ 0 ].clientY;
+
+        var inputCount = ( event.touches &amp;&amp; event.touches.length ) || 1 ;
+
+        switch ( inputCount ) {
+
+        	case 1:
+
+        		this.dragging = true;
+        		this.userMouse.set( x, y );
+
+        		break;
+
+        	case 2:
+
+        		var dx = event.touches[ 0 ].pageX - event.touches[ 1 ].pageX;
+				var dy = event.touches[ 0 ].pageY - event.touches[ 1 ].pageY;
+				var distance = Math.sqrt( dx * dx + dy * dy );
+				this.userMouse.pinchDistance = distance;
+
+        		break;
+
+        	default:
+
+        		break;
+
+        }
+
+        this.onUpdateCallback();
+
+	};
+
+	PANOLENS.LittlePlanet.prototype.onMouseMove = function ( event ) {
+
+		var x = ( event.clientX >= 0 ) ? event.clientX : event.touches[ 0 ].clientX;
+        var y = ( event.clientY >= 0 ) ? event.clientY : event.touches[ 0 ].clientY;
+
+        var inputCount = ( event.touches &amp;&amp; event.touches.length ) || 1 ;
+
+        switch ( inputCount ) {
+
+        	case 1:
+
+        		var angleX = THREE.Math.degToRad( x - this.userMouse.x ) * 0.4;
+		        var angleY = THREE.Math.degToRad( y - this.userMouse.y ) * 0.4;
+
+		        if ( this.dragging ) {
+		            this.quatA.setFromAxisAngle( this.vectorY, angleX );
+		            this.quatB.setFromAxisAngle( this.vectorX, angleY );
+		            this.quatCur.multiply( this.quatA ).multiply( this.quatB );
+		            this.userMouse.set( x, y );
+		        }
+
+        		break;
+
+        	case 2:
+
+        		var uniforms = this.material.uniforms;
+        		var dx = event.touches[ 0 ].pageX - event.touches[ 1 ].pageX;
+				var dy = event.touches[ 0 ].pageY - event.touches[ 1 ].pageY;
+				var distance = Math.sqrt( dx * dx + dy * dy );
+
+				this.addZoomDelta( this.userMouse.pinchDistance - distance );
+
+        		break;
+
+        	default:
+
+        		break;
+
+        }
+
+	};
+
+	PANOLENS.LittlePlanet.prototype.onMouseUp = function ( event ) {
+
+        this.dragging = false;
+
+	};
+
+	PANOLENS.LittlePlanet.prototype.onMouseWheel = function ( event ) {
+
+		event.preventDefault();
+		event.stopPropagation();
+
+		var delta = 0;
+
+		if ( event.wheelDelta !== undefined ) { // WebKit / Opera / Explorer 9
+
+			delta = event.wheelDelta;
+
+		} else if ( event.detail !== undefined ) { // Firefox
+
+			delta = - event.detail;
+
+		}
+
+		this.addZoomDelta( delta );
+		this.onUpdateCallback();
+
+	};
+
+	PANOLENS.LittlePlanet.prototype.addZoomDelta = function ( delta ) {
+
+		var uniforms = this.material.uniforms;
+		var lowerBound = this.size * 0.1;
+		var upperBound = this.size * 10;
+
+		uniforms.zoom.value += delta;
+
+		if ( uniforms.zoom.value &lt;= lowerBound ) {
+
+			uniforms.zoom.value = lowerBound;
+
+		} else if ( uniforms.zoom.value >= upperBound ) {
+
+			uniforms.zoom.value = upperBound;
+
+		}
+
+	};
+
+	PANOLENS.LittlePlanet.prototype.onUpdateCallback = function () {
+
+		this.frameId = window.requestAnimationFrame( this.onUpdateCallback.bind( this ) );
+		
+		this.quatSlerp.slerp( this.quatCur, 0.1 );
+        this.material.uniforms.transform.value.makeRotationFromQuaternion( this.quatSlerp );
+        
+        if ( this.passiveRendering ) {
+
+        	this.dispatchEvent( { type: 'panolens-viewer-handler', method: 'render' } );
+
+        }
+        
+        if ( !this.dragging &amp;&amp; 1.0 - this.quatSlerp.clone().dot( this.quatCur ) &lt; this.EPS ) {
+        	
+        	window.cancelAnimationFrame( this.frameId );
+
+        }
+
+	};
+
+	PANOLENS.LittlePlanet.prototype.reset = function () {
+
+		this.quatCur.set( 0, 0, 0, 1 );
+		this.quatSlerp.set( 0, 0, 0, 1 );
+		this.onUpdateCallback();
+
+	};
+
+	PANOLENS.LittlePlanet.prototype.onLoad = function () {
+
+		this.material.uniforms.resolution.value = this.container.clientWidth / this.container.clientHeight;
+
+		this.registerMouseEvents();
+		this.onUpdateCallback();
+		
+		this.dispatchEvent( { type: 'panolens-viewer-handler', method: 'disableControl' } );
+		
+	};
+
+	PANOLENS.LittlePlanet.prototype.onLeave = function () {
+
+		this.unregisterMouseEvents();
+
+		this.dispatchEvent( { type: 'panolens-viewer-handler', method: 'enableControl', data: 0 } );
+
+		window.cancelAnimationFrame( this.frameId );
+
+		PANOLENS.Panorama.prototype.onLeave.call( this );
+		
+	};
+
+	PANOLENS.LittlePlanet.prototype.onPassiveRendering = function ( event ) {
+
+		this.passiveRendering = event &amp;&amp; event.enabled;
+
+	};
+
+	PANOLENS.LittlePlanet.prototype.onWindowResize = function () {
+
+		this.material.uniforms.resolution.value = this.container.clientWidth / this.container.clientHeight;
+
+	};
+
+	PANOLENS.LittlePlanet.prototype.onContextMenu = function () {
+
+		this.dragging = false;
+
+	};
+
+})();</pre>
+    </article>
+</section>
+
+
+
+
+
+		</div>
+	</div>
+
+	<div class="clearfix"></div>
+
+	
+
+</div>
+</div>
+
+<div class="modal fade" id="searchResults">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">Search results</h4>
+      </div>
+      <div class="modal-body"></div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div>
+
+<footer>
+
+
+<span class="jsdoc-message">
+	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a>
+	
+		on 2016-07-25T23:33:03-07:00
+	
+	using the <a href="https://github.com/docstrap/docstrap">DocStrap template</a>.
+</span>
+</footer>
+
+<script src="scripts/docstrap.lib.js"></script>
+<script src="scripts/toc.js"></script>
+<script type="text/javascript" src="scripts/fulltext-search-ui.js"></script>
+
+<script>
+$( function () {
+	$( "[id*='$']" ).each( function () {
+		var $this = $( this );
+
+		$this.attr( "id", $this.attr( "id" ).replace( "$", "__" ) );
+	} );
+
+	$( ".tutorial-section pre, .readme-section pre" ).each( function () {
+		var $this = $( this );
+
+		var example = $this.find( "code" );
+		exampleText = example.html();
+		var lang = /{@lang (.*?)}/.exec( exampleText );
+		if ( lang && lang[1] ) {
+			exampleText = exampleText.replace( lang[0], "" );
+			example.html( exampleText );
+			lang = lang[1];
+		} else {
+			var langClassMatch = example.parent()[0].className.match(/lang\-(\S+)/);
+			lang = langClassMatch ? langClassMatch[1] : "javascript";
+		}
+
+		if ( lang ) {
+
+			$this
+			.addClass( "sunlight-highlight-" + lang )
+			.addClass( "linenums" )
+			.html( example.html() );
+
+		}
+	} );
+
+	Sunlight.highlightAll( {
+		lineNumbers : false,
+		showMenu : true,
+		enableDoclinks : true
+	} );
+
+	$.catchAnchorLinks( {
+        navbarOffset: 10
+	} );
+	$( "#toc" ).toc( {
+		anchorName  : function ( i, heading, prefix ) {
+			var id = $( heading ).attr( "id" );
+			return id && id.replace(/\~/g, '-inner-').replace(/\./g, '-static-') || ( prefix + i );
+		},
+		selectors   : "#toc-content h1,#toc-content h2,#toc-content h3,#toc-content h4",
+		showAndHide : false,
+		smoothScrolling: true
+	} );
+
+	$( "#main span[id^='toc']" ).addClass( "toc-shim" );
+	$( '.dropdown-toggle' ).dropdown();
+
+    $( "table" ).each( function () {
+      var $this = $( this );
+      $this.addClass('table');
+    } );
+
+} );
+</script>
+
+
+
+<!--Navigation and Symbol Display-->
+
+
+<!--Google Analytics-->
+
+
+<script type="text/javascript">
+	$(document).ready(function() {
+		SearcherDisplay.init();
+	});
+</script>
+
+</body>
+</html>

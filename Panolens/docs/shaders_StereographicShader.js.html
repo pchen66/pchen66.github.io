@@ -4,7 +4,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width">
-	<title>Documentation Namespace: ImageLoader</title>
+	<title>Documentation Source: shaders/StereographicShader.js</title>
 
 	<!--[if lt IE 9]>
 	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
@@ -72,343 +72,83 @@
 <div class="row">
 
 	
-	<div class="col-md-8">
+	<div class="col-md-12">
 	
 		<div id="main">
 			
 
-	<h1 class="page-title">Namespace: ImageLoader</h1>
+		<h1 class="page-title">Source: shaders/StereographicShader.js</h1>
+    
 <section>
+    <article>
+        <pre
+            class="sunlight-highlight-javascript ">/**
+ * Stereographic projection shader
+ * based on http://notlion.github.io/streetview-stereographic
+ * @author pchen66
+ */
 
-<header>
-    
-        <h2>
-            <span class="ancestors"><a href="PANOLENS.html">PANOLENS</a><a href="PANOLENS.Utils.html">.Utils</a>.</span>
-        
-        ImageLoader
-        </h2>
-        
-    
-</header>
+PANOLENS.StereographicShader = {
 
+	uniforms: {
 
-<article>
-    <div class="container-overview">
-    
-        
-            <div class="description">Image loader with progress based on <a href="https://github.com/mrdoob/three.js/blob/master/src/loaders/ImageLoader.js">https://github.com/mrdoob/three.js/blob/master/src/loaders/ImageLoader.js</a></div>
-        
+		"tDiffuse":   { value: new THREE.Texture() },
+        "resolution": { value: 1.0 },
+        "transform":  { value: new THREE.Matrix4() },
+        "zoom": 	  { value: 1.0 }
 
-        
-<dl class="details">
-    
+	},
 
-	
+	vertexShader: [
 
-	
+		"varying vec2 vUv;",
 
-	
+        "void main() {",
 
-    
+        	"vUv = uv;",
+        	"gl_Position = vec4( position, 1.0 );",
 
-    
+        "}" 
 
-    
+	].join( "\n" ),
 
-    
+	fragmentShader: [
 
-	
+		"uniform sampler2D tDiffuse;",
+        "uniform float resolution;",
+        "uniform mat4 transform;",
+        "uniform float zoom;",
 
-	
+        "varying vec2 vUv;",
 
-	
+        "const float PI = 3.141592653589793;",
 
-	
+        "void main(){",
 
-	
+        	"vec2 position = -1.0 +  2.0 * vUv;",
 
+        	"position *= vec2( zoom * resolution, zoom * 0.5 );",
 
+        	"float x2y2 = position.x * position.x + position.y * position.y;",
+        	"vec3 sphere_pnt = vec3( 2. * position, x2y2 - 1. ) / ( x2y2 + 1. );",
 
-	
-	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
-	<dd class="tag-source">
-		<ul class="dummy">
-			<li>
-				<a href="util_ImageLoader.js.html">util/ImageLoader.js</a>
-			</li>
-		</ul>
-	</dd>
-	
+        	"sphere_pnt = vec3( transform * vec4( sphere_pnt, 1.0 ) );",
 
-	
+        	"vec2 sampleUV = vec2(",
+        		"(atan(sphere_pnt.y, sphere_pnt.x) / PI + 1.0) * 0.5,",
+        		"(asin(sphere_pnt.z) / PI + 0.5)",
+        	");",
 
-	
+        	"gl_FragColor = texture2D( tDiffuse, sampleUV );",
 
-	
-</dl>
+        "}"
 
+	].join( "\n" )
 
-        
-    
-    </div>
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-        <h3 class="subsection-title">Methods</h3>
-
-        <dl>
-            
-<hr>
-<dt>
-    <h4 class="name" id=".load"><span class="type-signature">&lt;static> </span>load(url, onLoad, onProgress, onError)</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        Load an image with XMLHttpRequest to provide progress checking
-    </div>
-    
-
-    
-
-    
-
-    
-    
-        <h5>Parameters:</h5>
-        
-
-<table class="params table table-striped">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>url</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">An image url</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>onLoad</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">function</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">On load callback</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>onProgress</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">function</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">In progress callback</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>onError</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">function</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">On error callback</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
-	<dd class="tag-source">
-		<ul class="dummy">
-			<li>
-				<a href="util_ImageLoader.js.html">util/ImageLoader.js</a>
-			</li>
-		</ul>
-	</dd>
-	
-
-	
-
-	
-
-	
-</dl>
-
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <h5>Returns:</h5>
-    
-            
-<div class="param-desc">
-    - DOM image element
-</div>
-
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">HTMLImageElement</span>
-
-
-
-    </dd>
-</dl>
-
-
-        
-
-    
-</dd>
-
-        </dl>
-    
-
-    
-
-    
-</article>
-
+};</pre>
+    </article>
 </section>
+
 
 
 
@@ -418,10 +158,6 @@
 
 	<div class="clearfix"></div>
 
-	
-		<div class="col-md-3">
-			<div id="toc" class="col-md-3 hidden-xs hidden-sm hidden-md"></div>
-		</div>
 	
 
 </div>
@@ -448,7 +184,7 @@
 <span class="jsdoc-message">
 	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a>
 	
-		on 2016-07-25T23:33:04-07:00
+		on 2016-07-25T23:33:03-07:00
 	
 	using the <a href="https://github.com/docstrap/docstrap">DocStrap template</a>.
 </span>
