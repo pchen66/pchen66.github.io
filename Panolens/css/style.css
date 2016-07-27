@@ -403,6 +403,21 @@ figcaption > article {
   left: 8px;
 }
 
+#progress {
+  width: 0;
+  height: 5px;
+  position: fixed;
+  top: 0;
+  background: #fff;
+  -webkit-transition: opacity 0.5s ease;
+  transition: opacity 0.5s ease;
+  z-index: 99999;
+}
+
+#progress.finish {
+  opacity: 0;
+}
+
 @media screen and (max-width: 400px) {
   section.title, section.example, section.documentation {
     max-height: 100%;

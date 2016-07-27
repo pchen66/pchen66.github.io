@@ -1,6 +1,6 @@
 (function(){
 
-  var viewer, container, title, docSection, exampleSection, routePanoramas, assetPath, items, selection, cards, menuIcon, nav;
+  var viewer, container, title, docSection, exampleSection, routePanoramas, assetPath, items, selection, cards, menuIcon, nav, progressElement, progress;
 
   assetPath = 'examples/asset/textures/equirectangular';
   selection = document.querySelector( '.item.selected' );
@@ -27,8 +27,26 @@
   cards = document.querySelectorAll( '.card' );
   menuIcon = document.querySelector( '.menu-icon' );
   items = document.querySelectorAll( '.item' );
+  progressElement = document.getElementById( 'progress' );
 
   viewer = new PANOLENS.Viewer( { container: container, controlBar: false, passiveRendering: true } );
+
+  function onEnter ( event ) {
+
+    progressElement.style.width = 0;
+    progressElement.classList.remove( 'finish' );
+
+  }
+
+  function onProgress ( event ) {
+
+    progress = event.progress.loaded / event.progress.total * 100;
+    progressElement.style.width = progress + '%';
+    if ( progress === 100 ) {
+      progressElement.classList.add( 'finish' );
+    }
+
+  }
 
   function addDomEvents () {
 
@@ -98,6 +116,9 @@
             route.panorama.rotation.y = route.rotationY;
 
           }
+
+          route.panorama.addEventListener( 'progress', onProgress );
+          route.panorama.addEventListener( 'enter', onEnter );
 
           viewer.add( route.panorama );
 
