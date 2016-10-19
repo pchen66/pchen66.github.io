@@ -79,7 +79,7 @@
       toScale = fromScale.clone().multiplyScalar( 1.2 );
       eggTexture = PANOLENS.Utils.TextureLoader.load( 'asset/textures/noise.png' );
 
-      viewer = new PANOLENS.Viewer( { enableReticle: true, cameraFov: 45 } );
+      viewer = new PANOLENS.Viewer( { enableReticle: true } );
       panorama = new PANOLENS.BasicPanorama();
 
       viewer.add( panorama );

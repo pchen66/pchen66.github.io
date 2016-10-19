@@ -28,7 +28,7 @@
 
   <body>
 
-    <div class="credit"><a href="https://github.com/pchen66/panolens.js">Panolens.js</a> panorama video example. 360 Video from <a href="http://worldoftanks.com/" target="_blank">World of Tanks</a></div>
+    <div class="credit"><a href="https://github.com/pchen66/panolens.js">Panolens.js</a> panorama video example. 360 Video from <a href="http://supercell.com/en/games/clashofclans/" target="_blank">Clash of clans</a></div>
     
     <script src="../../js/three/three.min.js"></script>
     <script src="../../js/panolens/panolens.min.js"></script>
@@ -37,7 +37,7 @@
 
       var panorama, viewer;
 
-      panorama = new PANOLENS.VideoPanorama( 'asset/textures/video/1941-battle-low.mp4' );
+      panorama = new PANOLENS.VideoPanorama( 'asset/textures/video/ClashofClans.mp4', { autoplay: true } );
 
       viewer = new PANOLENS.Viewer();
       viewer.add( panorama );
