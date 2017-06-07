@@ -7,15 +7,15 @@
 
   routePanoramas = {
     Home: { 
-      panorama: new PANOLENS.ImagePanorama( assetPath + '/planet.jpg' ), 
-      rotationY: Math.PI 
+      panorama: new PANOLENS.ImagePanorama( assetPath + '/view.jpg' ), 
+      rotationY: Math.PI / 4
     },
     Documentation: { 
       panorama: new PANOLENS.ImagePanorama( assetPath + '/tunnel.jpg' ),
       rotationY: Math.PI / 2 
     },
     Example: { 
-      panorama: new PANOLENS.ImagePanorama( assetPath + '/sunset.jpg' )
+      panorama: new PANOLENS.ImagePanorama( assetPath + '/planet.jpg' )
     }
   };
 
