@@ -21,6 +21,7 @@ body {
   font-family: 'Oswald', 'Roboto', sans-serif;
   overflow: hidden;
   -webkit-font-smoothing: antialiased;
+  background-color: #000;
 }
 
 h3 {
