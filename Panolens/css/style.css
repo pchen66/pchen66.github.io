@@ -148,6 +148,7 @@ section.title.hide, section.example.hide, section.documentation.hide {
   filter: alpha(opacity=0);
   pointer-events: none;
   z-index: -1;
+  display: none;
 }
 
 article {
