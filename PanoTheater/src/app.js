@@ -327,12 +327,11 @@
     release.scale.multiplyScalar( 1/2 );
     release.rotation.y = Math.PI;
     release.position.set( -18, 5, 0 );
-    release_edge = new THREE.EdgesHelper( 
-      new THREE.Mesh( 
-        new THREE.PlaneGeometry( 10, 12, 1, 1 ), 
-        new THREE.MeshBasicMaterial()), 
-      0xffffff 
+    release_edge = new THREE.LineSegments( 
+      new THREE.EdgesGeometry( new THREE.PlaneGeometry( 10, 12, 1, 1 ) ), 
+      new THREE.LineBasicMaterial( { color: 0xffffff } ) 
     );
+
     release.add( release_edge );
 
     // Movie rating widget
@@ -752,10 +751,14 @@
         moviePanorama.movie = moviePanorama.movieData.results[ 0 ];
         moviePanorama.category = this.category;
         moviePanorama.movieIndex = 0;
+        viewer.panorama.visible = false;
         setPanorama( moviePanorama );
       } );
 
-      edge = new THREE.EdgesHelper( tile.clone(), 0xffffff );
+      edge = new THREE.LineSegments( 
+        new THREE.EdgesGeometry( tile.geometry ), 
+        new THREE.LineBasicMaterial( { color: 0xffffff } ) 
+      );
       edge.material.transparent = true;
       edge.material.opacity = 0;
       edge.matrixAutoUpdate = true;
@@ -1043,7 +1046,10 @@
 
       mesh = new THREE.Mesh( geometry, material.clone() );
 
-      edge = new THREE.EdgesHelper( mesh, 0xffffff );
+      edge = new THREE.LineSegments( 
+        new THREE.EdgesGeometry( geometry ), 
+        new THREE.LineBasicMaterial( { color: 0xffffff } ) 
+      );
       edge.material.transparent = true;
       edge.material.opacity = 0;
       edge.matrixAutoUpdate = true;
@@ -1282,7 +1288,11 @@
         
       } );
 
-      edge = new THREE.EdgesHelper( backdrop.clone(), 0xffffff );
+      edge = new THREE.LineSegments( 
+        new THREE.EdgesGeometry( backdrop.geometry ), 
+        new THREE.LineBasicMaterial( { color: 0xffffff } ) 
+      );
+
       edge.material.transparent = true;
       edge.material.opacity = 0;
       edge.matrixAutoUpdate = true;
@@ -1650,10 +1660,10 @@
 
   function back () {
 
+    viewer.panorama.visible = false;
     setPanorama( entryPanorama );
     moviePanorama.backdrops && moviePanorama.backdrops.reset( true );
     css3dWidget.reset();
-    viewer.widget.vrElement.style.visibility = 'visible';
 
   }
 
