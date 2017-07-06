@@ -8,11 +8,11 @@
   routePanoramas = {
     Home: { 
       panorama: new PANOLENS.ImagePanorama( assetPath + '/view.jpg' ), 
-      rotationY: Math.PI / 4
+      initialLookPosition: new THREE.Vector3( -3855.88, 129.86, -3164.48 )
     },
     Documentation: { 
       panorama: new PANOLENS.ImagePanorama( assetPath + '/tunnel.jpg' ),
-      rotationY: Math.PI / 2 
+      initialLookPosition: new THREE.Vector3( 4994.63, -110.08, -19.93 ) 
     },
     Example: { 
       panorama: new PANOLENS.ImagePanorama( assetPath + '/planet.jpg' )
@@ -29,7 +29,7 @@
   items = document.querySelectorAll( '.item' );
   progressElement = document.getElementById( 'progress' );
 
-  viewer = new PANOLENS.Viewer( { container: container, controlBar: false, passiveRendering: true } );
+  viewer = new PANOLENS.Viewer( { container: container, controlBar: false } );
 
   function onEnter ( event ) {
 
@@ -111,17 +111,17 @@
 
           var route = routePanoramas[ routeName ];
 
-          if ( route.rotationY ) {
-
-            route.panorama.rotation.y = route.rotationY;
-
-          }
-
           route.panorama.addEventListener( 'progress', onProgress );
           route.panorama.addEventListener( 'enter', onEnter );
 
-          viewer.add( route.panorama );
+          if ( route.initialLookPosition ) {
+            route.panorama.addEventListener('enter-fade-start', function( position ){
+              viewer.tweenControlCenter( position, 0 );
+            }.bind( this, route.initialLookPosition ));
 
+          }
+
+          viewer.add( route.panorama );
         }
 
       }
@@ -161,7 +161,7 @@
     selection = element;
     selection.classList.add( 'selected' );
 
-    viewer.setPanorama( routePanoramas[ name ].panorama );
+    viewer.setPanorama( routePanoramas[ name ].panorama );    
 
   }
 
