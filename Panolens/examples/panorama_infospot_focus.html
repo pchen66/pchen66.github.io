@@ -106,7 +106,7 @@
 
     <script>
 
-      var parameters, gui, panorama, viewer, radius, button, position, infospot, timerId, easingItem, list, listItem, index = 0, baseScale = 300;
+      var parameters, gui, panorama, panorama_video, viewer, radius, button, position, infospot, timerId, easingItem, list, listItem, index = 0, baseScale = 300;
 
       var curves = [], easings = [];
 
@@ -136,6 +136,10 @@
       easingItem = gui.add( parameters, 'easing', [ 'In', 'Out', 'InOut' ] );
 
       panorama = new PANOLENS.ImagePanorama( 'asset/textures/equirectangular/field.jpg' );
+      panorama_video = new PANOLENS.VideoPanorama( 'asset/textures/video/1941-battle-low.mp4' );
+
+      panorama.link( panorama_video, new THREE.Vector3(3883.71, 745.13, -3047.48), 400, 'asset/textures/1941-battle-thumb.jpg' );
+      panorama_video.link( panorama, new THREE.Vector3(4602.58, 1863.13, -547.70), 400 );
 
       radius = panorama.geometry.parameters.radius;
 
@@ -162,8 +166,8 @@
 
       }
 
-      viewer = new PANOLENS.Viewer( { container: document.querySelector( '#pcontainer' ) } );
-      viewer.add( panorama );
+      viewer = new PANOLENS.Viewer( { output: 'console', container: document.querySelector( '#pcontainer' ) } );
+      viewer.add( panorama, panorama_video );
 
       function getPropertyArray ( object ) {
 
