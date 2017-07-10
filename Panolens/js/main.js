@@ -31,6 +31,14 @@
 
   viewer = new PANOLENS.Viewer( { container: container, controlBar: false } );
 
+  window.addEventListener( 'orientationchange', function () {
+    nav.classList.remove('animated');
+    setTimeout(function(){
+      viewer.onWindowResize(window.innerWidth, window.innerHeight)
+    }, 200);
+    
+  }, false );
+
   function onEnter ( event ) {
 
     progressElement.style.width = 0;
