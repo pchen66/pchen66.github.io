@@ -87,7 +87,7 @@ section.content {
   z-index: 1;
 }
 
-section.title, section.example, section.documentation {
+section.title, section.example, section.documentation, section.support {
   position: absolute;
   width: 100%;
   max-width: 1000px;
@@ -109,7 +109,7 @@ section.example, section.documentation {
   -webkit-overflow-scrolling: touch;
 }
 
-section.title {
+section.title, section.support {
   text-align: center;
   font-size: 72px;
   font-weight: 300;
@@ -132,23 +132,34 @@ section.example {
           flex-wrap: wrap;
 }
 
-section.title header, section.title article {
+section.title header, section.title article,
+section.support header, section.support article{
   -webkit-transition: all 0.5s ease-out;
           transition: all 0.5s ease-out;
 }
 
-section.title.hide header, section.title.hide article {
+section.title.hide header, section.title.hide article,
+section.support.hide header, section.support.hide article {
   -webkit-transform: translateY(-30px);
       -ms-transform: translateY(-30px);
           transform: translateY(-30px);
 }
 
-section.title.hide, section.example.hide, section.documentation.hide {
+section.title.hide, section.example.hide, section.documentation.hide, section.support.hide {
   opacity: 0;
   filter: alpha(opacity=0);
   pointer-events: none;
   z-index: -1;
   display: none;
+}
+
+section.support a{
+  pointer-events: auto;
+}
+
+section.support a img {
+  border: 3px solid #fff;
+  border-radius: 3px;
 }
 
 article {

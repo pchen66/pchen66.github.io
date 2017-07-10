@@ -1,6 +1,6 @@
 (function(){
 
-  var viewer, container, title, docSection, exampleSection, routePanoramas, assetPath, items, selection, cards, menuIcon, nav, progressElement, progress;
+  var viewer, container, title, docSection, exampleSection, supportSection, routePanoramas, assetPath, items, selection, cards, menuIcon, nav, progressElement, progress;
 
   assetPath = 'examples/asset/textures/equirectangular';
   selection = document.querySelector( '.item.selected' );
@@ -16,6 +16,9 @@
     },
     Example: { 
       panorama: new PANOLENS.ImagePanorama( assetPath + '/planet.jpg' )
+    },
+    Support: { 
+      panorama: new PANOLENS.GoogleStreetviewPanorama( '-OiczBjHvoJdQVTg9tGUTQ' )
     }
   };
 
@@ -24,6 +27,7 @@
   title = document.querySelector( 'section.title' );
   docSection = document.querySelector( 'section.documentation' );
   exampleSection = document.querySelector( 'section.example' );
+  supportSection = document.querySelector( 'section.support' );
   cards = document.querySelectorAll( '.card' );
   menuIcon = document.querySelector( '.menu-icon' );
   items = document.querySelectorAll( '.item' );
@@ -147,18 +151,28 @@
       title.classList.remove( 'hide' );
       docSection.classList.add( 'hide' );
       exampleSection.classList.add( 'hide' );
+      supportSection.classList.add( 'hide' );
 
     } else if ( name === 'Documentation' ){
 
       title.classList.add( 'hide' );
       docSection.classList.remove( 'hide' );
       exampleSection.classList.add( 'hide' );
+      supportSection.classList.add( 'hide' );
 
     } else if ( name === 'Example' ){
 
       title.classList.add( 'hide' );
       docSection.classList.add( 'hide' );
       exampleSection.classList.remove( 'hide' );
+      supportSection.classList.add( 'hide' );
+
+    } else if ( name === 'Support' ){
+
+      title.classList.add( 'hide' );
+      docSection.classList.add( 'hide' );
+      exampleSection.classList.add( 'hide' );
+      supportSection.classList.remove( 'hide' );
 
     }
 
