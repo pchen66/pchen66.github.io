@@ -431,7 +431,7 @@ figcaption > article {
   opacity: 0;
 }
 
-@media screen and (max-width: 400px) {
+@media screen and (max-width: 500px) {
   section.title, section.example, section.documentation {
     max-height: 100%;
   }
