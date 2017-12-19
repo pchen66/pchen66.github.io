@@ -98,7 +98,7 @@
         var url = path + lists[ i ] + format;
         photo.classList.add( 'photo' );
         photo.style.backgroundImage = 'url(' + url + ')';
-        photo.texture = PANOLENS.Utils.TextureLoader.load( url );
+        photo.texture = new THREE.TextureLoader().load( url );
         photo.addEventListener( 'click', function () {
           littlePlanet.updateTexture( this.texture );
           littlePlanet.reset();
