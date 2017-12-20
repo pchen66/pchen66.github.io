@@ -63,7 +63,7 @@
 				controls.addEventListener( 'change', render );
 					
 				// renderer
-				renderer = new THREE.WebGLRenderer({antialias: true});
+				renderer = new THREE.WebGLRenderer({antialias: false});
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setFaceCulling( THREE.CullFaceNone );
@@ -106,7 +106,6 @@
 				};
 
 				var mtlLoader = new THREE.MTLLoader();
-				mtlLoader.setBaseUrl( 'model/' );
 				mtlLoader.setPath( 'model/' );
 				mtlLoader.load( 'bumblebee.mtl', function( materials ) {
 
@@ -138,7 +137,7 @@
 				var panoGeo = new THREE.SphereGeometry( 3000, 60, 40 );
 				panoGeo.applyMatrix( new THREE.Matrix4().makeScale( -1, 1, 1 ) );
 
-				var panoMat = new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'img/panorama.jpg' )} );
+				var panoMat = new THREE.MeshBasicMaterial( { map: new THREE.TextureLoader().load( 'img/panorama.jpg' )} );
 
 				var pano = new THREE.Mesh( panoGeo, panoMat );		
 				pano.name = 'Environment';
@@ -231,7 +230,7 @@
 
 			function render() {
 			
-				cubeCamera.updateCubeMap( renderer, scene );
+				cubeCamera.update( renderer, scene );
 				
 				renderer.render( scene, camera );
 
@@ -255,7 +254,7 @@
 			}
 
 			function makeImageSprite(){
-				var image = THREE.ImageUtils.loadTexture('textures/ui.png');
+				var image = new THREE.TextureLoader().load('textures/ui.png');
 
 				var spriteMaterial = new THREE.SpriteMaterial( 
 					{ map: image } );
