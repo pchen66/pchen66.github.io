@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width, shrink-to-fit=no">
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,300' rel='stylesheet' type='text/css'>
+    <title>Panolens.js memory leak test</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+
+      html, body {
+        margin: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        font-family: 'Open Sans', sans-serif;
+        background-color: #000;
+      }
+
+      .intro {
+        position: fixed;
+        top: 0;
+        right: 0;
+        font-size: 14px;
+        display: block;
+        padding: 20px;
+        color: #fff;
+        text-transform: uppercase;
+        text-shadow: 0 0 2px #000;
+      }
+
+    </style>
+  </head>
+
+  <body>
+
+    <div class="intro">Memory leak test</div>
+    
+    <script src="../../js/three/three.min.js"></script>
+    <script src="../../js/panolens/panolens.min.js"></script>
+
+    <script>
+
+      var panorama, viewer, images, index = 0;
+
+      images = [
+
+        'asset/textures/equirectangular/mountainpeak15000x7500.jpg',
+        'asset/textures/equirectangular/dusty9000x4500.jpg',
+        'asset/textures/equirectangular/dawn4000x2000.jpg',
+        'asset/textures/equirectangular/lake5000x2500.jpg',
+        'asset/textures/equirectangular/pier4000x2000.jpg'
+
+      ];
+
+      viewer = new PANOLENS.Viewer( { output: 'console'} );      
+
+      function renew () {
+
+        panorama && panorama.dispose() && viewer.remove( panorama );
+        panorama = new PANOLENS.ImagePanorama( images[ index++ ] );
+        viewer.add( panorama );
+
+        index = index >= images.length ? 0 : index;
+
+      }
+
+      setInterval( renew, 10000 );
+
+      renew();
+
+    </script>
+
+  </body>
