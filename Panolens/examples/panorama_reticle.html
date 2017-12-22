@@ -165,6 +165,7 @@
         } );
         mesh.addEventListener( 'click', function () {
           this.vanishAnimation.start();
+          this.zodiac.material.opacity = 1;
         } );
 
         // Egg auto rotation
@@ -185,7 +186,7 @@
         mesh = new PANOLENS.Infospot( 50, url, false );
         mesh.name = zodiacs[ index ].name;
         mesh.position.set( radius * Math.sin( angle ), 0, radius * Math.cos( angle ) );
-        mesh.visible = false;
+        mesh.material.opacity = 0;
         mesh.setCursorHoverStyle( 'default' );
 
         // Zodiac event listeners
