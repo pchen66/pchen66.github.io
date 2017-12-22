@@ -43,7 +43,7 @@
 
     <script>
 
-      var panorama, viewer, images, index = 0;
+      var panorama, viewer, images, index = 0, renewDuration = 10000;
 
       images = [
 
@@ -60,14 +60,19 @@
       function renew () {
 
         panorama && panorama.dispose() && viewer.remove( panorama );
+        
         panorama = new PANOLENS.ImagePanorama( images[ index++ ] );
+        panorama.addEventListener( 'load', function () {
+
+          setTimeout( renew, renewDuration );
+
+        } ); 
+
         viewer.add( panorama );
 
         index = index >= images.length ? 0 : index;
 
       }
-
-      setInterval( renew, 10000 );
 
       renew();
 
