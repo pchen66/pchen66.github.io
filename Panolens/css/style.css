@@ -333,6 +333,9 @@ figcaption > article {
 .card.memory{
   background-image: url( '../images/panorama_memorytest.png' );
 }
+.card.storytelling{
+  background-image: url( '../images/panorama_storytelling.png' );
+}
 .card.xdiamond{
   background-image: url( '../images/XDiamond.png' );
 }
