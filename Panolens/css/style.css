@@ -153,6 +153,12 @@ section.title.hide, section.example.hide, section.documentation.hide, section.su
   display: none;
 }
 
+section.support {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
 section.support a{
   pointer-events: auto;
   display: inline-block;
@@ -165,6 +171,7 @@ section.support a img {
 
 section.support article {
   margin: 0 0 30px 0;
+  max-width: 430px;
 }
 
 section.support .link {
@@ -470,6 +477,9 @@ figcaption > article {
   }
   section.title article {
     font-size: 13px;
+  }
+  section.support article {
+    max-width: 300px;
   }
   nav {
     -webkit-box-orient: vertical;
