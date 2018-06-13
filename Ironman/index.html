@@ -322,6 +322,8 @@
 			var dae_ironman, dae_armrobot, dae_disc, dae_wardrobe_right, dae_wardrobe_left, dae_arc_model, 
 				dae_earth_model, dae_car_left, dae_car_right,
 				dae_ironman_doll = [];
+
+			var loader = new THREE.ColladaLoader();
 			/*var righthand = [];
 			for(var i=105;i<=113;i++){
 				righthand.push("mesh"+i);
@@ -393,7 +395,7 @@
 				audio.play();
 				
 				controls.target = periodictable_object.position;
-				tweenCamera( 0, 50, 1000 );					
+				tweenCamera( 0, 50, 2000 );					
 				transform( targets.table, 3000);
 			}
 		
@@ -414,8 +416,8 @@
 			//Initial Model for loading
 			function loadArcModel(){
 				var dae;
-				var loader = new THREE.ColladaLoader();
-				loader.options.convertUpAxis = true;
+				
+				
 				loader.load( 'model/ironman/ironman_arc.dae', function ( collada ) {
 
 				dae = collada.scene;
@@ -434,11 +436,11 @@
 				
 				// Tween
 				var tweenClockWise	= new TWEEN.Tween( dae_arc_model.rotation )
-					.to({y: Math.PI * 2}, 6000)
+					.to({z: Math.PI * 2}, 6000)
 					.easing( TWEEN.Easing.Exponential.Out)
 				// build the tween to go backward
 				var tweenAntiClockWise = new TWEEN.Tween( dae_arc_model.rotation )
-					.to({y: 0}, 6000)
+					.to({z: 0}, 6000)
 					.easing( TWEEN.Easing.Exponential.Out)
 
 				// after tweenHead do tweenBack
@@ -456,8 +458,7 @@
 
 			function loadSideModel(){
 				var dae;
-				var loader = new THREE.ColladaLoader();
-				loader.options.convertUpAxis = true;
+				
 				loader.load( 'model/ironman/earth2.dae', function ( collada ) {
 
 				dae = collada.scene;
@@ -484,14 +485,13 @@
 				}, progressCallback.bind( this, 'earth' ) );
 
 				var dae2;
-				var loader2 = new THREE.ColladaLoader();
-				loader2.options.convertUpAxis = true;
-				loader2.load( 'model/ironman/car1.dae', function ( collada ) {
+
+				loader.load( 'model/ironman/car1.dae', function ( collada ) {
 
 				dae2 = collada.scene;
 				dae2.scale.x = dae2.scale.y = dae2.scale.z = 100;
 				dae2.position.set( HallwayWidth/2,-20,-800 );
-				dae2.rotation.y = Math.PI / 3;
+				dae2.rotation.z = Math.PI / 3;
 				dae2.name = "car_right";
 				
 				dae_car_right = dae2;
@@ -502,14 +502,12 @@
 				}, progressCallback.bind( this, 'car1' ) );
 				
 				var dae3;
-				var loader3 = new THREE.ColladaLoader();
-				loader3.options.convertUpAxis = true;
-				loader3.load( 'model/ironman/car2.dae', function ( collada ) {
+				loader.load( 'model/ironman/car2.dae', function ( collada ) {
 
 				dae3 = collada.scene;
 				dae3.scale.x = dae3.scale.y = dae3.scale.z = 0.8;
 				dae3.position.set( -HallwayWidth/2,-70, -800 );
-				dae3.rotation.y = Math.PI * 2 / 3;
+				dae3.rotation.z = Math.PI * 2 / 3;
 				dae3.name = "car_left";
 				
 				dae_car_left = dae3;
@@ -522,8 +520,8 @@
 		
 			//Model
 			function loadIronManModel(){
-			var loader = new THREE.ColladaLoader();
-			loader.options.convertUpAxis = true;
+			
+			
 			loader.load( 'model/ironman/ironman.dae', function ( collada ) {
 
 				dae_ironman = collada.scene;
@@ -552,23 +550,30 @@
 			}
 			
 			function loadArmRobotModel(){
-				var loader = new THREE.ColladaLoader();
-				loader.options.convertUpAxis = true;
+				
+				var object = {};
+
 				loader.load( 'model/ironman/ironman_arm_robot2.dae', function ( collada ) {
 
-				dae_armrobot = collada.scene;
+				let dae_armrobot = collada.scene;
 				dae_armrobot.scale.x = dae_armrobot.scale.y = dae_armrobot.scale.z = 1.2;
 				dae_armrobot.position.set(2,-50,-18);
+
+				// Remove line segments
+				dae_armrobot.children[0].children.pop();
+				dae_armrobot.children[0].children.pop();
 				
-				scene.add( dae_armrobot );		
+				scene.add( dae_armrobot );
+
+				object.model = dae_armrobot;		
 
 				// Tween
 				var tweenClockWise	= new TWEEN.Tween( dae_armrobot.rotation )
-					.to({y: Math.PI * 2}, 6000)
+					.to({z: Math.PI * 2}, 6000)
 					.easing( TWEEN.Easing.Exponential.Out)
 				// build the tween to go backward
 				var tweenAntiClockWise = new TWEEN.Tween( dae_armrobot.rotation )
-					.to({y: 0}, 6000)
+					.to({z: 0}, 6000)
 					.easing( TWEEN.Easing.Exponential.Out)
 
 				// after tweenHead do tweenBack
@@ -581,13 +586,14 @@
 
 				progressCallback( 'armRobot', completedState );
 				
-				}, progressCallback.bind( this, 'armRobot' ) );		
-				return dae_armrobot;
+				}, progressCallback.bind( this, 'armRobot' ) );	
+
+				return object;
 			}
 			
 			function loadDiscModel(){
-				var loader = new THREE.ColladaLoader();
-				loader.options.convertUpAxis = true;
+				
+				
 				loader.load( 'model/ironman/ironman_disc.dae', function ( collada ) {
 
 				dae_disc = collada.scene;
@@ -625,22 +631,26 @@
 			}
 			
 			function loadwardrobeModel( name ){
-				var loader = new THREE.ColladaLoader();
-				var dae;
-				loader.options.convertUpAxis = true;
+				
+				var object = {};
+				
 				loader.load( 'model/ironman/ironman_wardrobe.dae', function ( collada ) {
+
+				let dae;
 
 				dae = collada.scene;
 				dae.scale.x = dae.scale.y = dae.scale.z = 2;
 				
 				if( name == "right" ){
 					dae.position.set(-HallwayWidth/2,-80,0);
-					dae.rotation.y = Math.PI/2;
+					dae.rotation.z = Math.PI/2;
 				}
 				else if( name == "left"){
 					dae.position.set(HallwayWidth/2,-80,0);
-					dae.rotation.y = -Math.PI/2;
+					dae.rotation.z = -Math.PI/2;
 				}
+
+				object.model = dae;
 				
 				scene.add( dae );
 				loadIronmanDollModel( dae );
@@ -649,18 +659,17 @@
 				}, progressCallback.bind( this, 'wardrobe' ) );
 
 				
-				return dae;	
+				return object;	
 			}
 			
 			function loadIronmanDollModel( dae ){
-				var loader2 = new THREE.ColladaLoader();
 				var dae2;
-				loader2.options.convertUpAxis = true;
-				loader2.load( 'model/ironman/ironman.dae', function ( collada ) {
+				loader.load( 'model/ironman/ironman.dae', function ( collada ) {
 				
 					dae2 = collada.scene;
 					dae2.scale.x = dae2.scale.y = dae2.scale.z = 0.09 / 2;
-					dae2.position.set(-115,2,-5);
+					dae2.rotation.x = 0;
+					dae2.position.set(-115,2,3);
 					dae2.name = "suit";
 					dae2.isMovingForward = false;
 					
@@ -689,14 +698,6 @@
 							if( cloneObj.children[k].name == "Arclight")
 								cloneObj.children[k].color = new THREE.Color( tempArcColor );
 						}
-						
-						var tempColor;						
-						cloneObj.traverse(function(node){						
-							if( node.material != undefined ){
-								tempColor = 0xffffff*Math.random();
-								node.material = new THREE.MeshPhongMaterial( { color: tempColor, specular: 0xffffff, shininess: 50, vertexColors: THREE.FaceColors} );	
-							}
-						});
 						
 						// Top SpotLight for each Ironman
 						spotLight = new THREE.SpotLight( 0xffffff, 5, 300);
@@ -821,7 +822,7 @@
 
 				}
 
-				var line = new THREE.Line( geometry, material, THREE.LinePieces );
+				var line = new THREE.LineSegments( geometry, material );
 				scene.add( line );				
 
 				// Lights				
@@ -926,14 +927,14 @@
 						
 						if( !tempObj.isMovingForward ){
 							new TWEEN.Tween( tempObj.position )
-							.to({z:tempObj.position.z + 30}, 1000)
+							.to({y:tempObj.position.y - 30}, 1000)
 							.easing( TWEEN.Easing.Exponential.Out)
 							.start();
 							tempObj.isMovingForward = true;
 						}
 						else{
 							new TWEEN.Tween( tempObj.position )
-							.to({z:tempObj.position.z - 30}, 1000)
+							.to({y:tempObj.position.y + 30}, 1000)
 							.easing( TWEEN.Easing.Exponential.Out)
 							.start();
 							tempObj.isMovingForward = false;

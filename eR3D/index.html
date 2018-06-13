@@ -189,7 +189,6 @@
 
 			//Model
 			var loader = new THREE.ColladaLoader();
-			loader.options.convertUpAxis = true;
 			loader.load( 'iphone4s/iphone4s.dae', function ( collada ) {
 
 				iphone4S = collada.scene;
@@ -198,16 +197,15 @@
 				iphone4S.position.set(0,-30,0);
 				iphone4S.rotation.set(0,Math.PI,0);		
 
-				iphone4S.traverse(function(children){
-					if( children.material != undefined ){
+				iphone4S.traverse(function(child){
+					if( child.material != undefined ){
 
-						switch( children.parent.name ){
+						switch( child.name ){
 						case "Main":
-							children.material.materials[0].metal = true;
-							appleMat = children.material.materials[0].clone();
+							appleMat = child.material.clone();
 							break;
 						case "Screen":
-							ScreenMesh = children;
+							ScreenMesh = child;
 							ScreenMeshCopy = ScreenMesh.clone();
 							// Trailers Texture
 							monitor_video = document.getElementById('video');
@@ -218,20 +216,20 @@
 							monitor_texture.format = THREE.RGBFormat;
 							monitor_texture.generateMipmaps = false;
 							
-							children.material.map = monitor_texture;
+							child.material.map = monitor_texture;
 
 							break;
 						case "Description":
-							children.material.materials[0].transparent = true;
-							children.material.materials[0].map = THREE.ImageUtils.loadTexture("img/iphonebackcover.png");
+							child.material.transparent = true;
+							child.material.map = THREE.ImageUtils.loadTexture("img/iphonebackcover.png");
 							break;
 						case "Home":			
-							children.material.materials[0].transparent = true;
-							children.material.materials[0].map = THREE.ImageUtils.loadTexture("img/button.png");
-							children.material.materials[0].side = THREE.DoubleSide;
+							child.material.transparent = true;
+							child.material.map = THREE.ImageUtils.loadTexture("img/button.png");
+							child.material.side = THREE.DoubleSide;
 							break;
 						case "Apple_Logo":
-							appleGeo = children.geometry.clone();
+							appleGeo = child.geometry.clone();
 							break;
 						}						
 						

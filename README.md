@@ -1,4 +1,4 @@
-## Current Projects
+## Current Experiments
 
 <span>
 	<a title="Splash" href="http://pchen66.github.io/Splash">
