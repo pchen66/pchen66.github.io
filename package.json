@@ -28,6 +28,6 @@
     "gulp-uglify": "^1.5.3"
   },
   "dependencies": {
-    "three": "^0.89.0"
+    "three": "^0.93.0"
   }
 }
