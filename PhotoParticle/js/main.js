@@ -32,7 +32,7 @@ var firstTime = true;
 var timerIds = [];
 
 var resolution = { width: 1080, height: 607 };
-var imageSizeRatio = { small: 0.3, medium: 0.5, large: 1 };
+var imageSizeRatio = { extrasmall: 0.1, small: 0.3, medium: 0.5, large: 1 };
 var lastLoadedURL = '';
 
 function getImageData( image ) {
@@ -189,7 +189,7 @@ function init() {
 
         image: { 
 
-            size: 'small',
+            size: 'ontouchstart' in window ? 'extrasmall' : 'small',
             url: 'https://source.unsplash.com/random/324x182', 
             brightness: 1.0, 
             depth: 0.0, 
@@ -225,7 +225,7 @@ function init() {
     optionsDefault = JSON.parse( JSON.stringify( options ) );
 
     var folderImage = gui.addFolder( 'image' );
-    folderImage.add( options.image, "size", [ 'small', 'medium', 'large' ] ).onChange( onChangeImageSize );
+    folderImage.add( options.image, "size", [ 'extrasmall', 'small', 'medium', 'large' ] ).onChange( onChangeImageSize );
     folderImage.add( options.image, "url" );
     folderImage.add( options.image, "brightness", 0, 5 ).onChange( onChangeBrightness );
     folderImage.add( options.image, "depth", -MAX_DEPTH, MAX_DEPTH ).onChange( onChangeDepth );
@@ -252,18 +252,16 @@ function init() {
     container.appendChild( renderer.domElement );
 
     window.addEventListener( 'resize', onWindowResize, false );
+
     container.addEventListener( 'mousemove', onMouseMove, false );
     container.addEventListener( 'click', onMouseClick, false );
 
+    container.addEventListener( 'touchstart', onMouseMove, false );
+    container.addEventListener( 'touchmove', onMouseMove, false );
+    container.addEventListener( 'touchend', onMouseClick, false );
+
     loadImage( options.image.url );
     animate();
-
-}
-
-function onMouseClick() {
-
-    clickPoint.copy( hoveredPoint );
-    decay = options.regroup.decay;
 
 }
 
@@ -582,8 +580,8 @@ function onWindowResize() {
 
 function onMouseMove( event ) {
 
-    mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
-    mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+    mouse.x = ( ( event.touches.length > 0 ? event.touches[ 0 ] : event ).clientX / window.innerWidth ) * 2 - 1;
+    mouse.y = - ( ( event.touches.length > 0 ? event.touches[ 0 ] : event ).clientY / window.innerHeight ) * 2 + 1;
 
     raycaster.setFromCamera( mouse, camera );
 
@@ -596,6 +594,13 @@ function onMouseMove( event ) {
         hoveredPoint.copy( intersects[ 0 ].point );
 
     }
+
+}
+
+function onMouseClick() {
+
+    clickPoint.copy( hoveredPoint );
+    decay = options.regroup.decay;
 
 }
 
