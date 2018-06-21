@@ -499,7 +499,7 @@ function reset() {
 
             gui.__folders[ folderName ].__controllers.forEach( function ( controller ) {
 
-                if ( controller.property !== 'size' && controller.property !== 'loadURL' ) {
+                if ( controller.property !== 'loadURL' ) {
 
                     options[ folderName ][ controller.property ] = optionsDefault[ folderName ][ controller.property ];
                     controller.updateDisplay();
