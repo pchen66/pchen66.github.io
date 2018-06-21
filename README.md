@@ -1,7 +1,7 @@
 ## Current Experiments
 
 <span>
-	<a title="Splash" href="http://pchen66.github.io/PhotoParticle">
+	<a title="PhotoParticle" href="http://pchen66.github.io/PhotoParticle/">
 		<img src="images/PhotoParticle.png" width="30%">
 	</a>
 	<a title="Splash" href="http://pchen66.github.io/Splash">
