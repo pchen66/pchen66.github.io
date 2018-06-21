@@ -580,8 +580,8 @@ function onWindowResize() {
 
 function onMouseMove( event ) {
 
-    mouse.x = ( ( event.touches.length > 0 ? event.touches[ 0 ] : event ).clientX / window.innerWidth ) * 2 - 1;
-    mouse.y = - ( ( event.touches.length > 0 ? event.touches[ 0 ] : event ).clientY / window.innerHeight ) * 2 + 1;
+    mouse.x = ( ( event.touches ? event.touches[ 0 ] : event ).clientX / window.innerWidth ) * 2 - 1;
+    mouse.y = - ( ( event.touches ? event.touches[ 0 ] : event ).clientY / window.innerHeight ) * 2 + 1;
 
     raycaster.setFromCamera( mouse, camera );
 
