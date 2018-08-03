@@ -1405,8 +1405,8 @@
     });
 
     viewer.addEventListener( 'window-resize', function(){
-      renderer.setSize( window.innerWidth, window.innerHeight );
-      stereorenderer.setSize( window.innerWidth, window.innerHeight );
+      //renderer.setSize( window.innerWidth, window.innerHeight, false );
+      //stereorenderer.setSize( window.innerWidth, window.innerHeight );
     } );
 
     widget.paused = true;

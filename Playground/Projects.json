@@ -1,0 +1,121 @@
+{
+   "Spherical Harmonics": {
+      "index3D": [
+         -2,
+         1,
+         -2
+      ],
+      "link": "SphericalHarmonics/",
+      "imageURL": "images/SphericalHarmonics.png",
+      "year": "2018",
+      "options": {
+         "m0": 1,
+         "m1": 6,
+         "m2": 4,
+         "m3": 2,
+         "m4": 2,
+         "m5": 4,
+         "m6": 0,
+         "m7": 1,
+         "wireframe": false
+      }
+   },
+   "Photo Particle": {
+      "index3D": [
+         2,
+         1,
+         -2
+      ],
+      "link": "PhotoParticle/",
+      "imageURL": "images/PhotoParticle.png",
+      "year": "2018",
+      "options": {
+         "textureURL": "https://source.unsplash.com/random/300x300"
+      }
+   },
+   "Splash": {
+      "index3D": [
+         2,
+         -2,
+         -2
+      ],
+      "link": "Splash/",
+      "imageURL": "images/Splash.png",
+      "year": "2016"
+   },
+   "Pano Theater": {
+      "index3D": [
+         -2,
+         -2,
+         0
+      ],
+      "link": "PanoTheater/",
+      "imageURL": "images/PanoTheater.png",
+      "year": "2017"
+   },
+   "Panolens.js": {
+      "index3D": [
+         0,
+         2,
+         2
+      ],
+      "link": "Panolens/",
+      "imageURL": "images/Panolens.png",
+      "year": "2015"
+   },
+   "Claw Catch": {
+      "index3D": [
+         -2,
+         2,
+         0
+      ],
+      "link": "ClawCatch/",
+      "imageURL": "images/ClawCatch.png",
+      "year": "2015",
+      "mobile": false
+   },
+   "Ironman": {
+      "index3D": [
+         -2,
+         -1,
+         2
+      ],
+      "link": "Ironman/",
+      "imageURL": "images/ironman.png",
+      "year": "2014",
+      "mobile": false
+   },
+   "3D_Assembly": {
+      "index3D": [
+         2,
+         2,
+         0
+      ],
+      "link": "3D_Assembly/",
+      "imageURL": "images/3d_assembly.png",
+      "year": "2014",
+      "mobile": false
+   },
+   "eR3D": {
+      "index3D": [
+         2,
+         -1,
+         2
+      ],
+      "link": "eR3D/",
+      "imageURL": "images/eR3D.png",
+      "year": "2014",
+      "mobile": false
+   },
+   "Periodic Table": {
+      "index3D": [
+         -1,
+         -2,
+         -2
+      ],
+      "link": "PeriodicTable/",
+      "imageURL": "images/PeriodicTable.png",
+      "year": "2014",
+      "mobile": false
+   }
+}

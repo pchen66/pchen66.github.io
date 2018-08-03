@@ -1,9 +1,35 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<meta HTTP-EQUIV="REFRESH" content="0; url=https://github.com/pchen66/pchen66.github.io">
+    <title>Playground</title>
+	<meta charset="utf-8">
+    <meta name="author" content="Ray Chen">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+    <link href="Playground/css/all.css" rel="stylesheet">
+    <link href="Playground/css/random.css" rel="stylesheet">
+    <link href="Playground/css/main.css" rel="stylesheet">
 </head>
 <body>
-	<h1>Redirecting to pchen66.github.io...</h1>
+    <video class="video-texture" playsinline autoplay loop>
+        <source src="Playground/videos/groot.mp4" type="video/mp4">
+    </video>
+
+    <div class="entrance"></div>
+    <div class="menu-container hidden"></div>
+    <iframe class="iframe-container hidden" src="" frameBorder="0"></iframe>
+
+    <button class="menu-button hidden">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <script src="js/three/three.min.js"></script>
+	<script src="js/panolens/panolens.min.js"></script>
+
+    <!-- Projects Previews -->
+    <script src="js/three/modifiers/ExplodeModifier.js"></script>
+
+    <!-- Main Module -->
+    <script type="module" src="Playground/js/main.js"></script>
 </body>
 </html>

@@ -2,6 +2,8 @@
  * Photo Particle created by Ray Chen @ 2018
  */
 
+import TexturePoints from './TexturePoints.js';
+
 var MAX_DEPTH = 100;
 
 var camera,
@@ -34,19 +36,6 @@ var timerIds = [];
 var resolution = { width: 1080, height: 607 };
 var imageSizeRatio = { extrasmall: 0.1, small: 0.3, medium: 0.5, large: 1 };
 var lastLoadedURL = '';
-
-function getImageData( image ) {
-
-    var canvas = document.createElement( 'canvas' );
-    canvas.width = image.width;
-    canvas.height = image.height;
-
-    var context = canvas.getContext( '2d' );
-    context.drawImage( image, 0, 0 );
-
-    return context.getImageData( 0, 0, image.width, image.height );
-
-}
 
 function updateURLonGUI ( url ) {
 
@@ -106,65 +95,15 @@ function loadImage ( path ) {
 
     textureLoader.load( path, function( texture ){
 
-        var positions = [];
-        var colors = [];
-        var directions = [];
-        var geometry = new THREE.BufferGeometry();
-        var material = new THREE.PointsMaterial( { size: 1, vertexColors: THREE.VertexColors, sizeAttenuation: false, blending: THREE.AdditiveBlending } );
-        var width, height, index, data, px, py, pz = 0, pixelColor = new THREE.Color();
-        var maxWidth, maxHeight, dpr;
+        const texturePoints = new TexturePoints();
+
+        var maxWidth = imageSizeRatio[ options.image.size ] * resolution.width;
+        var maxHeight = imageSizeRatio[ options.image.size ] * resolution.height;
 
         lastLoadedURL = texture.image.src.split( '?' )[ 0 ];
 
-        maxWidth = imageSizeRatio[ options.image.size ] * resolution.width;
-        maxHeight = imageSizeRatio[ options.image.size ] * resolution.height;
+        points = texturePoints.generateTexturePoints( texture, maxWidth, maxHeight );
 
-        imageData = getImageData( texture.image );
-
-        width = imageData.width > maxWidth ? maxWidth : imageData.width;
-        height = imageData.height > maxHeight ? maxHeight : imageData.height;
-        dpr = Math.max( window.devicePixelRatio, 2.0 );
-
-        for ( var y = 0; y < height; y++ ) {
-            for ( var x = 0; x < width; x++ ) {
-
-                index = ( x + imageData.width * y ) * 4;
-                data = imageData.data;
-
-                px = x - width / 2;
-                py = - ( y - height / 2 );
-                px /= dpr;
-                py /= dpr;
-
-                // Color
-                pixelColor.setRGB( data[ index ] / 255, data[ index + 1 ] / 255, data[ index + 2 ] / 255 );
-                colors.push( pixelColor.r, pixelColor.g, pixelColor.b );
-
-                // Alpha
-                if ( data[ index + 3 ] == 0 ) pz = -Math.Infinity;
-
-                // Position
-                positions.push( px, py, pz );
-
-                // Directions
-                directions.push( 
-                    ( Math.random() - 0.5 ) * 2, 
-                    ( Math.random() - 0.5 ) * 2, 
-                    ( Math.random() - 0.5 ) * 2 
-                );
-
-            }
-        }
-
-        geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( positions, 3 ).setDynamic( true ) );
-        geometry.addAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
-        geometry.addAttribute( 'originalPosition', new THREE.Float32BufferAttribute( positions, 3 ) );
-        geometry.computeBoundingSphere();
-
-        geometry.attributes.position.directions = directions.slice(0);
-        geometry.attributes.color.original = colors.slice(0);
-
-        points = new THREE.Points( geometry, material );
         scene.add( points );
 
         wave();
@@ -450,9 +389,9 @@ function update ( time ) {
 
     while( i-- ) {
 
-        var x = i % imageData.width;
-        var y = Math.floor( i / imageData.width );
-        var alpha = imageData.data[ ( x + imageData.width * y ) * 4 + 3 ];
+        var x = i % points.imageData.width;
+        var y = Math.floor( i / points.imageData.width );
+        var alpha = points.imageData.data[ ( x + points.imageData.width * y ) * 4 + 3 ];
         var ix, iy, iz;
 
         if ( alpha === 0 ) continue;
@@ -574,7 +513,7 @@ function onWindowResize() {
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
 
-    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setSize(window.innerWidth, window.innerHeight, false);
 
 }
 

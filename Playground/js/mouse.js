@@ -1,0 +1,1 @@
+export let mouse = new THREE.Vector2();
