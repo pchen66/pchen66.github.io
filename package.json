@@ -22,12 +22,13 @@
   },
   "homepage": "https://github.com/pchen66/pchen66.github.io#readme",
   "devDependencies": {
-    "gulp": "^3.9.1",
+    "gulp": "^4.0.0",
+    "gulp-cli": "^2.0.1",
     "gulp-concat": "^2.6.0",
     "gulp-strip-debug": "^1.1.0",
     "gulp-uglify": "^1.5.3"
   },
   "dependencies": {
-    "three": "^0.93.0"
+    "three": "^0.99.0"
   }
 }

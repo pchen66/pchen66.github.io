@@ -11,24 +11,22 @@ var THREEJS = [
 ];
 var THREEJS_COMPONENTS = [
 
-	'node_modules/three/examples/js/Detector.js',
 	'node_modules/three/examples/js/libs/stats.min.js',
 	'node_modules/three/examples/js/libs/tween.min.js',
-  'node_modules/three/examples/js/libs/dat.gui.min.js',
-	'node_modules/three/examples/js/loaders/ColladaLoader.js',
-  'node_modules/three/examples/js/loaders/MTLLoader.js',
-  'node_modules/three/examples/js/loaders/OBJLoader.js',
-	'node_modules/three/examples/js/controls/OrbitControls.js',
-  'node_modules/three/examples/js/controls/TrackballControls.js',
-  'node_modules/three/examples/js/renderers/CSS3DRenderer.js',
-  'node_modules/three/examples/js/modifiers/ExplodeModifier.js',
+	'node_modules/three/examples/js/loaders/*.js',
+	'node_modules/three/examples/js/controls/*.js',
+  'node_modules/three/examples/js/renderers/*.js',
+  'node_modules/three/examples/js/modifiers/*.js',
+  'node_modules/three/examples/js/postprocessing/*.js',
+  'node_modules/three/examples/js/geometries/*.js',
+  'node_modules/three/examples/js/shaders/*.js',
   'node_modules/three/examples/js/GPUParticleSystem.js'
 
 ];
 
-gulp.task( 'default', [ 'copy-three-library', 'copy-three-library-component' ] );
+//gulp.task( 'default', [ 'copy-three-library', 'copy-three-library-component' ] );
 
-gulp.task('copy-three-library', function () {
+gulp.task('copy-three', function () {
   return gulp.src( THREEJS )
     .pipe( gulp.dest( THREEJS_OUTPUT ) );
 });

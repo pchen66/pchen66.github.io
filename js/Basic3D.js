@@ -7,11 +7,13 @@
 
 const EVENT_INIT_COMPLETE = 1;
 const EVENT_ANIMATION_FRAME = 2;
+const EVENT_WIDNOW_RESIZE = 3;
 
 class Basic3D {
 
     static get EVENT_INIT_COMPLETE () { return EVENT_INIT_COMPLETE;  };
     static get EVENT_ANIMATION_FRAME () { return EVENT_ANIMATION_FRAME;  };
+    static get EVENT_WIDNOW_RESIZE () { return EVENT_WIDNOW_RESIZE;  };
 
     constructor ( options ) {
 
@@ -129,7 +131,9 @@ class Basic3D {
         this.camera.aspect = window.innerWidth / window.innerHeight;
         this.camera.updateProjectionMatrix();
 
-        this.renderer.setSize( window.innerWidth, window.innerHeight, false );
+        this.renderer.setSize( window.innerWidth, window.innerHeight );
+
+        this.dispatchEvent( { type: EVENT_WIDNOW_RESIZE } );
 
     }
 
@@ -155,6 +159,12 @@ class Basic3D {
         this.controls && this.controls.update();
 
         this.dispatchEvent( { type: EVENT_ANIMATION_FRAME } );
+
+        this.render();
+
+    }
+
+    render () {
 
         this.renderer.render( this.scene, this.camera );
 
