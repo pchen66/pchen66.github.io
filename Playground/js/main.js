@@ -146,15 +146,22 @@ const createProjectName = ( project ) => {
 
 const createProjectVideo = ( project ) => {
 
+    // Fix for Github Pages doesn't support Git LFS resource
+    const GITHUB_RESOURCE_PATH = 'https://github.com/pchen66/pchen66.github.io/blob/master';
+
     const element = document.createElement( 'div' );
     element.classList.add( 'project-video-container' );
 
     const video = document.createElement( 'video' );
+    const source = window.location.host.indexOf( 'pchen66.github.io' ) === -1 
+        ? project.video
+        : project.video.replace( './Playground', `${GITHUB_RESOURCE_PATH}/Playground` ).concat( '?raw=true' );
+
     video.classList.add( 'project-video' );
     video.loop = true;
     video.muted = true;
     video.setAttribute( 'playsinline', true );
-    video.setAttribute( 'data-src', project.video );
+    video.setAttribute( 'data-src', source );
 
     videos.push( video );
 
