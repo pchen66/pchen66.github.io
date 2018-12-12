@@ -3,25 +3,24 @@
 import addWheelListener from './wheel.js';
 import { lazyLoadSupport, registerLazyLoad } from './lazyload.js';
 
+const SCROLL_INTERVAL_THRESHOLD = 800;
+const SCROLL_DISTANCE_THRESHOLD = 20;
+const DEFAULT_PROJECT_NAME_TRANSFORM = 'translate3d(0,0, 100px)';
+const PROJECT_JSON = 'Playground/Projects.json';
+
 const main = document.querySelector( 'main' );
 const sideNav = document.querySelector( '.side-nav' );
 const about = document.querySelector( '.about' );
 const home = document.querySelector( '.home' );
 const overlay = document.querySelector( '.overlay' );
 const iframe = document.querySelector( '.project-iframe' );
-const icon_close = document.createElement( 'i' );
-icon_close.classList.add( 'material-icons' );
-icon_close.textContent = 'close';
+const icon_close = document.querySelector( '.nav-item.close' );
 const loading = document.querySelector( '.lds-ring' );
 
 const sections = [];
 const videos = [];
 
 const triggerTypes = [ 'click', 'touchend' ];
-
-const SCROLL_INTERVAL_THRESHOLD = 800;
-const SCROLL_DISTANCE_THRESHOLD = 20;
-const DEFAULT_PROJECT_NAME_TRANSFORM = 'translate3d(0,0, 100px)';
 
 const touchEvent = { startX: 0, startY: 0, lastEndTime: 0, startTime: 0 };
 const scrollEvent = { startTime: 0 };
@@ -38,6 +37,12 @@ const loadProjectJSON = ( url ) => {
 
 };
 
+const resizeSection = ( section ) => {
+
+    section.style.height = `${window.innerHeight}px`;
+
+};
+
 const onProjectListLoaded = ( projectList ) => {
 
     projectList.forEach( ( entry, index ) => {
@@ -48,14 +53,16 @@ const onProjectListLoaded = ( projectList ) => {
 
         Object.assign( section, projectData );
 
+        resizeSection( section );
+
         section.appendChild( projectElement );
-        section.style.height = window.innerHeight + 'px';
         section.index = index;
         section.project = Object.assign( { element: projectElement }, projectData );
 
         const textElement = projectElement.name.textElement;
         const sideEntry = projectElement.entry;
-        const videoElement = projectElement.videoContainer.video;
+        const videoContainer = projectElement.videoContainer;
+        const videoElement = videoContainer.video;
         const isVideoWithoutLazyLoad = !lazyLoadSupport && videoElement;
         const eventTypes = [ 'mousemove', 'touchmove' ];
 
@@ -90,6 +97,8 @@ const onProjectListLoaded = ( projectList ) => {
 
             }
 
+            videoContainer.show();
+
         };
 
         section.addEventListener( 'touchstart', onTouchStart, { passive: false } );
@@ -100,8 +109,8 @@ const onProjectListLoaded = ( projectList ) => {
 
     } );
 
-    updateSection( 0 );
     registerLazyLoad( '.project-video' );
+    updateSection( 0 );
 
     return projectList;
 
@@ -150,7 +159,7 @@ const createProjectVideo = ( project ) => {
     const GITHUB_RESOURCE_PATH = 'https://github.com/pchen66/pchen66.github.io/blob/master';
 
     const element = document.createElement( 'div' );
-    element.classList.add( 'project-video-container' );
+    element.classList.add( 'project-video-container', 'initial' );
 
     const video = document.createElement( 'video' );
     const source = window.location.host.indexOf( 'pchen66.github.io' ) === -1 
@@ -186,6 +195,16 @@ const createProjectVideo = ( project ) => {
 
         element.removeEventListener( 'transitionend', onExpandComplete );
 
+    };
+
+    element.show = () => {
+
+        if ( element.classList.contains( 'initial' ) ) {
+
+            element.classList.remove( 'initial' );
+
+        }
+        
     };
 
     element.expand = () => {
@@ -279,7 +298,7 @@ const onSectionMouseMove = ( event ) => {
 
 const scrollToSection = ( section ) => {
 
-    main.style.transform = `translate3d( 0, ${ -section.clientHeight * section.index }px, 0 )`;
+    main.style.transform = `translate3d( 0, ${ -window.innerHeight * section.index }px, 0 )`;
 
 };
 
@@ -359,6 +378,13 @@ const onTouchEnd = ( event ) => {
 
 };
 
+const toggleAbout = () => {
+
+    about.classList.toggle( 'hidden' );
+    icon_close.classList.toggle( 'hidden' );
+
+};
+
 const onAbout = ( event ) => {
 
     event.preventDefault();
@@ -367,23 +393,16 @@ const onAbout = ( event ) => {
     overlay.classList.toggle( 'hidden' );
     sections[ sectionIndex ].classList.toggle( 'shrink' );
 
-    if ( overlay.classList.contains( 'hidden' ) ) {
-
-        about.textContent = 'About';
-        about.removeChild( icon_close );
-
-    } else {
-
-        about.textContent = '';
-        about.appendChild( icon_close );
-
-    }
+    toggleAbout();
 
 };
 
 const onHome = ( event ) => {
 
     const section = sections[ sectionIndex ];
+    const videoContainer = section.project.element.videoContainer;
+
+    if ( !videoContainer.classList.contains( 'full' ) || !loading.classList.contains( 'hidden' ) ) { return };
 
     event.preventDefault();
     event.stopPropagation();
@@ -402,14 +421,28 @@ const onHome = ( event ) => {
 
 };
 
+const onWindowResize = () => {
+
+    sections.forEach( resizeSection );
+    scrollToSection( sections[ sectionIndex ] );
+
+};
+
 const init = () => {
 
-    loadProjectJSON( 'Playground/Projects.json' ).then( onProjectListLoaded );
+    loadProjectJSON( PROJECT_JSON ).then( onProjectListLoaded );
 
     addWheelListener( main, onScroll );
+    
+    triggerTypes.forEach( ( type ) => {
 
-    about.addEventListener( 'click', onAbout );
-    home.addEventListener( 'click', onHome );
+        about.addEventListener( type, onAbout );
+        icon_close.addEventListener( type, onAbout );
+        home.addEventListener( type, onHome );
+
+    } )
+
+    window.addEventListener( 'resize', onWindowResize );
 
 };
 
