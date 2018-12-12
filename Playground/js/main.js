@@ -121,7 +121,7 @@ const createProjectElements = ( project, index ) => {
     const element = document.createElement( 'div' );
     element.classList.add( 'project' );
     
-    const videoContainer = createProjectVideo( project );
+    const videoContainer = createProjectVideo( project, index );
     const name = createProjectName( project );
     const entry = createSideEntry( project, index );
 
@@ -153,7 +153,7 @@ const createProjectName = ( project ) => {
 
 };
 
-const createProjectVideo = ( project ) => {
+const createProjectVideo = ( project, index ) => {
 
     // Fix for Github Pages doesn't support Git LFS resource
     const GITHUB_RESOURCE_PATH = 'https://github.com/pchen66/pchen66.github.io/blob/master';
@@ -171,6 +171,14 @@ const createProjectVideo = ( project ) => {
     video.muted = true;
     video.setAttribute( 'playsinline', true );
     video.setAttribute( 'data-src', source );
+    video.canplay = false;
+
+    video.addEventListener( 'canplay', () => { 
+
+        video.canplay = true;
+        if ( index === sectionIndex ) { element.show(); }
+
+    });
 
     videos.push( video );
 
@@ -199,7 +207,7 @@ const createProjectVideo = ( project ) => {
 
     element.show = () => {
 
-        if ( element.classList.contains( 'initial' ) ) {
+        if ( element.classList.contains( 'initial' ) && video.canplay ) {
 
             element.classList.remove( 'initial' );
 
