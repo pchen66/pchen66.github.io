@@ -57,6 +57,7 @@
     viewer.add( entryPanorama, moviePanorama );
     viewer.getContainer().style.position = 'fixed';
     viewer.getContainer().style.top = 0;
+    viewer.getContainer().style.background = 'transparent';
   }
 
   function generateProgressManager () {

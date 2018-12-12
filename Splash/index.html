@@ -21,6 +21,7 @@
     <script src="../js/three/three.min.js"></script>
     <script src="../js/three/libs/tween.min.js"></script>
     <script src="../js/three/modifiers/ExplodeModifier.js"></script>
+    <script src="../js/three/loaders/GLTFLoader.js"></script>
     <script src="../js/three/controls/OrbitControls.js"></script>
     <script>
       
@@ -84,8 +85,8 @@
         spotLight.shadow.camera.far = 1500;
         spotLight.shadow.camera.fov = 60;
 
-        loader = new THREE.JSONLoader();
-        loader.load( "model/leeperrysmith/LeePerrySmith.js", function( geometry ) { 
+        loader = new THREE.GLTFLoader();
+        loader.load( "model/leeperrysmith/LeePerrySmith.glb", function( geometry ) { 
           addHeadMesh( geometry );
           addWreckingBacll();
           addDatGui();
@@ -113,7 +114,7 @@
 
       }
 
-      function addHeadMesh( geometry ) {
+      function addHeadMesh( gltf ) {
 
         var scale = 100;
 
@@ -136,6 +137,8 @@
           map: map,
           side: THREE.DoubleSide
         } );
+
+        var geometry = new THREE.Geometry().fromBufferGeometry( gltf.scene.children[ 0 ].geometry );
 
         // Explode modifier
         var explodeModifier = new THREE.ExplodeModifier();

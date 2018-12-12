@@ -1,6 +1,9 @@
 ## Current Experiments
 
 <span>
+	<a title="Toon" href="https://pchen66.github.io/Toon/">
+		<img src="images/Toon.png" width="30%">
+	</a>
 	<a title="Spherical Harmonics" href="https://pchen66.github.io/SphericalHarmonics/">
 		<img src="images/SphericalHarmonics.png" width="30%">
 	</a>

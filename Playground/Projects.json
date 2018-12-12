@@ -1,10 +1,14 @@
 {
+   "Toon": {
+      "background": "#757575",
+      "video": "./Playground/videos/Toon.mp4",
+      "link": "Toon/",
+      "imageURL": "images/Toon.png",
+      "year": "2018"
+   },
    "Spherical Harmonics": {
-      "index3D": [
-         -2,
-         1,
-         -2
-      ],
+      "background": "#EF5350",
+      "video": "./Playground/videos/SphericalHarmonics.mp4",
       "link": "SphericalHarmonics/",
       "imageURL": "images/SphericalHarmonics.png",
       "year": "2018",
@@ -21,11 +25,8 @@
       }
    },
    "Photo Particle": {
-      "index3D": [
-         2,
-         1,
-         -2
-      ],
+      "background": "#AB47BC",
+      "video": "./Playground/videos/PhotoParticle.mp4",
       "link": "PhotoParticle/",
       "imageURL": "images/PhotoParticle.png",
       "year": "2018",
@@ -34,88 +35,24 @@
       }
    },
    "Splash": {
-      "index3D": [
-         2,
-         -2,
-         -2
-      ],
+      "background": "#E65100",
+      "video": "./Playground/videos/Splash.mp4",
       "link": "Splash/",
       "imageURL": "images/Splash.png",
       "year": "2016"
    },
    "Pano Theater": {
-      "index3D": [
-         -2,
-         -2,
-         0
-      ],
+      "background": "#43A047",
+      "video": "./Playground/videos/PanoTheater.mp4",
       "link": "PanoTheater/",
       "imageURL": "images/PanoTheater.png",
       "year": "2017"
    },
-   "Panolens.js": {
-      "index3D": [
-         0,
-         2,
-         2
-      ],
+   "Panolens": {
+      "background": "#009688",
+      "video": "./Playground/videos/Panolens.mp4",
       "link": "Panolens/",
       "imageURL": "images/Panolens.png",
       "year": "2015"
-   },
-   "Claw Catch": {
-      "index3D": [
-         -2,
-         2,
-         0
-      ],
-      "link": "ClawCatch/",
-      "imageURL": "images/ClawCatch.png",
-      "year": "2015",
-      "mobile": false
-   },
-   "Ironman": {
-      "index3D": [
-         -2,
-         -1,
-         2
-      ],
-      "link": "Ironman/",
-      "imageURL": "images/ironman.png",
-      "year": "2014",
-      "mobile": false
-   },
-   "3D_Assembly": {
-      "index3D": [
-         2,
-         2,
-         0
-      ],
-      "link": "3D_Assembly/",
-      "imageURL": "images/3d_assembly.png",
-      "year": "2014",
-      "mobile": false
-   },
-   "eR3D": {
-      "index3D": [
-         2,
-         -1,
-         2
-      ],
-      "link": "eR3D/",
-      "imageURL": "images/eR3D.png",
-      "year": "2014",
-      "mobile": false
-   },
-   "Periodic Table": {
-      "index3D": [
-         -1,
-         -2,
-         -2
-      ],
-      "link": "PeriodicTable/",
-      "imageURL": "images/PeriodicTable.png",
-      "year": "2014",
-      "mobile": false
    }
 }

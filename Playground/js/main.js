@@ -1,22 +1,33 @@
-import { ROOM_SIZE, GRID_SIZE, ROTATION_FACTOR } from "./constants.js";
-import { entrance, menuButton, toggleMenu } from "./elements.js";
-import { createProjectContainer } from "./container.js";
-import { mouse } from './mouse.js';
+// author - Ray Chen
 
-let projects, selection, message;
-let emptyRoom, mainRoom;
-let viewer;
+import addWheelListener from './wheel.js';
+import { lazyLoadSupport, registerLazyLoad } from './lazyload.js';
 
-let config = {
+const main = document.querySelector( 'main' );
+const sideNav = document.querySelector( '.side-nav' );
+const about = document.querySelector( '.about' );
+const home = document.querySelector( '.home' );
+const overlay = document.querySelector( '.overlay' );
+const iframe = document.querySelector( '.project-iframe' );
+const icon_close = document.createElement( 'i' );
+icon_close.classList.add( 'material-icons' );
+icon_close.textContent = 'close';
+const loading = document.querySelector( '.lds-ring' );
 
-    Viewer: {
+const sections = [];
+const videos = [];
 
-        cameraFov: 45,
-        controlBar: false
+const triggerTypes = [ 'click', 'touchend' ];
 
-    }
+const SCROLL_INTERVAL_THRESHOLD = 800;
+const SCROLL_DISTANCE_THRESHOLD = 20;
+const DEFAULT_PROJECT_NAME_TRANSFORM = 'translate3d(0,0, 100px)';
 
-};
+const touchEvent = { startX: 0, startY: 0, lastEndTime: 0, startTime: 0 };
+const scrollEvent = { startTime: 0 };
+const mouseEvent = { clientX: 0, clientY: 0 };
+
+let sectionIndex = 0, lastSectionIndex = 0;
 
 const loadProjectJSON = ( url ) => {
     
@@ -25,198 +36,374 @@ const loadProjectJSON = ( url ) => {
     .then( json => Object.entries( json ) )
     .catch( console.error );
 
-}
-
-const projectWorldToScreen = ( object ) => {
-
-    let position = new THREE.Vector3();
-    let direction = new THREE.Vector3();
-
-    object.getWorldPosition( position );
-    viewer.camera.getWorldDirection( direction );
-
-    if ( direction.dot( position ) > 0 ) {
-
-        object.dispatchEvent( { type: 'inside-viewport', vector: viewer.getScreenVector( position ) } );
-
-    } else {
-
-        object.dispatchEvent( { type: 'outside-viewport' } );
-
-    }
-
 };
 
-const createEntranceMessage = ( text ) => {
+const onProjectListLoaded = ( projectList ) => {
 
-    const point = new THREE.Object3D();
-    const displayText = text ? text : 'TEXT';
-    let letter, vector;
+    projectList.forEach( ( entry, index ) => {
 
-    for ( let character of displayText ) {
+        const section = document.createElement( 'section' );
+        const projectData = Object.assign( { name: entry[ 0 ] }, entry[ 1 ] );
+        const projectElement = createProjectElements( projectData, index );
 
-        letter = document.createElement( 'span' );
-        letter.classList.add( 'letter' );
-        letter.textContent = character;
-        entrance.appendChild( letter );
+        Object.assign( section, projectData );
 
-    }
+        section.appendChild( projectElement );
+        section.style.height = window.innerHeight + 'px';
+        section.index = index;
+        section.project = Object.assign( { element: projectElement }, projectData );
 
-    entrance.style.marginLeft = -entrance.clientWidth / 2 + 'px';
-    entrance.style.marginTop = -entrance.clientHeight / 2 + 'px';
+        const textElement = projectElement.name.textElement;
+        const sideEntry = projectElement.entry;
+        const videoElement = projectElement.videoContainer.video;
+        const isVideoWithoutLazyLoad = !lazyLoadSupport && videoElement;
+        const eventTypes = [ 'mousemove', 'touchmove' ];
 
-    point.position.set( 0, 0, -ROOM_SIZE / 2 );
-    point.addEventListener( 'inside-viewport', ( event ) => {
+        section.hide = () => {
 
-        vector = event.vector;
-        entrance.style.display = '';
-        entrance.style.transform = `translate3d( ${vector.x}px, ${vector.y}px, ${vector.z}px )`;
+            eventTypes.forEach( type => section.removeEventListener( type, onSectionMouseMove ) );
+            textElement.classList.add( 'hidden' );
+            sideEntry.classList.remove( 'selected' );
 
-    } );
-    point.addEventListener( 'outside-viewport', () => { 
+            if ( isVideoWithoutLazyLoad ) { videoElement.pause(); }
 
-        entrance.style.display = 'none'; 
+        };
+        section.show = () => {
 
-    } );
-    
-    viewer.addUpdateCallback( () => { 
+            main.style.background = section.background;
 
-        if ( viewer.panorama === mainRoom ) {
+            scrollToSection( section );
 
-            projectWorldToScreen( point );
+            eventTypes.forEach( type => section.addEventListener( type, onSectionMouseMove ) );
+            textElement.classList.remove( 'hidden' );
+            sideEntry.classList.add( 'selected' );
 
-        }
+            if ( isVideoWithoutLazyLoad ) { 
 
-    } );
+                if ( !videoElement.src ) {
 
-    return point;
-
-};
-
-const createMainRoom = () => {
-
-    let room;
-    let spotlight, pointlight;
-
-    const onPanoramaHover = ( event ) => {
-
-        const intersects = event.intersects;
-
-        if ( intersects.length > 0 
-            && intersects[ 0 ].object.name === 'container' 
-            && viewer.hoverObject !== selection ) {
-
-            selection = intersects[ 0 ].object;
-            selection.dispatchEvent( { type: 'hoverstart' } );
-
-        } else if ( !viewer.hoverObject && selection ) {
-
-            selection.dispatchEvent( { type: 'hoverend' } );
-            selection = null;
-
-        }
-
-    };
-
-    const onPanoramaClick = ( event ) => {
-
-        if ( event.intersects.length > 0  ) {
-
-            const object = event.intersects[ 0 ].object;
-            object.traverseAncestors( ancestor => { 
-
-                if ( ancestor.name === 'container' ) {
-
-                    ancestor.dispatchEvent( { type: 'click' } );                
+                    videoElement.src = videoElement.getAttribute( 'data-src' );
 
                 }
 
-            } );
+                videoElement.play();
 
-        } 
+            }
 
-    };
+        };
 
-    room = new PANOLENS.BasicPanorama( ROOM_SIZE );
-    room.addEventListener( 'hover', onPanoramaHover );
-    room.addEventListener( 'click', onPanoramaClick );
+        section.addEventListener( 'touchstart', onTouchStart, { passive: false } );
 
-    spotlight = new THREE.SpotLight( 0xffffff, 1 );
-    spotlight.position.set( 0, 1000, 0 );
-    room.add( spotlight );
+        sections.push( section );
 
-    spotlight = new THREE.SpotLight( 0xffffff, 0.3 );
-    spotlight.position.set( 100, 150, -300 );
-    room.add( spotlight );
-
-    pointlight = new THREE.PointLight( 0xffffff, 0.2 );
-    pointlight.position.set( -200, -250, 100 );
-    room.add( pointlight );
-
-    return room;
-
-};
-
-const createEmptyRoom = () => {
-
-    let room;
-
-    room = new PANOLENS.EmptyPanorama();
-    room.geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( [], 1 ) );
-    room.addEventListener( 'load', () => {
-
-        setTimeout( () => {
-
-            menuButton.classList.remove( 'hidden' );
-            entrance.style.display = '';
-            viewer.setPanorama( mainRoom );
-
-        }, 1000 );
-        
+        main.appendChild( section );
 
     } );
 
-    return room;
+    updateSection( 0 );
+    registerLazyLoad( '.project-video' );
+
+    return projectList;
 
 };
 
-const onLoaded = ( projectList ) => {
+const createProjectElements = ( project, index ) => {
 
-    const mobile = PANOLENS.Utils.isMobile;
+    const element = document.createElement( 'div' );
+    element.classList.add( 'project' );
+    
+    const videoContainer = createProjectVideo( project );
+    const name = createProjectName( project );
+    const entry = createSideEntry( project, index );
 
-    viewer = new PANOLENS.Viewer( config.Viewer );
+    element.appendChild( videoContainer );
+    element.appendChild( name );
 
-    message = createEntranceMessage( 'PLAYGROUND' );
-    emptyRoom = createEmptyRoom();
-    mainRoom = createMainRoom();
+    element.videoContainer = videoContainer;
+    element.name = name;
+    element.entry = entry;
 
-    viewer.add( message, emptyRoom, mainRoom );
+    return element;
 
-    projects = projectList.filter( item => mobile ? item[ 1 ].mobile !== false : true );
+};
 
-    for ( let project of projects ) {
+const createProjectName = ( project ) => {
 
-        let container;
-        let name = project[ 0 ];
-        let config = project[ 1 ];
-        let position = new THREE.Vector3().fromArray( config.index3D );
+    const textElement = document.createElement( 'div' );
+    textElement.classList.add( 'hidden' );
+    textElement.textContent = project.name;
 
-        config.viewer = viewer;
+    const element = document.createElement( 'div' );
+    element.classList.add( 'project-name' );
+    element.style.transform = DEFAULT_PROJECT_NAME_TRANSFORM;
 
-        container = createProjectContainer( name, config );
-        container.position.copy( position ).multiplyScalar( GRID_SIZE );
+    element.appendChild( textElement );
+    element.textElement = textElement;
 
-        mainRoom.add( container );
+    return element;    
+
+};
+
+const createProjectVideo = ( project ) => {
+
+    const element = document.createElement( 'div' );
+    element.classList.add( 'project-video-container' );
+
+    const video = document.createElement( 'video' );
+    video.classList.add( 'project-video' );
+    video.loop = true;
+    video.muted = true;
+    video.setAttribute( 'playsinline', true );
+    video.setAttribute( 'data-src', project.video );
+
+    videos.push( video );
+
+    element.video = video;
+    element.appendChild( video );
+
+    element.addEventListener( 'mouseenter', () => { video.play(); } );
+    element.addEventListener( 'mouseleave', () => { video.pause(); } );
+
+    const onIFrameLoaded = () => {
+
+        iframe.classList.remove( 'hidden' );
+        iframe.removeEventListener( 'load', onIFrameLoaded );
+        loading.classList.add( 'hidden' );
+
+    };
+
+    const onExpandComplete = () => {
+
+        iframe.addEventListener( 'load', onIFrameLoaded );
+        iframe.src = project.link;
+
+        element.removeEventListener( 'transitionend', onExpandComplete );
+
+    };
+
+    element.expand = () => {
+
+        if ( element.classList.contains( 'full' ) ) { return };
+
+        element.classList.add( 'full' );
+        element.addEventListener( 'transitionend', onExpandComplete );
+        loading.classList.remove( 'hidden' );
+
+    };
+
+    element.reset = () => {
+
+        element.classList.remove( 'full' );
+
+    };
+
+    element.toggle = () => {
+
+        element.classList.toggle( 'full' );
+
+    };
+
+    element.addEventListener( 'click', element.expand );
+    element.addEventListener( 'touchend', ( event ) => { 
+
+        const threshold = 15;
+        const minTime = 400;
+        const deltaX = event.changedTouches[ 0 ].clientX - touchEvent.startX;
+        const deltaY = event.changedTouches[ 0 ].clientY - touchEvent.startY;
+        const deltaTime = performance.now() - touchEvent.startTime;
+
+        if ( Math.abs( deltaX ) < threshold && Math.abs( deltaY ) < threshold && deltaTime < minTime ) {
+
+            element.expand();
+
+        }
+
+    } );
+
+    return element;
+
+};
+
+const createSideEntry = ( project, index ) => {
+
+    const bar = document.createElement( 'div' );
+    bar.classList.add( 'bar' );
+
+    const number = document.createElement( 'div' );
+    number.textContent = `0${index + 1}`;
+    number.classList.add( 'number' );
+
+    const entry = document.createElement( 'div' );
+    entry.index = index
+    entry.classList.add( 'entry' );
+
+    triggerTypes.forEach( ( type ) => {
+
+        entry.addEventListener( type, () => updateSection( entry.index ) );
+
+    } )
+
+    entry.appendChild( bar );
+    entry.appendChild( number );
+    sideNav.appendChild( entry );
+
+    return entry;
+
+};
+
+const onSectionMouseMove = ( event ) => {
+
+    const ROTATION_SCALAR = 30;
+
+    const clientX = event.changedTouches ? event.changedTouches[ 0 ].clientX : event.clientX;
+    const clientY = event.changedTouches ? event.changedTouches[ 0 ].clientY : event.clientY;
+
+    const section = sections[ sectionIndex ];
+    const nameElement = section.project.element.name;
+    const videoContainer = section.project.element.videoContainer;
+    const degX = - ( clientY / window.innerHeight - 0.5 ) * ROTATION_SCALAR;
+    const degY = ( clientX / window.innerWidth - 0.5 ) * ROTATION_SCALAR;
+    const transform = `rotateX(${degX}deg) rotateY(${degY}deg)`;
+    
+    videoContainer.style.transform = transform;
+    nameElement.style.transform = `${transform} ${DEFAULT_PROJECT_NAME_TRANSFORM}`;
+
+};
+
+const scrollToSection = ( section ) => {
+
+    main.style.transform = `translate3d( 0, ${ -section.clientHeight * section.index }px, 0 )`;
+
+};
+
+const updateSection = ( index ) => {
+
+    if ( index >= sections.length || index < 0 ) {
+
+        index = 0;
 
     }
 
-    viewer.container.addEventListener( 'mousemove', function( event ){
+    lastSectionIndex = sectionIndex;
+    sectionIndex = index;
 
-        mouse.x = ( event.touches ? event.touches[ 0 ] : event ).clientX;
-        mouse.y = ( event.touches ? event.touches[ 0 ] : event ).clientY;
-
-    }, false );
+    advanceSection();
 
 };
 
-loadProjectJSON( 'Playground/Projects.json' ).then( onLoaded );
+const advanceSection = () => {
+
+    const previous = sections[ lastSectionIndex ];
+    const current = sections[ sectionIndex ];
+
+    previous.hide();
+    current.show();
+
+};
+
+const isScrollEnabled = () => performance.now() - scrollEvent.startTime > SCROLL_INTERVAL_THRESHOLD;
+
+const onScroll = ( event ) => { 
+
+    if ( ( isScrollEnabled() || performance.now() < SCROLL_INTERVAL_THRESHOLD ) && Math.abs( event.deltaY ) > 10 ) {
+
+        scrollEvent.startTime = performance.now();
+
+        updateSection( sectionIndex + ( event.deltaY > 0 ? 1 : -1 ) );
+
+    } 
+
+ };
+
+const onTouchStart = ( event ) => {
+
+    const target = event.target;
+
+    event.preventDefault();
+    event.stopPropagation();
+
+    touchEvent.startX = event.changedTouches[ 0 ].clientX;
+    touchEvent.startY = event.changedTouches[ 0 ].clientY;
+    touchEvent.startTime = performance.now();
+
+    target.addEventListener( 'touchend', onTouchEnd, { passive: false } );
+
+};
+
+const onTouchEnd = ( event ) => {
+
+    const target = event.target;
+
+    event.preventDefault();
+    event.stopPropagation();
+
+    const deltaTime = performance.now() - touchEvent.lastEndTime;
+    const elapsedTime = performance.now() - touchEvent.startTime;
+    const deltaY = touchEvent.startY - event.changedTouches[ 0 ].clientY;
+
+    if ( deltaTime > SCROLL_INTERVAL_THRESHOLD && elapsedTime < SCROLL_INTERVAL_THRESHOLD && Math.abs( deltaY ) > SCROLL_DISTANCE_THRESHOLD ) {
+
+        touchEvent.lastEndTime = performance.now();
+        onScroll( { deltaY } );
+
+    }
+
+    target.removeEventListener( 'touchend', onTouchEnd );
+
+};
+
+const onAbout = ( event ) => {
+
+    event.preventDefault();
+    event.stopPropagation();
+
+    overlay.classList.toggle( 'hidden' );
+    sections[ sectionIndex ].classList.toggle( 'shrink' );
+
+    if ( overlay.classList.contains( 'hidden' ) ) {
+
+        about.textContent = 'About';
+        about.removeChild( icon_close );
+
+    } else {
+
+        about.textContent = '';
+        about.appendChild( icon_close );
+
+    }
+
+};
+
+const onHome = ( event ) => {
+
+    const section = sections[ sectionIndex ];
+
+    event.preventDefault();
+    event.stopPropagation();
+
+    const onIFrameHidden = () => {
+
+        iframe.src = 'about:blank';
+        iframe.removeEventListener( 'transitionend', onIFrameHidden );
+
+    };
+
+    iframe.addEventListener( 'transitionend', onIFrameHidden );
+    iframe.classList.add( 'hidden' );
+
+    section.project.element.videoContainer.reset();
+
+};
+
+const init = () => {
+
+    loadProjectJSON( 'Playground/Projects.json' ).then( onProjectListLoaded );
+
+    addWheelListener( main, onScroll );
+
+    about.addEventListener( 'click', onAbout );
+    home.addEventListener( 'click', onHome );
+
+};
+
+window.addEventListener( 'load', init );

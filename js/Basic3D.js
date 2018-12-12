@@ -9,6 +9,8 @@ const EVENT_INIT_COMPLETE = 1;
 const EVENT_ANIMATION_FRAME = 2;
 const EVENT_WIDNOW_RESIZE = 3;
 
+const iOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream; 
+
 class Basic3D {
 
     static get EVENT_INIT_COMPLETE () { return EVENT_INIT_COMPLETE;  };
@@ -114,6 +116,7 @@ class Basic3D {
         this.renderer = new THREE.WebGLRenderer( this.options.rendererOptions );
         this.renderer.setPixelRatio( window.devicePixelRatio );
         this.renderer.setSize( window.innerWidth, window.innerHeight );
+        
         document.body.appendChild( this.renderer.domElement );
 
         this.control = this.options.OrbitControls ? new THREE.OrbitControls( this.camera, this.renderer.domElement ) : undefined;
@@ -128,10 +131,13 @@ class Basic3D {
 
     onWindowResize ( event ) {
 
-        this.camera.aspect = window.innerWidth / window.innerHeight;
+        const width = iOS ? screen.width : window.innerWidth;
+        const height = iOS ? screen.height : window.innerHeight;
+
+        this.camera.aspect = width / height;
         this.camera.updateProjectionMatrix();
 
-        this.renderer.setSize( window.innerWidth, window.innerHeight );
+        this.renderer.setSize( width, height );
 
         this.dispatchEvent( { type: EVENT_WIDNOW_RESIZE } );
 
