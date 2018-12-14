@@ -436,6 +436,27 @@ const onWindowResize = () => {
 
 };
 
+const registerServiceWorker = () => {
+
+    if ( navigator.serviceWorker.controller ) {
+
+        console.log( '[ pchen66.github.io ] active service worker found, no need to register' );
+
+    } else {
+
+        navigator.serviceWorker.register('sw.js', {
+
+            scope: './'
+
+        }).then(function(reg) {
+
+            console.log( 'Service worker has been registered for scope: '+ reg.scope );
+
+        });
+    }
+
+};
+
 const init = () => {
 
     loadProjectJSON( PROJECT_JSON ).then( onProjectListLoaded );
@@ -451,6 +472,8 @@ const init = () => {
     } )
 
     window.addEventListener( 'resize', onWindowResize );
+
+    registerServiceWorker();
 
 };
 

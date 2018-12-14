@@ -3,7 +3,7 @@
     "name": "Playground",
     "scope": "/",
     "display": "standalone",
-    "start_url": "http://127.0.0.1:8080",
+    "start_url": "https://pchen66.github.io",
     "short_name": "Playground",
     "theme_color": "transparent",
     "description": "Collections of interactive experiments and experience",
