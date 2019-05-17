@@ -160,7 +160,7 @@ var App = {
 			name: 'AngryBird',
 			element_position: {x: 0, y: -20, z: 0},
 			position: {x: 10, y: -30, z: 0},
-			rotation: {x: 0, y: -Math.PI/2, z: 0},
+			rotation: {x: 0, y: 0, z: 0},
 			scale: 3.5,
 			boundingBox: {width: 130, height: 100, depth: 90},
 			progress: { loaded: 0, total: 0 },
@@ -173,7 +173,7 @@ var App = {
 			name: 'Pikachu',
 			element_position: {x: PRIZE_DISTANCE, y: -50, z: 0},
 			position: {x: 0, y: -50, z: 10},
-			rotation: {x: 0, y: -Math.PI/2, z: 0},
+			rotation: {x: 0, y: 0, z: 0},
 			scale: 14,
 			boundingBox: {width: 100, height: 130, depth: 140},
 			progress: { loaded: 0, total: 0 },
@@ -186,7 +186,7 @@ var App = {
 			name: 'Pokeball',
 			element_position: {x: PRIZE_DISTANCE*2, y: -5, z: 0},
 			position: {x: 0, y: 0, z: 0},
-			rotation: {x: 0, y: -Math.PI/2, z: 0},
+			rotation: {x: 0, y: 0, z: 0},
 			scale: 0.8,
 			boundingBox: {width: 90, height: 90, depth: 90},
 			progress: { loaded: 0, total: 0 },
@@ -199,7 +199,7 @@ var App = {
 			name: 'Maruko',
 			element_position: {x: PRIZE_DISTANCE*3, y: -60, z: 0},
 			position: {x: 0, y: -60, z: 0},
-			rotation: {x: 0, y: -Math.PI/2, z: 0},
+			rotation: {x: 0, y: 0, z: 0},
 			scale: 1.5,
 			boundingBox: {width: 100, height: 140, depth: 80},
 			progress: { loaded: 0, total: 0 },
@@ -213,7 +213,7 @@ var App = {
 			name: 'Kenny',
 			element_position: {x: PRIZE_DISTANCE*4, y: 0, z: 0},
 			position: {x: 0, y: 0, z: 0},
-			rotation: {x: 0, y: -Math.PI/2, z: 0},
+			rotation: {x: 0, y: 0, z: 0},
 			scale: 0.8,
 			boundingBox: {width: 100, height: 120, depth: 80},
 			progress: { loaded: 0, total: 0 },
@@ -226,7 +226,7 @@ var App = {
 			name: 'Gabumon',
 			element_position: {x: PRIZE_DISTANCE*5, y: -60, z: 0},
 			position: {x: 0, y: -62, z: 34},
-			rotation: {x: 0, y: -Math.PI/2, z: 0},
+			rotation: {x: 0, y: 0, z: 0},
 			scale: 3,
 			boundingBox: {width: 80, height: 140, depth: 120},
 			progress: { loaded: 0, total: 0 },
@@ -239,7 +239,7 @@ var App = {
 			name: 'Spongebob',
 			element_position: {x: PRIZE_DISTANCE*6, y: -80, z: -50},
 			position: {x: 0, y: -80, z: 0},
-			rotation: {x: 0, y: -Math.PI/2, z: 0},
+			rotation: {x: 0, y: 0, z: 0},
 			scale: 0.3,
 			boundingBox: {width: 120, height: 165, depth: 80},
 			progress: { loaded: 0, total: 0 },
@@ -252,7 +252,7 @@ var App = {
 			name: 'Goku',
 			element_position: {x: PRIZE_DISTANCE*7, y: -80, z: -50},
 			position: {x: 0, y: -80, z: 0},
-			rotation: {x: 0, y: -Math.PI/2, z: 0},
+			rotation: {x: 0, y: 0, z: 0},
 			scale: 0.6,
 			boundingBox: {width: 100, height: 165, depth: 60},
 			progress: { loaded: 0, total: 0 },
@@ -398,7 +398,7 @@ var App = {
 		
 			catchedToy = collada.scene;
 			catchedToy.position.set( object.element_position.x, object.element_position.y, object.element_position.z );
-			catchedToy.rotation.set( object.rotation.x, object.rotation.y + Math.PI/2, object.rotation.z );
+			catchedToy.rotation.set( object.rotation.x - Math.PI/2, object.rotation.y, object.rotation.z );
 			catchedToy.scale.x = catchedToy.scale.y = catchedToy.scale.z = object.scale;
 			catchedToy.name = object.name;
 			catchedToy.wiki_url = object.wiki_url;
@@ -1261,12 +1261,12 @@ var App = {
 		if( !document.getElementById('prizeContainer').classList.contains('close') ){
 			if( App.currentPrizeToy ){
 				if( App.prizePlaceHolder[ App.currentPrizeToy.name ].visible ){
-					var deltaRotation = ( App.currentPrizeToy.currentPrizeToyTargetRotation - App.prizePlaceHolder[ App.currentPrizeToy.name ].rotation.y ) * 0.05;
-					App.prizePlaceHolder[ App.currentPrizeToy.name ].rotation.y += deltaRotation;
+					var deltaRotation = ( App.currentPrizeToy.currentPrizeToyTargetRotation - App.prizePlaceHolder[ App.currentPrizeToy.name ].rotation.z ) * 0.05;
+					App.prizePlaceHolder[ App.currentPrizeToy.name ].rotation.z += deltaRotation;
 				}
 				if( App.currentPrizeToy.visible ){
-					var deltaRotation = ( App.currentPrizeToy.currentPrizeToyTargetRotation - App.currentPrizeToy.rotation.y ) * 0.05;
-					App.currentPrizeToy.rotation.y += deltaRotation;
+					var deltaRotation = ( App.currentPrizeToy.currentPrizeToyTargetRotation - App.currentPrizeToy.rotation.z ) * 0.05;
+					App.currentPrizeToy.rotation.z += deltaRotation;
 				}
 			}
 			App.prizerenderer.render( App.prizescene, App.prizecamera );

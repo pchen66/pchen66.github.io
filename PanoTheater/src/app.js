@@ -615,7 +615,7 @@
   function loadVideoSource ( videoId ) {
     var url, reset;
     if ( videoId ) {
-      url = 'http://www.youtube.com/embed/' + videoId + '?rel=0&autoplay=0&controls=0&showinfo=0&enablejsapi=1&iv_load_policy=3&playsinline=true';
+      url = 'https://www.youtube.com/embed/' + videoId + '?rel=0&autoplay=0&controls=0&showinfo=0&enablejsapi=1&iv_load_policy=3&playsinline=1&webkit-playsinline=1';
     } else {
       url = 'asset/textures/no-video.jpg';
       reset = true;
@@ -1341,7 +1341,7 @@
 
     var widget, scene, stereoscene, renderer, stereorenderer, iframe, object, stereoobject, scale;
 
-    scale = { x: 3.56, y: 2 };
+    scale = { x: 2 * 16/9, y: 2 };
     widget = { currentTime: 0 };
     scene = new THREE.Scene();
     stereoscene = new THREE.Scene();
@@ -1379,20 +1379,19 @@
     renderer.render( scene, viewer.getCamera() );
     stereorenderer.render( stereoscene, viewer.getCamera() );
 
-    viewer.addEventListener( 'VR-toggle', function( event ){ 
+    viewer.addEventListener( 'mode-change', function( event ){ 
+
       if ( event.mode === PANOLENS.Modes.NORMAL ) {
-        widget.pause( PANOLENS.Modes.VR );
-        if ( document.body.children[ 0 ] === renderer.domElement ) {
-          document.body.insertBefore( stereorenderer.domElement, renderer.domElement );
-        }
+        widget.pause();
         sendYTCommand( object.element, 'seekTo', [widget.currentTime, true] );
+        renderer.domElement.style.display = 'block';
+        stereorenderer.domElement.style.display = 'none';
         
       } else {
         widget.pause( PANOLENS.Modes.NORMAL );
-        if ( document.body.children[ 0 ] === stereorenderer.domElement ) {
-          document.body.insertBefore( renderer.domElement, stereorenderer.domElement );
-        }
         syncYT();
+        renderer.domElement.style.display = 'none';
+        stereorenderer.domElement.style.display = 'block';
       }
       widget.update();
     });
@@ -1406,8 +1405,9 @@
     });
 
     viewer.addEventListener( 'window-resize', function(){
-      //renderer.setSize( window.innerWidth, window.innerHeight, false );
-      //stereorenderer.setSize( window.innerWidth, window.innerHeight );
+      renderer.setSize( window.innerWidth, window.innerHeight );
+      stereorenderer.setSize( window.innerWidth, window.innerHeight );
+
     } );
 
     widget.paused = true;
@@ -1421,6 +1421,7 @@
       
       this.pause();
       object.element.src = stereoobject.elementL.src = stereoobject.elementR.src = url;
+      stereoobject.elementR.src += "&mute=1";
     };
     widget.reset = function () {
       this.pause();
@@ -1495,8 +1496,8 @@
     }
 
     function syncYT () {
-      if ( viewer.mode === PANOLENS.Modes.VR ) {
-        sendYTCommand( stereoobject.elementR, "mute" );
+      if ( viewer.mode === PANOLENS.Modes.CARDBOARD || viewer.mode === PANOLENS.Modes.STEREO ) {
+        //sendYTCommand( stereoobject.elementR, "mute" );
         sendYTCommand( stereoobject.elementR, 'seekTo', [widget.currentTime, true] );
         sendYTCommand( stereoobject.elementL, 'seekTo', [widget.currentTime, true] );
       }

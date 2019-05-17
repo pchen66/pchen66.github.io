@@ -145,10 +145,13 @@
 
       for ( var i = 1; i <= parameters.amount; i++ ) {
 
+        const theta = Math.random() * 2 * Math.PI;
+        const phi = Math.random() * Math.PI;
+
         position = new THREE.Vector3( 
-          ( Math.random() - 0.5 ) * radius, 
-          ( Math.random() - 0.5 ) * radius,
-          ( Math.random() - 0.5 ) * radius
+          radius * Math.sin( phi ) * Math.cos( theta ),
+          radius * Math.sin( phi ) * Math.sin( theta ),
+          radius * Math.cos( phi )
         );
 
         infospot = new PANOLENS.Infospot( baseScale * position.length() / radius, PANOLENS.DataImage.Info );
@@ -168,6 +171,7 @@
 
       viewer = new PANOLENS.Viewer( { output: 'console', container: document.querySelector( '#pcontainer' ) } );
       viewer.add( panorama, panorama_video );
+      viewer.renderer.sortObjects = true;
 
       function getPropertyArray ( object ) {
 
