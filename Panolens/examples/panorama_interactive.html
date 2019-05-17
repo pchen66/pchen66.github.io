@@ -156,6 +156,9 @@
 
       var chairModels = [];
 
+      // Disable warning from loading dae model
+      console.warn = ()=>{};
+
       path = 'asset/textures/cube/room/';
       format = '.jpg';
       panorama = new PANOLENS.CubePanorama( [
@@ -176,11 +179,20 @@
         dae.position.set( -60, -20, 370 );
         dae.rotation.set( -Math.PI/2, 0, -1.9 );
 
+        dae.traverse( child => {
+
+          if ( child.material instanceof THREE.Material ) {
+            const map = child.material.map;
+            child.material = new THREE.MeshPhysicalMaterial({map, reflectivity: 0, metalness: 0});
+          }
+
+        } );
+
         // Get chair model
         dae.children.map( function( object ) {
           if ( object.name === 'Chair-Desk' && 
-              object.children[0].material.name === 'Textile - Slate Blue' ) {
-            chairModels.push( object.children[ 0 ] );
+              object.material.name === 'Textile - Slate Blue' ) {
+            chairModels.push( object );
           }
         } )
 
