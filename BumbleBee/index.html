@@ -120,8 +120,8 @@
 						object.rotation.set(-Math.PI/2, 0, -Math.PI/2);
 						object.position.y = -800;
 						
-						object.children[0].material.envMap = cubeCamera.renderTarget;
-						object.children[0].material.blending = THREE.MultiplyBlending;
+						object.children[0].material.envMap = cubeCamera.renderTarget.texture;
+						//object.children[0].material.blending = THREE.MultiplyBlending;
 						object.children[0].material.reflectivity = 0.85;
 						
 						scene.add( object );
