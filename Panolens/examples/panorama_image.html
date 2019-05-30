@@ -36,11 +36,8 @@
 
     <script>
 
-      var panorama, viewer;
-
-      panorama = new PANOLENS.ImagePanorama( 'asset/textures/equirectangular/field.jpg' );
-
-      viewer = new PANOLENS.Viewer( { output: 'console' } );
+      const panorama = new PANOLENS.ImagePanorama( 'asset/textures/equirectangular/field.jpg' );
+      const viewer = new PANOLENS.Viewer( { output: 'console' } );
       viewer.add( panorama );
 
     </script>
