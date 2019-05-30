@@ -36,7 +36,7 @@
 
     <script>
 
-      var panorama, viewer, radius, zodiacs, zodiac, title, desc, egg, eggTexture, fromScale, toScale, duration, easing;
+      var panorama, viewer, radius, zodiacs, zodiac, title, desc, egg, eggTexture, fromScale, toScale, duration, easing, font;
 
       // information from http://iml.jou.ufl.edu/projects/fall07/Bhimani/thezodiac/zodiacsigns.html
       // image asset from online source
@@ -78,20 +78,78 @@
       easing = TWEEN.Easing.Elastic.Out;
       fromScale = new THREE.Vector3( 1, 1.2, 1 );
       toScale = fromScale.clone().multiplyScalar( 1.2 );
-      eggTexture = PANOLENS.Utils.TextureLoader.load( 'asset/textures/noise.png' );
+      eggTexture = PANOLENS.TextureLoader.load( 'asset/textures/noise.png' );
 
-      viewer = new PANOLENS.Viewer( { enableReticle: true } );
-      panorama = new PANOLENS.BasicPanorama();
+      const visibleObjects = [];
 
-      viewer.add( panorama );
+      function fadeInCurrent () {
 
-      function onFontLoaded () {
+        zodiacs.forEach( ( { eggMesh, zodiacMesh } ) => {
+
+          const duration = 500;
+          const delay = 1000;
+          const { title } = zodiacMesh;
+
+          new TWEEN.Tween( eggMesh.material )
+            .to({opacity: 1}, duration)
+            .easing(TWEEN.Easing.Exponential.Out)
+            .delay( delay )
+            .start();
+
+          new TWEEN.Tween( title.material )
+            .to({opacity: 1}, duration)
+            .easing(TWEEN.Easing.Exponential.Out)
+            .delay( delay )
+            .start();
+
+        } );
+
+      }
+
+      function fadeOutCurrent () {
+
+        zodiacs.forEach( ( { eggMesh, zodiacMesh } ) => {
+
+          const duration = 500;
+          const { visible } = eggMesh;
+          const { title, desc } = zodiacMesh;
+
+          new TWEEN.Tween( eggMesh.material )
+            .to({opacity: 0}, duration)
+            .easing(TWEEN.Easing.Exponential.Out)
+            .start();
+
+          new TWEEN.Tween( title.material )
+            .to({opacity: 0}, duration)
+            .easing(TWEEN.Easing.Exponential.Out)
+            .start();
+
+          new TWEEN.Tween( desc.material )
+            .to({opacity: 0}, duration)
+            .easing(TWEEN.Easing.Exponential.Out)
+            .start();
+
+        } );
+
+      }
+
+      function onFontLoaded ( _font ) {
+
+        font = _font;
+        panorama = new PANOLENS.BasicPanorama();
+        viewer = new PANOLENS.Viewer( { enableReticle: true, renderer: new THREE.WebGLRenderer({antialias: true}) } );
+        viewer.reticle.setColor( 0x77ffff );
+        viewer.add( panorama );
+
+        panorama.addEventListener( 'enter', fadeInCurrent );
 
         for ( var i = 0, angle, zodiacPanorama; i < zodiacs.length; i++ ) {
 
+          const zodicObject = zodiacs[ i ];
+
           angle = Math.PI / 6 * i + Math.PI;
 
-          zodiacPanorama = zodiacs[ i ].panorama;
+          zodiacPanorama = zodicObject.panorama;
 
           // Zodiac eggs
           egg = createEgg( angle );
@@ -120,8 +178,10 @@
           panorama.add( title );
           panorama.add( zodiac );
 
-        }
+          zodicObject.eggMesh = egg;
+          zodicObject.zodiacMesh = zodiac;
 
+        }
       }
 
       function createEgg ( angle ) {
@@ -135,7 +195,7 @@
         );
         mesh.position.set( radius * Math.sin( -angle ), 0, radius * Math.cos( -angle ) );
         mesh.scale.copy( fromScale );
-        mesh.lookAt( panorama.position );
+        mesh.lookAt( new THREE.Vector3( 0, 0, 0 ) );
 
         // Egg animation
         mesh.scaleUpAnimation = new TWEEN.Tween( mesh.scale )
@@ -150,8 +210,7 @@
           .onComplete(function(){
             this.visible = false;
             this.zodiac.visible = true;
-            this.zodiac.animated = true;
-            this.zodiac.title.visible = true;
+            this.zodiac.show();
           }.bind( mesh ) );
 
         // Egg event listeners
@@ -165,7 +224,6 @@
         } );
         mesh.addEventListener( 'click', function () {
           this.vanishAnimation.start();
-          this.zodiac.material.opacity = 1;
         } );
 
         // Egg auto rotation
@@ -183,7 +241,8 @@
 
         url = 'asset/textures/zodiac/' + ( index + 1 ) + '.png';
 
-        mesh = new PANOLENS.Infospot( 50, url, false );
+        mesh = new PANOLENS.Infospot( 50, url );
+        mesh.visible = false;
         mesh.name = zodiacs[ index ].name;
         mesh.position.set( radius * Math.sin( angle ), 0, radius * Math.cos( angle ) );
         mesh.material.opacity = 0;
@@ -203,11 +262,61 @@
           this.desc.tweens['fadeOut'].start();
         } );
         mesh.addEventListener( 'click', function () {
-          this.toPanorama && viewer.setPanorama( this.toPanorama );
+
           this.scaleDownAnimation.start();
+
+          if ( this.toPanorama ) {
+
+            viewer.setPanorama( this.toPanorama );
+            fadeOutCurrent();
+
+          }
+          
         } );
 
         return mesh;
+
+      }
+
+      function makeMultiLine ( text = '', count = 40 ) {
+
+        let lineCharacterLimit = 0;
+
+        return text.split(' ').map( word => {
+
+          lineCharacterLimit += word.length;
+          
+          if ( lineCharacterLimit > count ) {
+            word += '\n';
+            
+            lineCharacterLimit = 0;
+          }
+
+          return word;
+
+        }).join(' ').replace( /\n /g, '\n' );
+
+      }
+
+      function createTextShape ( message, size = 10, count ) {
+
+        message = makeMultiLine( message, count );
+
+        var shapes = font.generateShapes( message, size );
+        var geometry = new THREE.ShapeGeometry( shapes );
+        var matLite = new THREE.MeshBasicMaterial( {
+          color: 0xffffff,
+          transparent: true,
+          opacity: 1,
+          side: THREE.DoubleSide
+        } );
+        
+        geometry.computeBoundingBox();
+
+        var xMid = - 0.5 * ( geometry.boundingBox.max.x - geometry.boundingBox.min.x );
+        geometry.translate( xMid, 0, 0 );
+
+        return new THREE.Mesh( geometry, matLite );
 
       }
 
@@ -219,20 +328,21 @@
         description = zodiacs[ index ].desc;
 
         // Zodiac title
-        titleSprite = new PANOLENS.SpriteText( name, name.length * 35 );
-        titleSprite.visible = false;
+        titleSprite = createTextShape( name, 6 );
         titleSprite.position.set( radius * Math.sin( -angle ), 0, radius * Math.cos( -angle ) );
         titleSprite.position.y += 45;
-        titleSprite.rotation.y = -angle;
+        titleSprite.rotation.y = Math.PI - angle;
         titleSprite.scale.multiplyScalar( 2 );
-
+        
         // Zodiac description
-        descSprite = new PANOLENS.SpriteText( description, 1000 );
-        descSprite.mesh.material.uniforms.opacity.value = 0;
+        descSprite = createTextShape( description, 4 );
+        descSprite.material.opacity = 0;
         descSprite.position.y = -42;
         descSprite.scale.multiplyScalar( 0.5 );
-        descSprite.tween( 'fadeOut', descSprite.mesh.material.uniforms.opacity, { value: 0 }, 1000 );
-        descSprite.tween( 'fadeIn', descSprite.mesh.material.uniforms.opacity, { value: 1 }, 1000 );
+        descSprite.tweens = {
+          fadeOut: new TWEEN.Tween( descSprite.material ).to( { opacity: 0 }, 500 ),
+          fadeIn: new TWEEN.Tween( descSprite.material ).to( { opacity: 1 }, 500 )
+        };
 
         titleSprite.add( descSprite );
         titleSprite.desc = descSprite;
@@ -247,11 +357,8 @@
 
       }
 
-      // Load font with callback when font is ready
-      PANOLENS.Utils.loadBMFont({
-        font: 'asset/fnt/Lato-Regular-64.fnt',
-        image: 'asset/fnt/lato.png'
-      }, onFontLoaded);
+      var loader = new THREE.FontLoader();
+      loader.load( 'fonts/helvetiker_regular.typeface.json', onFontLoaded );
 
     </script>
 

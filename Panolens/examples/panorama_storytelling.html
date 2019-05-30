@@ -35,11 +35,13 @@
 
       #dialog {
         position: absolute;
-        top: 400px;
+        top: 50%;
         width: 100%;
         display: flex;
         justify-content: center;
         align-items: center;
+        padding: 20px;
+        box-sizing: border-box;
       }
 
       #progress {
@@ -87,8 +89,8 @@
         welcome: [ 'Panolens Presents', 'A Journey to a <strong>Train</strong>', 'Here we go' ],
         meter: [ 'One of the common meter that you can see on a train', 'it is not specially eye-catching but it just can get your attention', 'it indicates how fast the train is currently going', 'Let us continue' ],
         valve: [ 'A Valve', 'solid looking and quite decent color', 'here shows the evidence that time would leaves marks on everything', 'same thing applies to our face...' ],
-        seat: [ 'Alright. Here we have a seat. The green pad looks quite comfortable', 'only when you are on a train', 'OK. Move on to next one' ],
-        box: [ 'There is a box over there', 'I wonder what it does', 'Hmmmm............', 'I cannot figure it out', 'Anyone knows the answer?' ],
+        seat: [ 'Alright. Here we have a seat. The green pad looks quite comfortable', 'when you are on a train', 'OK. Move on to next one' ],
+        box: [ 'There is a box over there', 'probably some fuse or electronic devices', 'Hmmmm............', 'Anyway', 'Let\'s keep moving' ],
         ending: [ 'This is our last stop', 'Please continue your journey with this wonder train...' ]
 
       };
@@ -193,16 +195,16 @@
       topboxInfospot = new PANOLENS.Infospot();
       endingInfospot = new PANOLENS.Infospot( 10e-7 );  // Make it not visible
 
-      meterInfospot.position.set( 4610.25, 1271.36, -1440.01 );
+      meterInfospot.position.set( 4610.04, 1280.07, -1431.29 );
       valveInfospot.position.set( 4637.61, -798.12, 1671.24 );
       seatInfospot.position.set( 1934.61, -2611.69, 3792.91 );
       topboxInfospot.position.set( -3348.82, 3705.92, -45.54 );
       endingInfospot.position.set( -3461.4, -3592.37, 241.38 );
 
-      meterInfospot.addHoverText( 'Speedometer', -50 );
-      valveInfospot.addHoverText( 'Valve', -50 );
-      seatInfospot.addHoverText( 'Seat', -50 );
-      topboxInfospot.addHoverText( 'Box', -50 );
+      meterInfospot.addHoverText( 'Speedometer', 50 );
+      valveInfospot.addHoverText( 'Valve', 50 );
+      seatInfospot.addHoverText( 'Seat', 50 );
+      topboxInfospot.addHoverText( 'Box', 50 );
 
       // Panorama
       panorama = new PANOLENS.ImagePanorama( 'asset/textures/equirectangular/dusty9000x4500.jpg' );
@@ -212,7 +214,7 @@
       panorama.add( meterInfospot, valveInfospot, seatInfospot, topboxInfospot, endingInfospot );
 
       // Viewer
-      viewer = new PANOLENS.Viewer( { controlBar: false } );
+      viewer = new PANOLENS.Viewer( { controlBar: false, output: 'console' } );
       viewer.OrbitControls.enabled = false;
       viewer.add( panorama );
 

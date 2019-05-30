@@ -36,18 +36,23 @@
 
     <script>
 
-      var panorama, viewer;
+      let panorama, panorama2, viewer;
 
-      var path = 'asset/textures/cube/sand/';
-      var format = '.png';
+      const path = 'asset/textures/cube/sand/';
+      const format = '.png';
       panorama = new PANOLENS.CubePanorama( [
           path + 'px' + format, path + 'nx' + format,
           path + 'py' + format, path + 'ny' + format,
           path + 'pz' + format, path + 'nz' + format
       ] );
 
+      panorama2 = new PANOLENS.ImagePanorama( 'asset/textures/equirectangular/field.jpg' );
+
+      panorama.link( panorama2, new THREE.Vector3( -807.50, 604.88, -5000.00 ) );
+      panorama2.link( panorama, new THREE.Vector3( -807.50, 604.88, -5000.00 ) );
+
       viewer = new PANOLENS.Viewer();
-      viewer.add( panorama );
+      viewer.add( panorama, panorama2 );
 
     </script>
 
