@@ -320,58 +320,55 @@ figcaption > article {
 }
 
 .card.image{
-  background-image: url( '../images/panorama_image.png' );
+  background-image: url( '../images/panorama_image.jpg' );
 }
 .card.cube{
-  background-image: url( '../images/panorama_cube.png' );
+  background-image: url( '../images/panorama_cube.jpg' );
 }
 .card.basic{
-  background-image: url( '../images/panorama_basic.png' );
+  background-image: url( '../images/panorama_basic.jpg' );
 }
 .card.gsv{
-  background-image: url( '../images/panorama_googlestreetview.png' );
+  background-image: url( '../images/panorama_googlestreetview.jpg' );
 }
 .card.video{
-  background-image: url( '../images/panorama_video.png' );
+  background-image: url( '../images/panorama_video.jpg' );
 }
 .card.infospot{
-  background-image: url( '../images/panorama_infospot.png' );
+  background-image: url( '../images/panorama_infospot.jpg' );
 }
 .card.infospot-focus{
-  background-image: url( '../images/panorama_infospot_focus.png' );
+  background-image: url( '../images/panorama_infospot_focus.jpg' );
 }
 .card.linking{
-  background-image: url( '../images/panorama_link.png' );
+  background-image: url( '../images/panorama_link.jpg' );
 }
 .card.loading{
-  background-image: url( '../images/panorama_loading_progress.png' );
+  background-image: url( '../images/panorama_loading_progress.jpg' );
 }
 .card.gallery{
-  background-image: url( '../images/panorama_simple_gallery.png' );
+  background-image: url( '../images/panorama_simple_gallery.jpg' );
 }
 .card.lp-image{
-  background-image: url( '../images/littleplanet_image.png' );
+  background-image: url( '../images/littleplanet_image.jpg' );
 }
 .card.reticle{
-  background-image: url( '../images/panorama_reticle_event.png' );
-}
-.card.ui{
-  background-image: url( '../images/panorama_ui.png' );
+  background-image: url( '../images/panorama_reticle_event.jpg' );
 }
 .card.interactive{
-  background-image: url( '../images/panorama_interactive.png' );
+  background-image: url( '../images/panorama_interactive.jpg' );
 }
 .card.memory{
-  background-image: url( '../images/panorama_memorytest.png' );
+  background-image: url( '../images/panorama_memorytest.jpg' );
 }
 .card.storytelling{
-  background-image: url( '../images/panorama_storytelling.png' );
+  background-image: url( '../images/panorama_storytelling.jpg' );
 }
-.card.xdiamond{
-  background-image: url( '../images/XDiamond.png' );
+.card.camera{
+  background-image: url( '../images/panorama_camera.jpg' );
 }
 .card.panotheater{
-  background-image: url( '../images/PanoTheater.png' );
+  background-image: url( '../images/PanoTheater.jpg' );
 }
 
 .menu-icon{
