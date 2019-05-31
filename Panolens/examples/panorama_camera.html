@@ -34,8 +34,12 @@
 
     <script>
 
-      const panorama = new PANOLENS.CameraPanorama();
-      const viewer = new PANOLENS.Viewer( { output: 'console' } );
+      const isDeviceOrientationSupported = window.DeviceOrientationEvent && 'ontouchstart' in window;
+      const facingMode = isDeviceOrientationSupported ? { exact: 'environment' } : 'environment'; // Quick hack for demo only
+      const constraints = { video: { width: { ideal: 1920 }, height: { ideal: 1080 }, facingMode } };
+
+      const panorama = new PANOLENS.CameraPanorama( constraints );
+      const viewer = new PANOLENS.Viewer();
 
       const onListReady = ( list ) => {
 
@@ -90,6 +94,16 @@
         } );
 
         viewer.add( panorama );
+
+        if ( isDeviceOrientationSupported ) {
+
+          viewer.enableControl( PANOLENS.CONTROLS.DEVICEORIENTATION );
+
+        } else {
+
+          panorama.media.ratioScalar = -1;
+
+        }
 
       };
 
