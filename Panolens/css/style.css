@@ -120,6 +120,8 @@ section.title, section.support {
 section.documentation {
   background-color: rgba(0,0,0,0.1);
   box-shadow: 0 0 50px rgba(0,0,0,0.2);
+  margin: 0;
+  max-width: 100%;
 }
 
 section.example {
@@ -130,6 +132,10 @@ section.example {
   -webkit-flex-wrap: wrap;
       -ms-flex-wrap: wrap;
           flex-wrap: wrap;
+  padding: 5px;
+  margin: 0;
+  max-width: 100%;
+  flex-direction: row;
 }
 
 section.title header, section.title article,
@@ -315,8 +321,9 @@ figcaption > article {
           transition: all 0.2s ease-in-out;
 }
 
-.card:hover {
-
+.card.codepen {
+  flex-basis: 450px;
+  height: 350px;
 }
 
 .card.image{
@@ -369,6 +376,24 @@ figcaption > article {
 }
 .card.panotheater{
   background-image: url( '../images/PanoTheater.jpg' );
+}
+
+.group {
+  display: contents;
+}
+
+.group-title {
+  flex: 1 0 100%;
+  padding: 0 20px;
+}
+
+.cp_embed_wrapper > iframe {
+  height: 100%;
+  margin-top: 0;
+}
+
+.cp_embed_wrapper {
+  height: calc(100% - 76px);
 }
 
 .menu-icon{
