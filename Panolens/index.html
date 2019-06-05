@@ -32,11 +32,11 @@
             </article>
 
             <header><h3>API</h3></header>
-            <article>More panorama constructors, methods and events detail can be found in <a href="docs/index.html" target="_blank">API documentation</a>
+            <article>More panorama constructors, methods and events detail can be found in <a href="https://pchen66.github.io/panolens.js" target="_blank">API documentation</a>
             </article>
 
             <header><h3>Basic Usage</h3></header>
-            <article>To create an image panorama, an <a href="http://wiki.panotools.org/Panorama_formats#Equirectangular" target="_blank">equirectangular</a> image (2 to 1 ratio e.g. width and height is 1024 x 512) is required. The following code creates a viewer and an image panorama with given url. To be able to see the panorama, the panorama has to be added to the viewer<br/><pre><code class="language-javascript">&lt;script>&#13;&#13;var panorama, viewer;&#13;&#13;panorama = new PANOLENS.ImagePanorama( 'asset/textures/equirectangular/field.jpg' );&#13;&#13;viewer = new PANOLENS.Viewer();&#13;viewer.add( panorama );&#13;&#13;&lt;/script></code></pre>
+            <article>To create an image panorama, an <a href="http://wiki.panotools.org/Panorama_formats#Equirectangular" target="_blank">equirectangular</a> image (2 to 1 ratio e.g. width and height is 1024 x 512) is required. The following code creates a viewer and an image panorama with given url. To be able to see the panorama, the panorama has to be added to the viewer<br/><pre><code class="language-javascript">&lt;script>&#13;&#13;const panorama = new PANOLENS.ImagePanorama( 'asset/textures/equirectangular/field.jpg' );&#13;const viewer = new PANOLENS.Viewer();&#13;viewer.add( panorama );&#13;&#13;&lt;/script></code></pre>
             </article>
 
             <header><h3>Embedded Iframe</h3></header>
