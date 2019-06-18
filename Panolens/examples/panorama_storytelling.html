@@ -122,6 +122,9 @@
 
       function onEnter ( event ) {
 
+        const initialLookAt = new THREE.Vector3( 0, 0, 5000 );
+        viewer.setControlCenter( initialLookAt );
+
         progressElement.style.width = 0;
         progressElement.classList.remove( 'finish' );
 
@@ -196,11 +199,11 @@
       topboxInfospot = new PANOLENS.Infospot();
       endingInfospot = new PANOLENS.Infospot( 10e-7 );  // Make it not visible
 
-      meterInfospot.position.set( 4610.04, 1280.07, -1431.29 );
-      valveInfospot.position.set( 4637.61, -798.12, 1671.24 );
-      seatInfospot.position.set( 1934.61, -2611.69, 3792.91 );
-      topboxInfospot.position.set( -3348.82, 3705.92, -45.54 );
-      endingInfospot.position.set( -3461.4, -3592.37, 241.38 );
+      meterInfospot.position.set( 4610.04, 1280.07, 1431.29 );
+      valveInfospot.position.set( 4637.61, -798.12, -1671.24 );
+      seatInfospot.position.set( 1934.61, -2611.69, -3792.91 );
+      topboxInfospot.position.set( -3348.82, 3705.92, 45.54 );
+      endingInfospot.position.set( -3461.4, -3592.37, -241.38 );
 
       meterInfospot.addHoverText( 'Speedometer', 50 );
       valveInfospot.addHoverText( 'Valve', 50 );
