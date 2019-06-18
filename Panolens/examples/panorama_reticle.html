@@ -244,7 +244,7 @@
         mesh = new PANOLENS.Infospot( 50, url );
         mesh.visible = false;
         mesh.name = zodiacs[ index ].name;
-        mesh.position.set( radius * Math.sin( angle ), 0, radius * Math.cos( angle ) );
+        mesh.position.set( -radius * Math.sin( angle ), 0, radius * Math.cos( angle ) );
         mesh.material.opacity = 0;
         mesh.setCursorHoverStyle( 'default' );
 

@@ -127,10 +127,9 @@
           route.panorama.addEventListener( 'enter', onEnter );
 
           if ( route.initialLookPosition ) {
-            route.panorama.addEventListener('enter-fade-start', function( position ){
-              viewer.tweenControlCenter( position, 0 );
+            route.panorama.addEventListener('enter', function( position ){
+              viewer.setControlCenter( position );
             }.bind( this, route.initialLookPosition ));
-
           }
 
           viewer.add( route.panorama );

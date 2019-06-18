@@ -141,7 +141,8 @@
       panorama.link( panorama_video, new THREE.Vector3(3883.71, 745.13, -3047.48), 400, 'asset/textures/1941-battle-thumb.png' );
       panorama_video.link( panorama, new THREE.Vector3(4602.58, 1863.13, -547.70), 400 );
 
-      radius = panorama.geometry.parameters.radius;
+      const { edgeLength } = panorama;
+      radius = edgeLength / 2;
 
       for ( var i = 1; i <= parameters.amount; i++ ) {
 
