@@ -34,6 +34,10 @@
 
     <script>
 
+      const isIOS = navigator.userAgent.match(/(iPad|iPhone|iPod)/g);
+      const isWebKit = navigator.userAgent.match(/(WebKit)/g);
+      const isVersionExist = navigator.userAgent.match(/(Version)/g);
+
       const isDeviceOrientationSupported = window.DeviceOrientationEvent && 'ontouchstart' in window;
       const facingMode = isDeviceOrientationSupported ? { exact: 'environment' } : 'environment'; // Quick hack for demo only
       const constraints = { video: { width: { ideal: 1920 }, height: { ideal: 1080 }, facingMode } };
@@ -44,7 +48,7 @@
       const onListReady = ( list ) => {
 
         const length = list.length;
-        const radius = panorama.radius;
+        const radius = panorama.edgeLength / 2;
 
         list.map( ( image, index ) => {
 
@@ -135,8 +139,14 @@
 
       };
 
-      getRandomImageList( 'https://picsum.photos/v2/list' );
+      if (isIOS && isWebKit && !isVersionExist) {
+        alert( 'Local Camera Access Not Available. Please open link in Safari' );
+      } else {
+        getRandomImageList( 'https://picsum.photos/v2/list' );
+      }
 
     </script>
 
   </body>
+
+</html>

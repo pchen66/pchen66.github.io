@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width, shrink-to-fit=no">
+    <title>Panolens.js stereo image panorama</title>
+    <style>
+      html, body {
+        margin: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background-color: #000;
+      }
+
+      a:link, a:visited{
+        color: #bdc3c7;
+      }
+
+      .credit{
+        position: absolute;
+        text-align: center;
+        width: 100%;
+        padding: 20px 0;
+        color: #fff;
+      }
+
+      #progress {
+        width: 0;
+        height: 4px;
+        position: fixed;
+        top: 0;
+        background: #fff;
+        -webkit-transition: opacity 1s ease-out;
+        transition: opacity 1s ease-out;
+      }
+
+      #progress.finish {
+        opacity: 0;
+      }
+
+      #source {
+        position: fixed;
+        top: 10px;
+        left: 10px;
+        width: 200px;
+        height: 200px;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-size: contain;
+      }
+
+      #source::before {
+        content: 'source';
+        position: absolute;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        color: #fff;
+      }
+
+      .panolens-infospot {
+        max-width: 40% !important;
+      }
+    </style>
+  </head>
+
+  <body>
+
+    <div class="credit"><a href="https://github.com/pchen66/panolens.js">Panolens.js</a> stereo image panorama example. Image from <a href="https://www.hellblade.com/">Hellblade</a> by <a href="https://ninjatheory.com">Ninja Theory Ltd</a></div>
+    
+    <div id="progress"></div>
+    <div id="source"></div>
+
+    <script src="../../js/three/three.min.js"></script>
+    <script src="../../js/panolens/panolens.min.js"></script>
+
+    <script>
+
+      const imageURL = 'https://fd210b1b-b131-4beb-b60f-2e3352887a8e.s3-us-west-1.amazonaws.com/hellblade.jpeg';
+      const source = document.querySelector( '#source' );
+      const { style, classList } = document.querySelector( '#progress' );
+
+      source.style.backgroundImage = `url(${imageURL})`;
+
+      const onEnterFadeStart = ( event ) => {
+        style.width = 0;
+        classList.remove( 'finish' );
+      }
+
+      const onProgress = ( event ) => {
+        style.width = `${event.progress.loaded / event.progress.total * 100}%`;
+        if ( progress === 100 ) {
+          classList.add( 'finish' );
+        }
+      }
+
+      const viewer = new PANOLENS.Viewer();
+      const stereo = new PANOLENS.Stereo( 0.02 );
+
+      const treeSpot = new PANOLENS.Infospot( 300 );
+      treeSpot.position.set( -5000.00, 3983.24, 4636.95 );
+      treeSpot.addHoverText( 'Burning Tree' );
+
+      const senuaSpot = new PANOLENS.Infospot( 300 );
+      senuaSpot.position.set( 5000.00, 1845.99, 91.14 );
+      senuaSpot.addHoverText( `Senua is a Pict warrior and protagonist of Hellblade: Senua's Sacrifice. Senua is a young woman with a troubled history and a life amplified by severe psychosis. She finds herself on a personal journey into the depths of Helheim, in order to save the soul of her lover, Dillion.`, 80 );
+
+      const panorama = new PANOLENS.StereoImagePanorama( `https://cors-anywhere.herokuapp.com/${imageURL}`, stereo );
+      panorama.addEventListener( 'progress', onProgress );
+      panorama.addEventListener( 'enter-fade-start', onEnterFadeStart );
+      panorama.add( senuaSpot, treeSpot );
+
+      viewer.add( panorama );
+      viewer.enableEffect( PANOLENS.MODES.STEREO );
+
+    </script>
+
+  </body>
+</html>
