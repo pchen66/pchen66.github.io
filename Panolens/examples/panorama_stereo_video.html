@@ -23,6 +23,7 @@
         width: 100%;
         padding: 20px 0;
         color: #fff;
+        -webkit-text-size-adjust: 100%;
       }
 
       #progress {
@@ -50,6 +51,11 @@
         width: 355px;
         height: 200px;
         border: 1px solid #fff;
+        display: none;
+      }
+
+      .panolens-video.visible {
+        display: block;
       }
     </style>
   </head>
@@ -65,7 +71,8 @@
 
     <script>
 
-      const videoURL = 'https://fd210b1b-b131-4beb-b60f-2e3352887a8e.s3-us-west-1.amazonaws.com/stereo2.mp4';
+      const isLowRes = window.innerWidth <= 1080;
+      const videoURL = `https://fd210b1b-b131-4beb-b60f-2e3352887a8e.s3-us-west-1.amazonaws.com/stereo2${isLowRes ? '-720p' : ''}.mp4`;
       const { style, classList } = document.querySelector( '#progress' );
 
       const onEnterFadeStart = ( event ) => {
@@ -86,6 +93,26 @@
         document.body.appendChild( videoElement );
       };
 
+      const createWidget = () => {
+
+        const onImage = 'url("https://i.imgur.com/wQnaQYj.png")';
+        const offImage = 'url("https://i.imgur.com/atUy07F.png")';
+        let status = 0;
+
+        const widget = { 
+          style: { backgroundImage: onImage },
+          onTap: () => {
+            const { videoElement } = panorama;
+            videoElement.classList.toggle( 'visible' );
+            item.style.backgroundImage = status === 0 ? offImage : onImage;
+            status = status === 1 ? 0 : 1;
+          }
+        };
+
+        const item = viewer.appendControlItem( widget );
+
+      };
+
       const viewer = new PANOLENS.Viewer();
       const stereo = new PANOLENS.Stereo( 0.02 );
 
@@ -93,7 +120,7 @@
       ue4Spot.position.set( -5000.00, 3983.24, 4636.95 );
       ue4Spot.addHoverText( 'Unreal Engine 4 Elemental Demo' );
 
-      const panorama = new PANOLENS.StereoVideoPanorama( `https://cors-anywhere.herokuapp.com/${videoURL}`, { autoplay: true, muted: true, loop: true }, stereo );
+      const panorama = new PANOLENS.StereoVideoPanorama( videoURL, { autoplay: true, muted: true, loop: true }, stereo );
       panorama.addEventListener( 'progress', onProgress );
       panorama.addEventListener( 'enter-fade-start', onEnterFadeStart );
       panorama.addEventListener( 'load', onLoad );
@@ -101,6 +128,7 @@
 
       viewer.add( panorama );
       viewer.enableEffect( PANOLENS.MODES.STEREO );
+      createWidget();
 
     </script>
 
