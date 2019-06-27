@@ -390,6 +390,12 @@ figcaption > article {
 .card.camera{
   background-image: url( '../images/panorama_camera.jpg' );
 }
+.card.stereo-image{
+  background-image: url( '../images/panorama_stereo_image.jpg' );
+}
+.card.stereo-video{
+  background-image: url( '../images/panorama_stereo_video.jpg' );
+}
 .card.panotheater{
   background-image: url( '../images/PanoTheater.jpg' );
 }
