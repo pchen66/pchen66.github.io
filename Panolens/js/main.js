@@ -8,7 +8,7 @@
   routePanoramas = {
     Home: { 
       panorama: new PANOLENS.ImagePanorama( assetPath + '/view.jpg' ), 
-      initialLookPosition: new THREE.Vector3( -3855.88, 129.86, -3164.48 )
+      initialLookPosition: new THREE.Vector3( -5000.00, 167.06, 3449.90 )
     },
     Documentation: { 
       panorama: new PANOLENS.ImagePanorama( assetPath + '/tunnel.jpg' ),
@@ -18,7 +18,8 @@
       panorama: new PANOLENS.ImagePanorama( assetPath + '/planet.jpg' )
     },
     Support: { 
-      panorama: new PANOLENS.GoogleStreetviewPanorama( '-OiczBjHvoJdQVTg9tGUTQ' )
+      panorama: new PANOLENS.GoogleStreetviewPanorama( '-OiczBjHvoJdQVTg9tGUTQ' ),
+      initialLookPosition: new THREE.Vector3( -5000.00, -901.09, -74.03 )
     }
   };
 
@@ -127,7 +128,7 @@
           route.panorama.addEventListener( 'enter', onEnter );
 
           if ( route.initialLookPosition ) {
-            route.panorama.addEventListener('enter', function( position ){
+            route.panorama.addEventListener('enter-fade-start', function( position ){
               viewer.setControlCenter( position );
             }.bind( this, route.initialLookPosition ));
           }

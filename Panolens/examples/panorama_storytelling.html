@@ -122,9 +122,6 @@
 
       function onEnter ( event ) {
 
-        const initialLookAt = new THREE.Vector3( 0, 0, 5000 );
-        viewer.setControlCenter( initialLookAt );
-
         progressElement.style.width = 0;
         progressElement.classList.remove( 'finish' );
 
@@ -218,7 +215,7 @@
       panorama.add( meterInfospot, valveInfospot, seatInfospot, topboxInfospot, endingInfospot );
 
       // Viewer
-      viewer = new PANOLENS.Viewer( { controlBar: false, output: 'console' } );
+      viewer = new PANOLENS.Viewer( { controlBar: false, initialLookAt: new THREE.Vector3( 0, 0, 5000 ) } );
       viewer.OrbitControls.enabled = false;
       viewer.add( panorama );
 
